@@ -1,0 +1,76 @@
+openapi: 3.0.1
+info:
+  title: Blockchain-Adapter
+  description: This is the REST api specification for the blockchain-adapter
+  version: 1.0.0
+servers:
+- url: /
+tags:
+- name: config-offchain-db-adapter
+  description: Configuration for the offchain-db-adapter
+- name: private-document
+  description: Access to private documents
+paths:
+  /private-documents:
+    post:
+      tags:
+      - private-document
+      summary: Manage private documents
+      operationId: uploadPrivateDocument
+      requestBody:
+        description: A document that should be uploaded
+        content:
+          application/octet-stream:
+            schema:
+              type: string
+              format: binary
+        required: true
+      responses:
+        "200":
+          description: successful operation, returns hash of stored document
+          content:
+            text/plain:
+              schema:
+                type: string
+                x-content-type: text/plain
+        "400":
+          description: Bad Request
+          content: {}
+        "500":
+          description: Internal Error
+          content: {}
+      x-swagger-router-controller: PrivateDocument
+  /config/offchain-db-adapter:
+    put:
+      tags:
+      - config-offchain-db-adapter
+      summary: Update the configuration of the offchain-db-adapter
+      operationId: setOffchainDBAdapterConfig
+      requestBody:
+        description: A configuration for the offchain-db-adapter
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OffchainDBAdapterConfig'
+        required: true
+      responses:
+        "200":
+          description: successful operation
+          content: {}
+        "400":
+          description: Bad Request
+          content: {}
+        "500":
+          description: Internal Error
+          content: {}
+      x-codegen-request-body-name: body
+      x-swagger-router-controller: ConfigOffchainDbAdapter
+components:
+  schemas:
+    OffchainDBAdapterConfig:
+      type: object
+      properties:
+        rest_uri:
+          type: string
+          description: URL
+          format: url

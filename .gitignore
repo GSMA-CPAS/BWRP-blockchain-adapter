@@ -1,3 +1,7 @@
+# codegen
+api/bin
+api/codegen
+
 # Logs
 logs
 *.log

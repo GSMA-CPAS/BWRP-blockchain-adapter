@@ -1,0 +1,21 @@
+{
+  "name": "blockchain-adapter",
+  "version": "1.0.0",
+  "description": "This is the REST api specification for the blockchain-adapter",
+  "main": "index.js",
+  "scripts": {
+    "prestart": "npm install",
+    "start": "node index.js"
+  },
+  "keywords": [
+    "swagger"
+  ],
+  "license": "Unlicense",
+  "private": true,
+  "dependencies": {
+    "connect": "^3.2.0",
+    "fabric-network": "^2.2.2",
+    "js-yaml": "^3.3.0",
+    "oas3-tools": "^2.0.2"
+  }
+}
