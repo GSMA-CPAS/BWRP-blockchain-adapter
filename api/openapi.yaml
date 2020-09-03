@@ -3,18 +3,20 @@ info:
   title: Blockchain-Adapter
   description: This is the REST api specification for the blockchain-adapter
   version: 1.0.0
-servers:
-- url: /
+  contact:
+    name: Simon Schulz
+    email: Simon.Schulz01@telekom.de
 tags:
-- name: config-offchain-db-adapter
-  description: Configuration for the offchain-db-adapter
-- name: private-document
-  description: Access to private documents
+  - name: config-offchain-db-adapter
+    description: Configuration for the offchain-db-adapter
+  - name: private-document
+    description: Access to private documents
 paths:
   /private-documents:
     post:
+      description: Upload a private document
       tags:
-      - private-document
+        - private-document
       summary: Manage private documents
       operationId: uploadPrivateDocument
       requestBody:
@@ -22,28 +24,28 @@ paths:
         content:
           application/octet-stream:
             schema:
-              type: string
-              format: binary
+              $ref: models/PrivateDocument.yaml
         required: true
       responses:
-        "200":
-          description: successful operation, returns hash of stored document
+        '200':
+          description: 'successful operation, returns hash of stored document'
           content:
             text/plain:
               schema:
                 type: string
                 x-content-type: text/plain
-        "400":
+        '400':
           description: Bad Request
           content: {}
-        "500":
+        '500':
           description: Internal Error
           content: {}
       x-swagger-router-controller: PrivateDocument
   /config/offchain-db-adapter:
     put:
+      description: dsds
       tags:
-      - config-offchain-db-adapter
+        - config-offchain-db-adapter
       summary: Update the configuration of the offchain-db-adapter
       operationId: setOffchainDBAdapterConfig
       requestBody:
@@ -51,26 +53,14 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/OffchainDBAdapterConfig'
+              $ref: models/OffchainDBAdapterConfig.yaml
         required: true
       responses:
-        "200":
+        '200':
           description: successful operation
           content: {}
-        "400":
-          description: Bad Request
-          content: {}
-        "500":
+        '500':
           description: Internal Error
           content: {}
       x-codegen-request-body-name: body
       x-swagger-router-controller: ConfigOffchainDbAdapter
-components:
-  schemas:
-    OffchainDBAdapterConfig:
-      type: object
-      properties:
-        rest_uri:
-          type: string
-          description: URL
-          format: url

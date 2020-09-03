@@ -55,23 +55,25 @@ class BlockchainService {
             console.log("> will configure REST of MSP "+msp+" endpoint to " + url)
             
             // send transaction
-            try{
-                let tx = contract.createTransaction('SetRESTConfig')
+            let tx = contract.createTransaction('SetRESTConfig')
 
-                return tx.setTransient({"uri" : Buffer.from(url).toString('base64')})
-                  .setEndorsingOrganizations(msp)
-                  .submit()
-                  .then( res => {
+            return tx.setTransient({"uri" : Buffer.from(url).toString('base64')})
+                .setEndorsingOrganizations(msp)
+                .submit()
+                .then( _ => {
                     return tx.getTransactionId()
-                  })
-            } catch (e) {
-                return e
-            }
+                })
+                .catch( error => {
+                    // forward error to main app
+                    //throw(error)
+                    //return error.toString()
+                    return Promise.reject(error);
+                });
         });
     }
 }
 
-const ccp = "/home/sschulz/src/restadapter_node/ccp/DTAG.json"
+const ccp = "/home/sschulz/src/blockchain-adapter/ccp/DTAG.json"
 const blockchain_connection = new BlockchainService(ccp);
 
 module.exports = { blockchain_connection };

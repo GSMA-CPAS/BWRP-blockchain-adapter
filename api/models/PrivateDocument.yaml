@@ -1,0 +1,19 @@
+title: PrivateDocument
+type: object
+properties:
+  from_msp:
+    type: string
+    description: The MSP that created this document
+    example: DTAG
+  to_msp:
+    type: string
+    description: The target MSP
+    example: TMUS
+  document:
+    type: string
+    format: binary
+    description: A document encoded in base64
+required:
+  - from_msp
+  - to_msp
+  - document

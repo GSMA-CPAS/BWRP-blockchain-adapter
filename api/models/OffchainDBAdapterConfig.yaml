@@ -1,0 +1,10 @@
+title: OffchainDBAdapterConfig
+type: object
+properties:
+  rest_uri:
+    type: string
+    description: URL
+    format: uri
+    example: 'http://blockchain-adapter:3333/documents'
+required:
+  - rest_uri

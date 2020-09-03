@@ -10,12 +10,16 @@ var hlf = require('../hyperledger/blockchain_service');
  **/
 exports.setOffchainDBAdapterConfig = function(body) {
   return new Promise(function(resolve, reject) {
-    return hlf.blockchain_connection.setRESTConfig(body.rest_uri).then( hash => {
-      var resJSON = {};
-      resJSON['DataHash'] = hash;
-      console.log("> stored data with hash " + hash)
-      resolve(resJSON);
-    });
+    hlf.blockchain_connection.setRESTConfig(body.rest_uri)
+      .then( txID => {
+        var resJSON = {};
+        resJSON['txID'] = txID;
+        console.log("> stored data with txID " + txID)
+        resolve(resJSON);})
+      .catch(error => {
+        console.log("ERROR: " + error)
+        reject({"message" : error.toString()})
+      });
   });
 }
 
