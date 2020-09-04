@@ -1,0 +1,54 @@
+{
+
+    "_COMMENT_" : "THE CERTIFICATES USED HERE ARE FOR THE TEST NETWORK. DO NOT CHECK IN REAL CERTIFICATES!",
+
+    "name": "DTAG",
+    "version": "1.0.0",
+    "config": {
+        "discoveryOptions" : {
+            "enabled" : true,
+            "asLocalhost" : false
+        },
+        "walletPath" : "wallet/DTAG",
+        "user" : "Admin",
+        "channelName": "roaming-contracts",
+        "contractID": "hybrid"
+    },
+    "client": {
+        "tlsEnable": true,
+        "clientTlsIdentity": "tlsuser",
+        "logging" : {
+            "level": "debug"
+        },
+        "organization": "dtag",
+        "connection": {
+            "timeout": {
+                "peer": {
+                    "endorser": "300"
+                }
+            }
+        }
+    },
+    "organizations": {
+        "dtag": {
+            "mspid": "DTAG",
+            "users" : {
+            },
+            "peers": [
+              "peer0.dtag.nomad.com:7051"
+            ]
+        }
+    },
+    "peers": {
+        "peer0.dtag.nomad.com:7051": {
+            "url": "grpcs://127.0.0.1:7051",
+            "tlsCACerts": {
+                "pem" :  "-----BEGIN CERTIFICATE-----\nMIIClzCCAj2gAwIBAgIQHjNxIosFAs846sUPicHhxzAKBggqhkjOPQQDAjCBnDEQ\nMA4GA1UEBhMHR2VybWFueTENMAsGA1UECBMEQm9ubjENMAsGA1UEBxMEQm9ubjEi\nMCAGA1UECRMZRnJpZWRyaWNoLUViZXJ0LUFsbGVlIDE0MDEOMAwGA1UEERMFNTMx\nMTMxFzAVBgNVBAoTDmR0YWcubm9tYWQuY29tMR0wGwYDVQQDExR0bHNjYS5kdGFn\nLm5vbWFkLmNvbTAeFw0xODExMjgxMTUxMDBaFw0yODExMjUxMTUxMDBaMIGcMRAw\nDgYDVQQGEwdHZXJtYW55MQ0wCwYDVQQIEwRCb25uMQ0wCwYDVQQHEwRCb25uMSIw\nIAYDVQQJExlGcmllZHJpY2gtRWJlcnQtQWxsZWUgMTQwMQ4wDAYDVQQREwU1MzEx\nMzEXMBUGA1UEChMOZHRhZy5ub21hZC5jb20xHTAbBgNVBAMTFHRsc2NhLmR0YWcu\nbm9tYWQuY29tMFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEUGUCEzemSi3GH4/k\nH5lCR00mHfdG6bguIe3fmchyVnabWEKaIpp2yBVjEUFft2ay2TI0RelOu1TpW1kQ\n89P0SKNfMF0wDgYDVR0PAQH/BAQDAgGmMA8GA1UdJQQIMAYGBFUdJQAwDwYDVR0T\nAQH/BAUwAwEB/zApBgNVHQ4EIgQgkzueHfuzgXERfjUEVbdAVzkdvfW5PLyJwqp/\nggUHi6cwCgYIKoZIzj0EAwIDSAAwRQIhAO+HFg28t7ZvmxDG00XGY28AdjMvFYC/\nLP4YK2LurjwpAiA1bpW2wZSavtKgVOpG5EVw4bYEnnlROO2CoNPdiPNqLA==\n-----END CERTIFICATE-----"
+            },
+            "grpcOptions": {
+                "ssl-target-name-override": "peer0.dtag.nomad.com",
+                "hostnameOverride": "peer0.dtag.nomad.com"
+            }
+        }
+    }
+}
