@@ -3,7 +3,6 @@
 var { BlockchainService } = require('../hyperledger/blockchain_service');
 
 /**
- * Manage private documents
  * Upload a private document
  *
  * body PrivateDocument A document that should be uploaded
@@ -27,7 +26,7 @@ exports.uploadPrivateDocument = function(body) {
       .then( hash => {
         var resJSON = {};
         resJSON['DataHash'] = hash;
-        console.log("> stored data with hash " + hash)
+        console.log("> both parties stored data with hash " + hash)
         resolve(resJSON);})
       .catch(error => {
         console.log("ERROR: " + error)

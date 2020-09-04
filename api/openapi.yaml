@@ -7,17 +7,18 @@ info:
     name: Simon Schulz
     email: Simon.Schulz01@telekom.de
 tags:
-  - name: config-offchain-db-adapter
+  - name: offchain-db-adapter-config
     description: Configuration for the offchain-db-adapter
   - name: private-document
     description: Access to private documents
+  - name: upload-signature
+    description: Upload a signature for a document
 paths:
   /private-documents:
     post:
       description: Upload a private document
       tags:
         - private-document
-      summary: Manage private documents
       operationId: uploadPrivateDocument
       requestBody:
         description: A document that should be uploaded
@@ -43,10 +44,9 @@ paths:
       x-swagger-router-controller: PrivateDocument
   /config/offchain-db-adapter:
     put:
-      description: dsds
+      description: Update the configuration of the offchain-db-adapter
       tags:
-        - config-offchain-db-adapter
-      summary: Update the configuration of the offchain-db-adapter
+        - offchain-db-adapter-config
       operationId: setOffchainDBAdapterConfig
       requestBody:
         description: A configuration for the offchain-db-adapter
@@ -57,10 +57,47 @@ paths:
         required: true
       responses:
         '200':
-          description: successful operation
-          content: {}
+          description: 'successful operation, returns transaction hash'
+          content:
+            text/plain:
+              schema:
+                type: string
+                x-content-type: text/plain
         '500':
           description: Internal Error
           content: {}
       x-codegen-request-body-name: body
-      x-swagger-router-controller: ConfigOffchainDbAdapter
+      x-swagger-router-controller: OffchainDbAdapterConfig
+  /signatures/{hash}:
+    put:
+      description: 'store a signature for a given document on the ledger'
+      tags:
+        - upload-signature
+      parameters:
+        - in: path
+          name: hash
+          required: true
+          schema:
+            type: string
+          description: The document hash
+      operationId: uploadSignature
+      responses:
+        '200':
+          description: 'successful operation, returns transaction hash'
+          content:
+            text/plain:
+              schema:
+                type: string
+                x-content-type: text/plain
+        '500':
+          description: Internal Server Error
+          content: {}
+      requestBody:
+        description: a document signature that should be uploaded
+        content:
+          application/json:
+            schema:
+              $ref: models/DocumentSignature.yaml
+        required: true
+        x-codegen-request-body-name: body
+        x-swagger-router-controller: UploadSignature

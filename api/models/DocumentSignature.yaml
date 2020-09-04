@@ -1,0 +1,20 @@
+title: DocumentSignature
+type: object
+properties:
+  document:
+    type: string
+    description: the document in base64 encodin
+  signer:
+    type: string
+    description: the user that signed it
+  pem:
+    type: string
+    description: the certificate of the signer in pem format
+  signature:
+    type: string
+    description: the signature over the document
+required:
+  - document
+  - signature
+  - signer
+  - pem

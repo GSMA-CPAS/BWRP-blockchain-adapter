@@ -4,10 +4,8 @@ properties:
   partner_msp:
     type: string
     description: The partner MSP that should receive this document as well
-    example: DTAG
   document:
     type: string
-    format: binary
     description: A base64 encoded document
 required:
   - from_msp
