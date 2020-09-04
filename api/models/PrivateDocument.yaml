@@ -1,19 +1,14 @@
 title: PrivateDocument
 type: object
 properties:
-  from_msp:
+  partner_msp:
     type: string
-    description: The MSP that created this document
+    description: The partner MSP that should receive this document as well
     example: DTAG
-  to_msp:
-    type: string
-    description: The target MSP
-    example: TMUS
   document:
     type: string
     format: binary
-    description: A document encoded in base64
+    description: A base64 encoded document
 required:
   - from_msp
-  - to_msp
   - document

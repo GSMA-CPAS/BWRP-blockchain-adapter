@@ -1,7 +1,10 @@
 const fs = require('fs');
 const path = require('path')
+var crypto = require('crypto');
+
 const { Gateway, Wallets } = require('fabric-network');
 const SingleMSPQueryHandler = require('./query_handler');
+const { exit } = require('process');
 
 class BlockchainService {
 	constructor(ccpFilename) {
@@ -34,11 +37,16 @@ class BlockchainService {
         }
         
         // connect to the gateway
-        const gateway = new Gateway();
-        await gateway.connect(this.connectionProfile, gatewayOptions);
+        this.gateway = new Gateway();
+        await this.gateway.connect(this.connectionProfile, gatewayOptions);
     
         // obtain the network
-        return await gateway.getNetwork(this.connectionProfile.config.channelName);
+        return await this.gateway.getNetwork(this.connectionProfile.config.channelName);
+    }
+
+    disconnect(){
+        console.log("> closing fabric connection")
+        return this.gateway.disconnect()
     }
 
     setRESTConfig(url) {
@@ -71,9 +79,50 @@ class BlockchainService {
                 });
         });
     }
+
+    storeDocument(network, contract, msp, data, expectedHash){
+        network.queryHandler.setFilter(msp)
+        
+        return contract.evaluateTransaction("StorePrivateDocument", ...data).then( result => {
+            // reset filter
+            network.queryHandler.setFilter("")
+
+            // check hash
+            if (expectedHash != result.toString()){
+                return Promise.reject(msp + " stored invalid hash: " + result.toString() + " != " + expectedHash)
+            }
+
+            // done
+            // console.log("> STORED data (hash "+result.toString()+") on "+msp)
+        })
+    }
+
+    addDocument(partnerMSP, document) {
+        let self = this
+        
+        return this.network.then( network => {
+            // fetch contract
+            const contract = network.getContract(self.connectionProfile.config.contractID);
+            
+            // prepare data
+            const data = [partnerMSP, document]
+
+            // calc expected hash
+            const expectedHash = crypto.createHash('sha256').update(document).digest('hex');
+    
+            // fetch our MSP name
+            const fromMSP = self.connectionProfile.organizations[self.connectionProfile.client.organization].mspid
+            
+            // EVALUATE store document on fromMSP (local)
+            return self.storeDocument(network, contract, fromMSP, data, expectedHash).then( () => {
+                // EVALUATE store document on partnerMSP (remote)
+                return self.storeDocument(network, contract, partnerMSP, data, expectedHash).then( () => {
+                    return expectedHash
+                });
+            });
+        });
+    }
 }
 
-const ccp = "/home/sschulz/src/blockchain-adapter/ccp/DTAG.json"
-const blockchain_connection = new BlockchainService(ccp);
 
-module.exports = { blockchain_connection };
+module.exports = { BlockchainService };

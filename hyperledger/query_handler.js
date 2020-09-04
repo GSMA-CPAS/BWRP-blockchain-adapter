@@ -22,12 +22,12 @@ class SingleMSPQueryHandler {
 	}
 	
 	setFilter(mspID) {
-		console.log("################### FILTERING BY MSP <"+mspID+">");
+		console.log("> setting MSP filter to <"+mspID+">");
 		this.peers = this.channel.getEndorsers(mspID);
     }
     
 	async evaluate(query){
-		console.log("################### USE PEERS = " + this.peers);
+		console.log("> evaluate will be executed on peers <" + this.peers + ">");
 
 		const errorMessages = [];
 

@@ -9,6 +9,6 @@ module.exports.uploadPrivateDocument = function uploadPrivateDocument (req, res,
       utils.writeJson(res, response);
     })
     .catch(function (response) {
-      utils.writeJson(res, response);
+      utils.writeJson(res, response, 500);
     });
 };
