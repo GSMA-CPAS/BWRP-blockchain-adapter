@@ -23,4 +23,4 @@ EXPOSE 3000
 
 USER $SERVICE_USER
 
-CMD ["run.sh"]
+CMD ["./run.sh"]
