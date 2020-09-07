@@ -1,0 +1,178 @@
+openapi: 3.0.1
+info:
+  title: Blockchain-Adapter
+  description: This is the REST api specification for the blockchain-adapter
+  contact:
+    name: Simon Schulz
+    email: Simon.Schulz01@telekom.de
+  version: 1.0.0
+servers:
+- url: /
+tags:
+- name: offchain-db-adapter-config
+  description: Configuration for the offchain-db-adapter
+- name: private-document
+  description: Access to private documents
+- name: upload-signature
+  description: Upload a signature for a document
+paths:
+  /private-documents:
+    post:
+      tags:
+      - private-document
+      description: Upload a private document
+      operationId: uploadPrivateDocument
+      requestBody:
+        description: A document that should be uploaded
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PrivateDocument'
+        required: true
+      responses:
+        "200":
+          description: successful operation, returns hash of stored document
+          content:
+            text/plain:
+              schema:
+                type: string
+                x-content-type: text/plain
+        "400":
+          description: Bad Request
+          content: {}
+        "500":
+          description: Internal Error
+          content: {}
+      x-swagger-router-controller: PrivateDocument
+  /config/offchain-db-adapter:
+    put:
+      tags:
+      - offchain-db-adapter-config
+      description: Update the configuration of the offchain-db-adapter
+      operationId: setOffchainDBAdapterConfig
+      requestBody:
+        description: A configuration for the offchain-db-adapter
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OffchainDBAdapterConfig'
+        required: true
+      responses:
+        "200":
+          description: successful operation, returns transaction hash
+          content:
+            text/plain:
+              schema:
+                type: string
+                x-content-type: text/plain
+        "500":
+          description: Internal Error
+          content: {}
+      x-swagger-router-controller: OffchainDbAdapterConfig
+  /signatures:
+    post:
+      tags:
+      - upload-signature
+      description: store a signature for a given document on the ledger
+      operationId: uploadSignature
+      requestBody:
+        description: a document signature that should be uploaded
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DocumentSignature'
+        required: true
+      responses:
+        "200":
+          description: successful operation, returns transaction hash
+          content:
+            text/plain:
+              schema:
+                type: string
+                x-content-type: text/plain
+        "500":
+          description: Internal Server Error
+          content: {}
+      x-swagger-router-controller: UploadSignature
+  /signatures/{hash}/{msp}:
+    get:
+      tags:
+      - fetch-signatures
+      description: fetch all signatures for a given msp and a given document hash
+        from the ledger
+      operationId: fetchSignatures
+      parameters:
+      - name: hash
+        in: path
+        description: The document hash
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      - name: msp
+        in: path
+        description: A MSP name
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      responses:
+        "200":
+          description: successful operation, returns json of signatures
+          content:
+            text/plain:
+              schema:
+                type: string
+                x-content-type: text/plain
+        "500":
+          description: Internal Server Error
+          content: {}
+      x-swagger-router-controller: FetchSignatures
+components:
+  schemas:
+    PrivateDocument:
+      title: PrivateDocument
+      required:
+      - document
+      type: object
+      properties:
+        partner_msp:
+          type: string
+          description: The partner MSP that should receive this document as well
+        document:
+          type: string
+          description: A base64 encoded document
+    OffchainDBAdapterConfig:
+      title: OffchainDBAdapterConfig
+      required:
+      - rest_uri
+      type: object
+      properties:
+        rest_uri:
+          type: string
+          description: URL
+          format: uri
+          example: http://blockchain-adapter:3333/documents
+    DocumentSignature:
+      title: DocumentSignature
+      required:
+      - document
+      - pem
+      - signature
+      - signer
+      type: object
+      properties:
+        document:
+          type: string
+          description: the document in base64 encodin
+        signer:
+          type: string
+          description: the user that signed it
+        pem:
+          type: string
+          description: the certificate of the signer in pem format
+        signature:
+          type: string
+          description: the signature over the document
