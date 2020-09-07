@@ -1,7 +1,6 @@
 'use strict';
 var { BlockchainService } = require('../hyperledger/blockchain_service');
 
-
 /**
  * store a signature for a given document on the ledger
  *
@@ -33,12 +32,11 @@ exports.uploadSignature = function(body) {
     }
 
     blockchain_connection.signDocument(body["document"], body["signature"], body["signer"], body["pem"])
-      .then( hash => {
-        console.log(hash)
-        /*var resJSON = {};
-        resJSON['txID'] = hash;
-        console.log("> stored data with txID " + hash)
-        resolve(resJSON)*/
+      .then( txID => {
+        var resJSON = {};
+        resJSON['txID'] = txID;
+        console.log("> stored signature with txID " + txID)
+        resolve(resJSON)
         ;})
       .catch(error => {
         console.log("ERROR: " + error)

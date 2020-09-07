@@ -129,11 +129,34 @@ class BlockchainService {
         });
     }
 
-    createStorageKey(network, contract, onMSP, partnerMSP, document){
+    // this will always be run locally
+    createStorageKey(network, contract, partnerMSP, document){
+        // fetch our MSP name
+        const localMSP = this.connectionProfile.organizations[this.connectionProfile.client.organization].mspid
+        
         // enable filter
-        network.queryHandler.setFilter(onMSP)
+        network.queryHandler.setFilter(localMSP)
         
         return contract.evaluateTransaction("CreateStorageKey", ...[partnerMSP, document]).then( result => {
+            // reset filter
+            network.queryHandler.setFilter("")
+
+            const storageKey = result.toString()
+            console.log("> got storage key "+storageKey+ " for MSP " + partnerMSP)
+
+            return storageKey;
+        })
+    }
+
+    // this will always be run locally
+    createStorageKeyFromHash(network, contract, partnerMSP, documentHash){
+        // fetch our MSP name
+        const localMSP = this.connectionProfile.organizations[this.connectionProfile.client.organization].mspid
+
+        // enable filter
+        network.queryHandler.setFilter(localMSP)
+        
+        return contract.evaluateTransaction("CreateStorageKeyFromHash", ...[partnerMSP, documentHash]).then( result => {
             // reset filter
             network.queryHandler.setFilter("")
 
@@ -156,21 +179,6 @@ class BlockchainService {
         });
     }
 
-    getSignatures(network, contract, storageKey, msp){
-        // enable filter to execute query on our MSP
-        const onMSP = this.connectionProfile.organizations[this.connectionProfile.client.organization].mspid
-        network.queryHandler.setFilter(onMSP)
-
-        return contract.evaluateTransaction("GetSignatures", ...[msp, storageKey]).then( signatures => {
-            // reset filter
-            network.queryHandler.setFilter("")
-
-            console.log(signatures)
-
-            return "";
-        })
-    }
-
     signDocument(document, signature, signer, pem) {
         let self = this
         
@@ -179,39 +187,70 @@ class BlockchainService {
             const contract = network.getContract(self.connectionProfile.config.contractID);
             
             // fetch our MSP name
-            const fromMSP = self.connectionProfile.organizations[self.connectionProfile.client.organization].mspid
+            const localMSP = self.connectionProfile.organizations[self.connectionProfile.client.organization].mspid
 
             // create signature object
             const signatureJSON = '{ "signer" : "' + signer + '", "pem" : "' + pem + '", "signature" : "' + signature + '" }'
 
             // calculate storage key
-            return self.createStorageKey(network, contract, fromMSP, fromMSP, document).then( storageKey => {
-                return self.storeSignature(network, contract, storageKey, signatureJSON).then( txID => {
-                    // fetch our MSP name
-            
-                    return self.getSignatures(network, contract, storageKey, fromMSP)
-                    //return txID
-                });
+            return self.createStorageKey(network, contract, localMSP, document).then( storageKey => {
+                return self.storeSignature(network, contract, storageKey, signatureJSON)
             });
-/*
-            contractORG1.CreateStorageKey(ORG1.Name, documentBase64)
+        });
+    }
 
-            // calc expected hash
-            const expectedHash = crypto.createHash('sha256').update(document).digest('hex');
-    
-            // fetch our MSP name
-            const fromMSP = self.connectionProfile.organizations[self.connectionProfile.client.organization].mspid
+
+    // this will always be run locally
+    getSignatures(network, contract, msp, storageKey){
+        // enable filter to execute query on our MSP
+        const onMSP = this.connectionProfile.organizations[this.connectionProfile.client.organization].mspid
+        network.queryHandler.setFilter(onMSP)
+
+        return contract.evaluateTransaction("GetSignatures", ...[msp, storageKey]).then( jsonSignatures => {
+            // reset filter
+            network.queryHandler.setFilter("")
+
+            console.log("> reply: GetSignatures("+msp+", "+storageKey + ") = " + jsonSignatures)
+
+            // check for error
+            if (jsonSignatures == "{}"){
+                console.log("> got no results")
+                return {}
+            }
+
+            // parse data
+            const txSet = JSON.parse(jsonSignatures);
+            console.log("> "+msp+" found " + Object.keys(txSet).length + " signatures for key "+ storageKey)
+
+            var signatures = {}
+            for (var txID in txSet) {
+                console.log("> decoding signature with txID " + txID)
+                var entry = txSet[txID].replace(/\n/g, "\\n").replace(/\r/g, "\\r").replace(/\t/g, "\\t");
+                signatures[txID] = JSON.parse(entry);
+            }
+
+            return signatures;
+        })
+    }
+
+    fetchSignatures(documentHash, msp) {
+        let self = this
+        
+        return this.network.then( network => {
+            // fetch contract
+            const contract = network.getContract(self.connectionProfile.config.contractID);
             
-            // EVALUATE store document on fromMSP (local)
-            return self.storeDocument(network, contract, fromMSP, data, expectedHash).then( () => {
-                // EVALUATE store document on partnerMSP (remote)
-                return self.storeDocument(network, contract, partnerMSP, data, expectedHash).then( () => {
-                    return expectedHash
-                });
-            });*/
+            console.log("> fetching signatures for <"+msp+"> and hash "+documentHash)
+
+            // calculate storage key for our own signatures:
+            return self.createStorageKeyFromHash(network, contract, msp, documentHash).then( storageKey => {
+                console.log("> accessing data using storage key " + storageKey)
+                return self.getSignatures(network, contract, msp, storageKey)
+            });
         });
     }
 }
 
+//46355eebfb47b0ee031f36a3f459aef9912663cd381124ceea84cf30c23f5bb3
 
 module.exports = { BlockchainService };
