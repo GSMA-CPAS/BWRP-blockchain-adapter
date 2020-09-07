@@ -1,3 +1,5 @@
+#!/bin/sh
+
 echo "#####################################################################"
 echo "# WARNING: setting TLS to insecure!"
 echo "#          THIS IS UNSAFE! DO NOT DO THIS IN PRODUCTION SYSTEMS"
