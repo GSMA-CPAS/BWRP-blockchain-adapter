@@ -9,6 +9,6 @@ module.exports.fetchSignatures = function fetchSignatures (req, res, next, hash,
       utils.writeJson(res, response);
     })
     .catch(function (response) {
-      utils.writeJson(res, response);
+      utils.writeJson(res, response, 500);
     });
 };

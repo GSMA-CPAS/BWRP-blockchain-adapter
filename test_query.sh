@@ -1,9 +1,13 @@
 #!/bin/bash
-set -ex
+set -e
 export no_proxy="localhost,$no_proxy"
 
-DTAG_PORT=8080
-TMUS_PORT=8081
+BSA_DTAG="blockchain-adapter-dtag:8080"
+BSA_TMUS="blockchain-adapter-tmus:8081"
+
+# SOME OPTIONS
+SIGNER_DTAG="simon@dtag"
+SIGNER_TMUS="simon@tmus"
 
 #DOCUMENT="MYDOCUMENT_DATA_123456..."
 # create a unique document:
@@ -11,47 +15,83 @@ DOCUMENT=$(date +%s)
 DOCUMENT64=$(echo $DOCUMENT|base64 -w0)
 DOCUMENTSHA256=$(echo -n $DOCUMENT64|sha256sum|cut -d " " -f1)
 
+# generate crypto material:
+KEY=$(tempfile)
+CRT=$(tempfile)
+PUB_DTAG=$(tempfile)
+PUB_TMUS=$(tempfile)
+DOC=$(tempfile)
+# make sure to remove temp files on exit
+trap "{ rm -f $DOC $PUB_DTAG $PUB_TMUS $KEY $CRT; }" EXIT
+
 echo "###################################################"
 echo "> setting rest uri on dtag"
-curl -i -X PUT -H "Content-Type: application/json" -d '{"rest_uri": "http://offchain-db-adapter-dtag:3333/documents"}'  http://localhost:${DTAG_PORT}/config/offchain-db-adapter
+curl -s -X PUT -H "Content-Type: application/json" -d '{"rest_uri": "http://offchain-db-adapter-dtag:3333/documents"}'  http://${BSA_DTAG}/config/offchain-db-adapter 
 echo ""
 
 echo "###################################################"
 echo "> setting rest uri on tmus"
-curl -i -X PUT -H "Content-Type: application/json" -d '{"rest_uri": "http://offchain-db-adapter-tmus:3334/documents"}'  http://localhost:${TMUS_PORT}/config/offchain-db-adapter
+curl -s -X PUT -H "Content-Type: application/json" -d '{"rest_uri": "http://offchain-db-adapter-tmus:3334/documents"}'  http://${BSA_TMUS}/config/offchain-db-adapter
 echo ""
 
 echo "###################################################"
 echo "> storing document on both parties"
-curl -i -X POST -H "Content-Type: application/json" -d '{"partner_msp": "TMUS", "document": "'$DOCUMENT64'" }'  http://localhost:${DTAG_PORT}/private-documents
+curl -s  -X POST -H "Content-Type: application/json" -d '{"partner_msp": "TMUS", "document": "'$DOCUMENT64'" }'  http://${BSA_DTAG}/private-documents
 echo ""
 
-# generate crypto material:
-SIGNER="simon@dtag"
-KEY=$(tempfile)
-CRT=$(tempfile)
-# make sure to remove temp files on exit
-trap "{ rm -f $KEY $CRT; }" EXIT
-# generate key and crt
-openssl req -x509 -newkey ec:<(openssl ecparam -name secp384r1) -nodes -keyout $KEY -out $CRT -subj "/CN=${SIGNER}/C=DE/ST=NRW/L=Bielefeld/O=ORG/OU=ORGOU" -addext keyUsage=digitalSignature
-# create pem formatted with \n
-PEM=$(cat $CRT | awk 1 ORS='\\n')
-#sign the file
-SIGNATURE=$(echo $DOCUMENT | openssl dgst -sha256 -sign $KEY | base64 -w0)
 
-#sign the contract
+# DTAG signs the contract
 echo "###################################################"
 echo "> dtag signs contract"
-curl -i -X POST -H "Content-Type: application/json" -d '{"signer": "'$SIGNER'", "pem" : "'"${PEM}"'", "signature" : "'$SIGNATURE'", "document": "'$DOCUMENT64'" }'  http://localhost:${DTAG_PORT}/signatures
+# generate key and crt
+openssl req -x509 -newkey ec:<(openssl ecparam -name secp384r1) -nodes -keyout $KEY -out $CRT -subj "/CN=${SIGNER_DTAG}/C=DE/ST=NRW/L=Bielefeld/O=ORG/OU=ORGOU" -addext keyUsage=digitalSignature
+# create pem formatted with \n
+PEM=$(cat $CRT | awk 1 ORS='\\n')
+# extract public key
+openssl x509 -pubkey -in $CRT > $PUB_DTAG
+# do the signing
+SIGNATURE=$(echo -ne $DOCUMENT | openssl dgst -sha256 -sign $KEY | base64 -w0)
+# call blockchain adapter
+curl -s -X POST -H "Content-Type: application/json" -d '{"signer": "'$SIGNER_DTAG'", "pem" : "'"${PEM}"'", "signature" : "'$SIGNATURE'", "document": "'$DOCUMENT64'" }'  http://${BSA_DTAG}/signatures
 echo ""
 
-#fetch all signatures
+# TMUS signs the contract
+echo "###################################################"
+echo "> tmus signs contract"
+# generate key and crt
+openssl req -x509 -newkey ec:<(openssl ecparam -name secp384r1) -nodes -keyout $KEY -out $CRT -subj "/CN=${SIGNER_TMUS}/C=DE/ST=NRW/L=Bielefeld/O=ORG/OU=ORGOU" -addext keyUsage=digitalSignature
+# create pem formatted with \n
+PEM=$(cat $CRT | awk 1 ORS='\\n')
+# extract public key
+openssl x509 -pubkey -in $CRT > $PUB_TMUS
+# do the signing
+SIGNATURE=$(echo -ne $DOCUMENT | openssl dgst -sha256 -sign $KEY | base64 -w0)
+# call the blockchain adapter
+curl -s -X POST -H "Content-Type: application/json" -d '{"signer": "'$SIGNER_TMUS'", "pem" : "'"${PEM}"'", "signature" : "'$SIGNATURE'", "document": "'$DOCUMENT64'" }'  http://${BSA_TMUS}/signatures
+echo ""
+
+
+#fetch all DTAG signatures
 echo "###################################################"
 echo "> fetching dtag signatures"
-curl -i -X GET -H "Content-Type: application/json"  http://localhost:${DTAG_PORT}/signatures/$DOCUMENTSHA256/DTAG
+SIGNATURES=$(curl -s -X GET -H "Content-Type: application/json"  http://${BSA_DTAG}/signatures/$DOCUMENTSHA256/DTAG)
+DTAG_SIGNATURE=$(echo $SIGNATURES | jq -r .[].signature)
+echo "> got $DTAG_SIGNATURE"
+
+echo "> verifying signature $DTAG_SIGNATURE"
 echo ""
+echo -ne $DOCUMENT > $DOC
+echo $DTAG_SIGNATURE | base64 -d | openssl dgst -sha256 -verify $PUB_DTAG -signature /dev/stdin $DOC
 
-#openssl x509 -pubkey -noout -in example.crt
+#fetch all TMUS signatures
+echo "###################################################"
+echo "> fetching tmus signatures"
+SIGNATURES=$(curl -s -X GET -H "Content-Type: application/json"  http://${BSA_DTAG}/signatures/$DOCUMENTSHA256/TMUS)
+TMUS_SIGNATURE=$(echo $SIGNATURES | jq -r .[].signature)
+echo "> got $TMUS_SIGNATURE"
 
-rm $KEY
-rm $CRT
+echo "> verifying signature $TMUS_SIGNATURE"
+echo ""
+echo -ne $DOCUMENT > $DOC
+echo $TMUS_SIGNATURE | base64 -d | openssl dgst -sha256 -verify $PUB_TMUS -signature /dev/stdin $DOC
+
