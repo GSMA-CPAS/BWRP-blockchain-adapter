@@ -41,7 +41,6 @@ paths:
         '500':
           description: Internal Error
           content: {}
-      x-swagger-router-controller: PrivateDocument
   /config/offchain-db-adapter:
     put:
       description: Update the configuration of the offchain-db-adapter
@@ -66,20 +65,11 @@ paths:
         '500':
           description: Internal Error
           content: {}
-      x-codegen-request-body-name: body
-      x-swagger-router-controller: OffchainDbAdapterConfig
-  /signatures/{hash}:
-    put:
+  /signatures:
+    post:
       description: 'store a signature for a given document on the ledger'
       tags:
         - upload-signature
-      parameters:
-        - in: path
-          name: hash
-          required: true
-          schema:
-            type: string
-          description: The document hash
       operationId: uploadSignature
       responses:
         '200':
@@ -99,5 +89,33 @@ paths:
             schema:
               $ref: models/DocumentSignature.yaml
         required: true
-        x-codegen-request-body-name: body
-        x-swagger-router-controller: UploadSignature
+  /signatures/{hash}/{msp}:
+    get:
+      description: 'fetch all signatures for a given msp and a given document hash from the ledger'
+      tags:
+        - fetch-signatures
+      parameters:
+        - in: path
+          name: hash
+          required: true
+          schema:
+            type: string
+          description: The document hash
+        - in: path
+          name: msp
+          required: true
+          schema:
+            type: string
+          description: A MSP name
+      operationId: fetchSignatures
+      responses:
+        '200':
+          description: 'successful operation, returns json of signatures'
+          content:
+            text/plain:
+              schema:
+                type: string
+                x-content-type: text/plain
+        '500':
+          description: Internal Server Error
+          content: {}

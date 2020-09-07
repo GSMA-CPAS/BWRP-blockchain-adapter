@@ -23,7 +23,7 @@ var options = {
     controllers: path.join(__dirname, './controllers')
 };
 
-var expressAppConfig = oas3Tools.expressAppConfig(path.join(__dirname, 'api/codegen/api/openapi.yaml'), options);
+var expressAppConfig = oas3Tools.expressAppConfig(path.join(__dirname, 'api/openapi.definition.out'), options);
 expressAppConfig.addValidator();
 var app = expressAppConfig.getApp();
 
