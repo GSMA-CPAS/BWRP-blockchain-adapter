@@ -13,7 +13,7 @@ SIGNER_TMUS="simon@tmus"
 # create a unique document:
 DOCUMENT=$(date +%s) 
 DOCUMENT64=$(echo $DOCUMENT | openssl base64 | tr -d '\n')
-DOCUMENTSHA256=$(echo -n $DOCUMENT64 | shasum -a 256 | cut -d " " -f1)
+DOCUMENTSHA256=$(echo -n $DOCUMENT64 | openssl dgst -sha256 -r | cut -d " " -f1)
 
 # generate crypto material:
 DIR=$(mktemp -d)
