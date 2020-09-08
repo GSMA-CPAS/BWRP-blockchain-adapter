@@ -1,5 +1,5 @@
 #!/bin/bash
-set -e
+set -ex
 export no_proxy="localhost,$no_proxy"
 
 BSA_DTAG="blockchain-adapter-dtag:8080"
@@ -12,17 +12,18 @@ SIGNER_TMUS="simon@tmus"
 #DOCUMENT="MYDOCUMENT_DATA_123456..."
 # create a unique document:
 DOCUMENT=$(date +%s) 
-DOCUMENT64=$(echo $DOCUMENT|base64 -w0)
-DOCUMENTSHA256=$(echo -n $DOCUMENT64|sha256sum|cut -d " " -f1)
+DOCUMENT64=$(echo $DOCUMENT | openssl base64 | tr -d '\n')
+DOCUMENTSHA256=$(echo -n $DOCUMENT64 | shasum -a 256 | cut -d " " -f1)
 
 # generate crypto material:
-KEY=$(tempfile)
-CRT=$(tempfile)
-PUB_DTAG=$(tempfile)
-PUB_TMUS=$(tempfile)
-DOC=$(tempfile)
+DIR=$(mktemp -d)
+KEY=$DIR/KEY
+CRT=$DIR/CRT
+PUB_DTAG=$DIR/PUB_DTAG
+PUB_TMUS=$DIR/PUB_TMUS
+DOC=$DIR/DOC
 # make sure to remove temp files on exit
-trap "{ rm -f $DOC $PUB_DTAG $PUB_TMUS $KEY $CRT; }" EXIT
+trap "{ rm -fr $DIR; }" EXIT
 
 echo "###################################################"
 echo "> setting rest uri on dtag"
@@ -50,7 +51,7 @@ PEM=$(cat $CRT | awk 1 ORS='\\n')
 # extract public key
 openssl x509 -pubkey -in $CRT > $PUB_DTAG
 # do the signing
-SIGNATURE=$(echo -ne $DOCUMENT | openssl dgst -sha256 -sign $KEY | base64 -w0)
+SIGNATURE=$(echo -ne $DOCUMENT | openssl dgst -sha256 -sign $KEY | openssl base64 | tr -d '\n')
 # call blockchain adapter
 curl -s -X POST -H "Content-Type: application/json" -d '{"signer": "'$SIGNER_DTAG'", "pem" : "'"${PEM}"'", "signature" : "'$SIGNATURE'", "document": "'$DOCUMENT64'" }'  http://${BSA_DTAG}/signatures
 echo ""
@@ -65,7 +66,7 @@ PEM=$(cat $CRT | awk 1 ORS='\\n')
 # extract public key
 openssl x509 -pubkey -in $CRT > $PUB_TMUS
 # do the signing
-SIGNATURE=$(echo -ne $DOCUMENT | openssl dgst -sha256 -sign $KEY | base64 -w0)
+SIGNATURE=$(echo -ne $DOCUMENT | openssl dgst -sha256 -sign $KEY | openssl base64  | tr -d '\n')
 # call the blockchain adapter
 curl -s -X POST -H "Content-Type: application/json" -d '{"signer": "'$SIGNER_TMUS'", "pem" : "'"${PEM}"'", "signature" : "'$SIGNATURE'", "document": "'$DOCUMENT64'" }'  http://${BSA_TMUS}/signatures
 echo ""
@@ -81,7 +82,7 @@ echo "> got $DTAG_SIGNATURE"
 echo "> verifying signature $DTAG_SIGNATURE"
 echo ""
 echo -ne $DOCUMENT > $DOC
-echo $DTAG_SIGNATURE | base64 -d | openssl dgst -sha256 -verify $PUB_DTAG -signature /dev/stdin $DOC
+echo $DTAG_SIGNATURE | openssl base64 -d | openssl dgst -sha256 -verify $PUB_DTAG -signature /dev/stdin $DOC
 
 #fetch all TMUS signatures
 echo "###################################################"
@@ -93,5 +94,5 @@ echo "> got $TMUS_SIGNATURE"
 echo "> verifying signature $TMUS_SIGNATURE"
 echo ""
 echo -ne $DOCUMENT > $DOC
-echo $TMUS_SIGNATURE | base64 -d | openssl dgst -sha256 -verify $PUB_TMUS -signature /dev/stdin $DOC
+echo $TMUS_SIGNATURE | openssl base64 -d | openssl dgst -sha256 -verify $PUB_TMUS -signature /dev/stdin $DOC
 
