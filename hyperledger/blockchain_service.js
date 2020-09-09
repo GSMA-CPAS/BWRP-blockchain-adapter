@@ -2,7 +2,7 @@ const fs = require('fs');
 const path = require('path')
 var crypto = require('crypto');
 
-const { Gateway, Wallets } = require('fabric-network');
+const { Gateway, Wallets, ContractListener } = require('fabric-network');
 const SingleMSPQueryHandler = require('./query_handler');
 const { exit } = require('process');
 
@@ -79,7 +79,6 @@ class BlockchainService {
     }
 
     storeDocument(network, contract, onMSP, partnerMSP, document){
-        
         // enable filter
         network.queryHandler.setFilter(onMSP)
         
@@ -170,6 +169,7 @@ class BlockchainService {
     storeSignature(network, contract, storageKey, signature){
         // send transaction
         let tx = contract.createTransaction('StoreSignature')
+        console.log("> will store signature at key " + storageKey)
 
         return tx.submit(...[storageKey, signature]).then( _ => {
             return tx.getTransactionId()
@@ -181,11 +181,32 @@ class BlockchainService {
 
     signDocument(document, signature, signer, pem) {
         let self = this
-        
+        console.log("> signDocument(..., ..., " + signer + ", ...)")
+
         return this.network.then( network => {
             // fetch contract
             const contract = network.getContract(self.connectionProfile.config.contractID);
             
+            // test the event API
+            const listener = async (event) => {
+                if (event.eventName === 'STORE:SIGNATURE') {
+                    const details = event.payload.toString()
+                    const msp = event.getTransactionEvent().transactionData.actions[0].header.creator.mspid
+
+                    console.log("> INCOMING EVENT: [" + msp + "] store signature <" + event.eventName + "> --> " + details)
+                    if (0) {
+                        // for debugging why i see a previous event replayed, see my bug report
+                        // https://jira.hyperledger.org/browse/FABN-1634
+                        console.log(event.getTransactionEvent())
+                        console.log(event.getTransactionEvent().transactionData)
+                        console.log(event.getTransactionEvent().transactionData.actions[0].header)
+                        console.log(event.getTransactionEvent().transactionData.actions[0].payload)
+                        console.log(event.getTransactionEvent().getBlockEvent())
+                    }
+                }
+            };
+            contract.addContractListener(listener)
+
             // fetch our MSP name
             const localMSP = self.connectionProfile.organizations[self.connectionProfile.client.organization].mspid
 
@@ -250,7 +271,5 @@ class BlockchainService {
         });
     }
 }
-
-//46355eebfb47b0ee031f36a3f459aef9912663cd381124ceea84cf30c23f5bb3
 
 module.exports = { BlockchainService };

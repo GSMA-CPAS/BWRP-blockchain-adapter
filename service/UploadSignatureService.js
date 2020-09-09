@@ -42,7 +42,7 @@ exports.uploadSignature = function(body) {
         console.log("ERROR: " + error)
         reject({"message" : error.toString()})
       }).finally( () => {
-        blockchain_connection.disconnect()
+       blockchain_connection.disconnect()
       });
   });
 }
