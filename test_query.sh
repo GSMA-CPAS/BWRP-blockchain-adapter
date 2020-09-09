@@ -27,12 +27,12 @@ trap "{ rm -fr $DIR; }" EXIT
 
 echo "###################################################"
 echo "> setting rest uri on dtag"
-curl -s -X PUT -H "Content-Type: application/json" -d '{"rest_uri": "http://offchain-db-adapter-dtag:3333/documents"}'  http://${BSA_DTAG}/config/offchain-db-adapter 
+curl -s -X PUT -H "Content-Type: application/json" -d '{"rest_uri": "http://offchain-db-adapter-dtag:3333"}'  http://${BSA_DTAG}/config/offchain-db-adapter 
 echo ""
 
 echo "###################################################"
 echo "> setting rest uri on tmus"
-curl -s -X PUT -H "Content-Type: application/json" -d '{"rest_uri": "http://offchain-db-adapter-tmus:3334/documents"}'  http://${BSA_TMUS}/config/offchain-db-adapter
+curl -s -X PUT -H "Content-Type: application/json" -d '{"rest_uri": "http://offchain-db-adapter-tmus:3334"}'  http://${BSA_TMUS}/config/offchain-db-adapter
 echo ""
 
 echo "###################################################"
