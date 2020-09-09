@@ -2,8 +2,8 @@
 set -ex
 export no_proxy="localhost,$no_proxy"
 
-BSA_DTAG="blockchain-adapter-dtag:8082"
-BSA_TMUS="blockchain-adapter-tmus:8081"
+BSA_DTAG="blockchain-adapter-dtag:8081"
+BSA_TMUS="blockchain-adapter-tmus:8082"
 
 # SOME OPTIONS
 SIGNER_DTAG="simon@dtag"
