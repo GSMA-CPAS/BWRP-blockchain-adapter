@@ -1,199 +1,184 @@
 openapi: 3.0.1
 info:
-  title: Blockchain-Adapter
-  description: This is the REST api specification for the blockchain-adapter
   contact:
-    name: Simon Schulz
     email: Simon.Schulz01@telekom.de
+    name: Simon Schulz
+  description: This is the REST api specification for the blockchain-adapter
+  title: Blockchain-Adapter
   version: 1.0.0
 servers:
 - url: /
 tags:
-- name: offchain-db-adapter-config
-  description: Configuration for the offchain-db-adapter
-- name: private-document
-  description: Access to private documents
-- name: upload-signature
-  description: Upload a signature for a document
+- description: Configuration for the offchain-db-adapter
+  name: offchain-db-adapter-config
+- description: Access to private documents
+  name: private-document
+- description: Upload a signature for a document
+  name: upload-signature
 paths:
   /private-documents:
     post:
-      tags:
-      - private-document
       description: Upload a private document
       operationId: uploadPrivateDocument
       requestBody:
-        description: A document that should be uploaded
         content:
           application/json:
             schema:
               $ref: '#/components/schemas/PrivateDocument'
+        description: A document that should be uploaded
         required: true
       responses:
         "200":
-          description: successful operation, returns hash of stored document
           content:
             text/plain:
               schema:
                 type: string
                 x-content-type: text/plain
+          description: successful operation, returns hash of stored document
         "400":
+          content: {}
           description: Bad Request
-          content: {}
         "500":
-          description: Internal Error
           content: {}
-      x-swagger-router-controller: PrivateDocument
-  /private-documents/{hash}:
-    get:
+          description: Internal Error
       tags:
       - private-document
+      x-codegen-request-body-name: body
+      x-eov-operation-handler: controllers/PrivateDocumentController
+  /private-documents/{hash}:
+    get:
       description: Fetch a private document from the database
       operationId: fetchPrivateDocument
       parameters:
-      - name: hash
-        in: path
-        description: The document hash
-        required: true
-        style: simple
+      - description: The document hash
         explode: false
+        in: path
+        name: hash
+        required: true
         schema:
           type: string
+        style: simple
       responses:
         "200":
-          description: successful operation, returns document
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/PrivateDocument'
+          description: successful operation, returns document
         "500":
-          description: Internal Error
           content: {}
-      x-swagger-router-controller: PrivateDocument
+          description: Internal Error
+      tags:
+      - private-document
+      x-eov-operation-handler: controllers/PrivateDocumentController
   /config/offchain-db-adapter:
     put:
-      tags:
-      - offchain-db-adapter-config
       description: Update the configuration of the offchain-db-adapter
       operationId: setOffchainDBAdapterConfig
       requestBody:
-        description: A configuration for the offchain-db-adapter
         content:
           application/json:
             schema:
               $ref: '#/components/schemas/OffchainDBAdapterConfig'
+        description: A configuration for the offchain-db-adapter
         required: true
       responses:
         "200":
-          description: successful operation, returns transaction hash
           content:
             text/plain:
               schema:
                 type: string
                 x-content-type: text/plain
+          description: successful operation, returns transaction hash
         "500":
-          description: Internal Error
           content: {}
-      x-swagger-router-controller: OffchainDbAdapterConfig
+          description: Internal Error
+      tags:
+      - offchain-db-adapter-config
+      x-codegen-request-body-name: body
+      x-eov-operation-handler: controllers/OffchainDbAdapterConfigController
   /signatures:
     post:
-      tags:
-      - upload-signature
       description: store a signature for a given document on the ledger
       operationId: uploadSignature
       requestBody:
-        description: a document signature that should be uploaded
         content:
           application/json:
             schema:
               $ref: '#/components/schemas/DocumentSignature'
+        description: a document signature that should be uploaded
         required: true
       responses:
         "200":
-          description: successful operation, returns transaction hash
           content:
             text/plain:
               schema:
                 type: string
                 x-content-type: text/plain
+          description: successful operation, returns transaction hash
         "500":
-          description: Internal Server Error
           content: {}
-      x-swagger-router-controller: UploadSignature
+          description: Internal Server Error
+      tags:
+      - upload-signature
+      x-eov-operation-handler: controllers/UploadSignatureController
+    x-codegen-request-body-name: body
   /signatures/{hash}/{msp}:
     get:
-      tags:
-      - fetch-signatures
       description: fetch all signatures for a given msp and a given document hash
         from the ledger
       operationId: fetchSignatures
       parameters:
-      - name: hash
-        in: path
-        description: The document hash
-        required: true
-        style: simple
+      - description: The document hash
         explode: false
+        in: path
+        name: hash
+        required: true
         schema:
           type: string
-      - name: msp
-        in: path
-        description: A MSP name
-        required: true
         style: simple
+      - description: A MSP name
         explode: false
+        in: path
+        name: msp
+        required: true
         schema:
           type: string
+        style: simple
       responses:
         "200":
-          description: successful operation, returns json of signatures
           content:
             text/plain:
               schema:
                 type: string
                 x-content-type: text/plain
+          description: successful operation, returns json of signatures
         "500":
-          description: Internal Server Error
           content: {}
-      x-swagger-router-controller: FetchSignatures
+          description: Internal Server Error
+      tags:
+      - fetch-signatures
+      x-eov-operation-handler: controllers/FetchSignaturesController
   /signatures/subscribe:
     post:
-      description: subscribes a client to receive new signature events
-      operationId: signaturesSubscribePOST
-      parameters:
-      - name: callbackUrl
-        in: query
-        description: the location where data will be sent
-        required: true
-        style: form
-        explode: true
-        schema:
-          type: string
-          format: uri
-          example: https://myapp.local
-      responses:
-        "201":
-          description: subscription successfully created
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/inline_response_201'
       callbacks:
         onData:
           '{$request.query.callbackUrl}/signature_data':
             post:
+              operationId: onData_SignatureDataPost
               requestBody:
-                description: subscription payload
+                $ref: '#/components/requestBodies/inline_object'
                 content:
                   application/json:
                     schema:
-                      type: object
                       properties:
                         timestamp:
-                          type: string
                           format: date-time
+                          type: string
                         userData:
                           type: string
+                      type: object
+                description: subscription payload
               responses:
                 "202":
                   description: the app should return this when the data was received
@@ -201,64 +186,102 @@ paths:
                 "204":
                   description: the app should return this when it is no longer interested
                     in further updates
-      x-swagger-router-controller: Default
+              x-callback-request: true
+      description: subscribes a client to receive new signature events
+      operationId: signaturesSubscribePOST
+      parameters:
+      - description: the location where data will be sent
+        explode: true
+        in: query
+        name: callbackUrl
+        required: true
+        schema:
+          example: https://myapp.local
+          format: uri
+          type: string
+        style: form
+      responses:
+        "201":
+          content:
+            application/json:
+              schema:
+                description: subscription information
+                properties:
+                  subscriptionId:
+                    description: this unique identifier allows management of the subscription
+                    example: 2531329f-fb09-4ef7-887e-84e648214436
+                    type: string
+                required:
+                - subscriptionId
+          description: subscription successfully created
+      x-eov-operation-handler: controllers/DefaultController
 components:
+  requestBodies:
+    inline_object:
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/inline_object'
   schemas:
     PrivateDocument:
-      title: PrivateDocument
-      required:
-      - document
-      type: object
-      properties:
-        partner_msp:
-          type: string
-          description: The partner MSP that should receive this document as well
-        document:
-          type: string
-          description: A base64 encoded document
       example:
         document: document
         partner_msp: partner_msp
-    OffchainDBAdapterConfig:
-      title: OffchainDBAdapterConfig
+      properties:
+        partner_msp:
+          description: The partner MSP that should receive this document as well
+          type: string
+        document:
+          description: A base64 encoded document
+          type: string
       required:
-      - rest_uri
+      - document
+      title: PrivateDocument
       type: object
+    OffchainDBAdapterConfig:
+      example:
+        rest_uri: http://blockchain-adapter:3333/documents
       properties:
         rest_uri:
-          type: string
           description: URL
-          format: uri
           example: http://blockchain-adapter:3333/documents
+          format: uri
+          type: string
+      required:
+      - rest_uri
+      title: OffchainDBAdapterConfig
+      type: object
     DocumentSignature:
-      title: DocumentSignature
+      example:
+        signature: signature
+        document: document
+        pem: pem
+        signer: signer
+      properties:
+        document:
+          description: the document in base64 encodin
+          type: string
+        signer:
+          description: the user that signed it
+          type: string
+        pem:
+          description: the certificate of the signer in pem format
+          type: string
+        signature:
+          description: the signature over the document
+          type: string
       required:
       - document
       - pem
       - signature
       - signer
+      title: DocumentSignature
       type: object
+    inline_object:
       properties:
-        document:
+        timestamp:
+          format: date-time
           type: string
-          description: the document in base64 encodin
-        signer:
+        userData:
           type: string
-          description: the user that signed it
-        pem:
-          type: string
-          description: the certificate of the signer in pem format
-        signature:
-          type: string
-          description: the signature over the document
-    inline_response_201:
-      required:
-      - subscriptionId
-      properties:
-        subscriptionId:
-          type: string
-          description: this unique identifier allows management of the subscription
-          example: 2531329f-fb09-4ef7-887e-84e648214436
-      description: subscription information
-      example:
-        subscriptionId: 2531329f-fb09-4ef7-887e-84e648214436
+      type: object

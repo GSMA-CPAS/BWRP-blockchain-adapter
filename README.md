@@ -2,28 +2,19 @@
 
 This is a POC for the blockchain-adapter.
 The REST interface is defined using the openAPI standard (see api/openapi.yaml) and the
-server code is created by teh swagger-codegen (node-server).
+server code is created by the openapi-codegen (nodejs-express-server).
 Changes in the api specification require a rebuild (cd api; ./generate_api_stubs.sh) and 
-a manual merge of the generated stubs and the implementation in controllers and service.
+a manual merge of the generated stubs and the implementation in the controllers and services dir.
 
 Two env variables can be used to configure the blockchain-adapter:
 - export BSA_PORT="8080"
 - export BSA_CCP="ccp/DTAG.json"
+- ./run.sh
+# API Documentation
 
-The full api specification can be accessed via http://localhost:$BSA_PORT/docs once the service is running.
+see the auto-generated [API Documentation](./api/doc/README.md)
 
-# SHORT API DOC
-
-<!-- markdown-swagger -->
- Endpoint                      | Method | Auth? | Description                                                                   
- ----------------------------- | ------ | ----- | ------------------------------------------------------------------------------
- `/private-documents`          | POST   | No    | Upload a private document                                                     
- `/private-documents/{hash}`   | GET    | No    | Fetch a private document from the database                                    
- `/config/offchain-db-adapter` | PUT    | No    | Update the configuration of the offchain-db-adapter                           
- `/signatures`                 | POST   | No    | store a signature for a given document on the ledger                          
- `/signatures/{hash}/{msp}`    | GET    | No    | fetch all signatures for a given msp and a given document hash from the ledger
- `/signatures/subscribe`       | POST   | No    | subscribes a client to receive new signature events                           
-<!-- /markdown-swagger -->
+alternative: the full online api specification can be accessed via http://localhost:$BSA_PORT/docs once the service is running.
 
 # NOTES
 
@@ -43,48 +34,34 @@ The full api specification can be accessed via http://localhost:$BSA_PORT/docs o
 - shell 3: ./test_query.sh
 - example output:
 ```
-$ ./test_query.sh 
+$> BSA_DTAG=localhost:8085 ./test_query.sh
+> calculated hash d9f844a8acc78446ba437ababb5e1fd4fbb54d929d717d57954cc5359e8ea70a for document
 ###################################################
 > setting rest uri on dtag
-{
-  "txID": "0b5f2725d8b1b5f739e04a41836d4c8b027ff88001bde57297844eef35a7a43b"
-}
+{"txID":"1cafeea809e747363c3da546f0b2b3bab331e60e6936d09b921909a9abd17701"}
 ###################################################
 > setting rest uri on tmus
-{
-  "txID": "c890bc128d6aa1d9c881dfcfd45d281f26bae173b9aa207d159a78e55246569e"
-}
+{ "txID": "589dd13df7a558cbab9034bae295130499d8d87e8af667b4bd1107a1219b3891" }
 ###################################################
 > storing document on both parties
-{
-  "DataHash": "ebdb0f14c91d269382a8333dd8ab64aa67c392edbbbf35eacc26cb3b3328dc89"
-}
+{"DataHash":"d9f844a8acc78446ba437ababb5e1fd4fbb54d929d717d57954cc5359e8ea70a"}
 ###################################################
 > dtag signs contract
-Generating an EC private key
-writing new private key to '/tmp/filejCCK95'
------
-{
-  "txID": "e8550cc7b2a0cb66819de5645158423eef009ceb55a2dd1ec22dfe8a479accf8"
-}
+{"txID":"2ba002563d6e06274824267cd5a222c720eacf2077fb87b5c758be73ba00f3ee"}
 ###################################################
 > tmus signs contract
-Generating an EC private key
-writing new private key to '/tmp/filejCCK95'
------
-{
-  "txID": "032a067f6a86d443489876a25d438793e7750c63d0faffd4973b580264b8a4b6"
-}
+{ "txID": "8f704dad4d62089f7077421edca68b2bc1d6296c9f182dbbb11e853fcc2080c1" }
+###################################################
+> fetching contract from dtag
+> 2020-09-10 13:36:56: DTAG -> TMUS, document data b64 = 'MTU5OTc0NTAwNwo='
 ###################################################
 > fetching dtag signatures
-> got MGUCMQCZnY6OF83iJinYRXmIJLmwnLVxisKpXwt54euU6CmCDeQHguhIcqhrzwzYY1QfIPgCME3EEXKtueoRPNv5DflrpOKWdzZxq26vTRGXtmTqk206KCft8FLS0pQGDhiBAVIi4w==
-> verifying signature MGUCMQCZnY6OF83iJinYRXmIJLmwnLVxisKpXwt54euU6CmCDeQHguhIcqhrzwzYY1QfIPgCME3EEXKtueoRPNv5DflrpOKWdzZxq26vTRGXtmTqk206KCft8FLS0pQGDhiBAVIi4w==
-
+> got DTAG signature MGYCMQCrlt4c3+BaJi8fwdai7d4kQtQ3MztI7JWa/l4SrgBZMQAm43hE0BLT6dc+fqhB0TYCMQCkWcEKw7Cf94JueCMwy1aEj9skLNldRCkVQYcGxicEyi0ekyWlOTu9EWg88pPpUAA=
+> verifying signature
 Verified OK
 ###################################################
 > fetching tmus signatures
-> got MGQCMET27hhqvlEgzTvGKDllC/AATyZPUMPGn7w4UyOI6wvTYIpNZyd7RZpHleEv+tpjfwIwSMQkjGHhgykunuFgt/iAFrRXgzDS+NykvrUzvBJvJzFl6+Yq/85kEESQam09c5O8
-> verifying signature MGQCMET27hhqvlEgzTvGKDllC/AATyZPUMPGn7w4UyOI6wvTYIpNZyd7RZpHleEv+tpjfwIwSMQkjGHhgykunuFgt/iAFrRXgzDS+NykvrUzvBJvJzFl6+Yq/85kEESQam09c5O8
-
+> got TMUS signature MGQCMG/GcMYMLqUfXEEYOFHqX4YiCDR8Ko3KzO91NyQ8jeasTS4SWkx1JxN9Ir5qjmKblQIwNLUl+HVVZvU5ROy8LySBU8SoJVc8iqhx5pV3i7Qm2g2iIL+bf3oIF2Tkfv4ViaMt
+> verifying signature
 Verified OK
 ```

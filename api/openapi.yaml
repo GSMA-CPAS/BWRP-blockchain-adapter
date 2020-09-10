@@ -41,6 +41,7 @@ paths:
         '500':
           description: Internal Error
           content: {}
+      x-codegen-request-body-name: body 
   /private-documents/{hash}:
     get:
       description: Fetch a private document from the database
@@ -88,6 +89,7 @@ paths:
         '500':
           description: Internal Error
           content: {}
+      x-codegen-request-body-name: body
   /signatures:
     post:
       description: 'store a signature for a given document on the ledger'
@@ -112,6 +114,7 @@ paths:
             schema:
               $ref: models/DocumentSignature.yaml
         required: true
+    x-codegen-request-body-name: body
   /signatures/{hash}/{msp}:
     get:
       description: 'fetch all signatures for a given msp and a given document hash from the ledger'
