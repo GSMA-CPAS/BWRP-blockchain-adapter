@@ -44,6 +44,32 @@ paths:
           description: Internal Error
           content: {}
       x-swagger-router-controller: PrivateDocument
+  /private-documents/{hash}:
+    get:
+      tags:
+      - private-document
+      description: Fetch a private document from the database
+      operationId: fetchPrivateDocument
+      parameters:
+      - name: hash
+        in: path
+        description: The document hash
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      responses:
+        "200":
+          description: successful operation, returns document
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PrivateDocument'
+        "500":
+          description: Internal Error
+          content: {}
+      x-swagger-router-controller: PrivateDocument
   /config/offchain-db-adapter:
     put:
       tags:
@@ -144,6 +170,9 @@ components:
         document:
           type: string
           description: A base64 encoded document
+      example:
+        document: document
+        partner_msp: partner_msp
     OffchainDBAdapterConfig:
       title: OffchainDBAdapterConfig
       required:

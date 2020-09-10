@@ -3,6 +3,29 @@
 var { BlockchainService } = require('../hyperledger/blockchain_service');
 
 /**
+ * Fetch a private document from the database
+ *
+ * hash String The document hash
+ * returns PrivateDocument
+ **/
+exports.fetchPrivateDocument = function(hash) {
+  return new Promise(function(resolve, reject) {
+    const blockchain_connection = new BlockchainService(process.env.BSA_CCP);
+
+    blockchain_connection.fetchPrivateDocument(hash)
+      .then( document => {
+        resolve(document);})
+      .catch(error => {
+        console.log("ERROR: " + error)
+        reject({"message" : error.toString()})
+      }).finally( () => {
+        blockchain_connection.disconnect()
+      })
+  })
+}
+
+
+/**
  * Upload a private document
  *
  * body PrivateDocument A document that should be uploaded

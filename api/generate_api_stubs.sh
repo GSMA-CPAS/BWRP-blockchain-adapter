@@ -13,6 +13,8 @@ if [ ! -f bin/${SWAGGER_JAR} ]; then
 fi
 
 echo "> generating api stubs"
+rm -rf codegen
+mkdir -p codegen
 java -jar bin/${SWAGGER_JAR} generate  -i openapi.yaml  -l nodejs-server -o codegen
 cp codegen/api/openapi.yaml ./openapi.definition.out
 

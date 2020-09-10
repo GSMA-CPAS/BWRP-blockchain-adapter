@@ -15,11 +15,12 @@ The full api specification can be accessed via http://localhost:$BSA_PORT/docs o
 # SHORT API DOC
 
 <!-- markdown-swagger -->
- Endpoint                      | Method | Auth? | Description
+ Endpoint                      | Method | Auth? | Description                                                                   
  ----------------------------- | ------ | ----- | ------------------------------------------------------------------------------
- `/private-documents`          | POST   | No    | Upload a private document
- `/config/offchain-db-adapter` | PUT    | No    | Update the configuration of the offchain-db-adapter
- `/signatures`                 | POST   | No    | store a signature for a given document on the ledger
+ `/private-documents`          | POST   | No    | Upload a private document                                                     
+ `/private-documents/{hash}`   | GET    | No    | Fetch a private document from the database                                    
+ `/config/offchain-db-adapter` | PUT    | No    | Update the configuration of the offchain-db-adapter                           
+ `/signatures`                 | POST   | No    | store a signature for a given document on the ledger                          
  `/signatures/{hash}/{msp}`    | GET    | No    | fetch all signatures for a given msp and a given document hash from the ledger
 <!-- /markdown-swagger -->
 

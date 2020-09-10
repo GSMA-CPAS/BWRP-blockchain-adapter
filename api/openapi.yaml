@@ -41,6 +41,29 @@ paths:
         '500':
           description: Internal Error
           content: {}
+  /private-documents/{hash}:
+    get:
+      description: Fetch a private document from the database
+      tags:
+        - private-document
+      parameters:
+        - in: path
+          name: hash
+          required: true
+          schema:
+            type: string
+          description: The document hash
+      operationId: fetchPrivateDocument
+      responses:
+        '200':
+          description: 'successful operation, returns document'
+          content:
+            application/json:
+              schema:
+                $ref: models/PrivateDocument.yaml
+        '500':
+          description: Internal Error
+          content: {}
   /config/offchain-db-adapter:
     put:
       description: Update the configuration of the offchain-db-adapter
