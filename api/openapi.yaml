@@ -114,7 +114,7 @@ paths:
             schema:
               $ref: models/DocumentSignature.yaml
         required: true
-    x-codegen-request-body-name: body
+      x-codegen-request-body-name: body
   /signatures/{hash}/{msp}:
     get:
       description: 'fetch all signatures for a given msp and a given document hash from the ledger'
