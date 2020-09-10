@@ -22,6 +22,7 @@ The full api specification can be accessed via http://localhost:$BSA_PORT/docs o
  `/config/offchain-db-adapter` | PUT    | No    | Update the configuration of the offchain-db-adapter                           
  `/signatures`                 | POST   | No    | store a signature for a given document on the ledger                          
  `/signatures/{hash}/{msp}`    | GET    | No    | fetch all signatures for a given msp and a given document hash from the ledger
+ `/signatures/subscribe`       | POST   | No    | subscribes a client to receive new signature events                           
 <!-- /markdown-swagger -->
 
 # NOTES

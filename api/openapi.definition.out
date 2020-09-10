@@ -156,6 +156,52 @@ paths:
           description: Internal Server Error
           content: {}
       x-swagger-router-controller: FetchSignatures
+  /signatures/subscribe:
+    post:
+      description: subscribes a client to receive new signature events
+      operationId: signaturesSubscribePOST
+      parameters:
+      - name: callbackUrl
+        in: query
+        description: the location where data will be sent
+        required: true
+        style: form
+        explode: true
+        schema:
+          type: string
+          format: uri
+          example: https://myapp.local
+      responses:
+        "201":
+          description: subscription successfully created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/inline_response_201'
+      callbacks:
+        onData:
+          '{$request.query.callbackUrl}/signature_data':
+            post:
+              requestBody:
+                description: subscription payload
+                content:
+                  application/json:
+                    schema:
+                      type: object
+                      properties:
+                        timestamp:
+                          type: string
+                          format: date-time
+                        userData:
+                          type: string
+              responses:
+                "202":
+                  description: the app should return this when the data was received
+                    successfully
+                "204":
+                  description: the app should return this when it is no longer interested
+                    in further updates
+      x-swagger-router-controller: Default
 components:
   schemas:
     PrivateDocument:
@@ -205,3 +251,14 @@ components:
         signature:
           type: string
           description: the signature over the document
+    inline_response_201:
+      required:
+      - subscriptionId
+      properties:
+        subscriptionId:
+          type: string
+          description: this unique identifier allows management of the subscription
+          example: 2531329f-fb09-4ef7-887e-84e648214436
+      description: subscription information
+      example:
+        subscriptionId: 2531329f-fb09-4ef7-887e-84e648214436
