@@ -121,8 +121,8 @@ paths:
           description: Internal Server Error
       tags:
       - upload-signature
+      x-codegen-request-body-name: body
       x-eov-operation-handler: controllers/UploadSignatureController
-    x-codegen-request-body-name: body
   /signatures/{hash}/{msp}:
     get:
       description: fetch all signatures for a given msp and a given document hash

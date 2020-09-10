@@ -9,7 +9,7 @@ Method | HTTP request | Description
 
 <a name="uploadSignature"></a>
 # **uploadSignature**
-> String uploadSignature(DocumentSignature)
+> String uploadSignature(body)
 
 
 
@@ -19,7 +19,7 @@ Method | HTTP request | Description
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **DocumentSignature** | [**DocumentSignature**](../Models/DocumentSignature.md)| a document signature that should be uploaded |
+ **body** | [**DocumentSignature**](../Models/DocumentSignature.md)| a document signature that should be uploaded |
 
 ### Return type
 
