@@ -296,7 +296,7 @@ class BlockchainService {
                     return {}
                 }
 
-                return document;
+                return document.toString();
             });
         });
     }
