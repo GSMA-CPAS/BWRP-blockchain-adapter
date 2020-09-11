@@ -74,6 +74,7 @@ request "PUT" '{"signer": "'$SIGNER_TMUS'", "pem" : "'"${PEM}"'", "signature" : 
 echo "###################################################"
 echo "> fetching contract from dtag"
 RES=$(request "GET" "" http://$BSA_DTAG/private-documents/$DOCUMENTSHA256)
+echo $RES
 FETCHED_DOC64=$(echo "$RES" | jq -r .data)
 FETCHED_TS=$(echo "$RES" | jq -r .timestamp)
 FETCHED_FROM=$(echo "$RES" | jq -r .fromMSP)
