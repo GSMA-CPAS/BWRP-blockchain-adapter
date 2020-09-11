@@ -1,25 +1,25 @@
-# UploadSignatureApi
+# ConfigApi
 
 All URIs are relative to *http://localhost*
 
 Method | HTTP request | Description
 ------------- | ------------- | -------------
-[**uploadSignature**](UploadSignatureApi.md#uploadSignature) | **POST** /signatures | 
+[**setOffchainDBAdapterConfig**](ConfigApi.md#setOffchainDBAdapterConfig) | **PUT** /config/offchain-db-adapter | 
 
 
-<a name="uploadSignature"></a>
-# **uploadSignature**
-> String uploadSignature(body)
+<a name="setOffchainDBAdapterConfig"></a>
+# **setOffchainDBAdapterConfig**
+> String setOffchainDBAdapterConfig(body)
 
 
 
-    store a signature for a given document on the ledger
+    Update the configuration of the offchain-db-adapter
 
 ### Parameters
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **body** | [**DocumentSignature**](../Models/DocumentSignature.md)| a document signature that should be uploaded |
+ **body** | [**OffchainDBAdapterConfig**](../Models/OffchainDBAdapterConfig.md)| A configuration for the offchain-db-adapter |
 
 ### Return type
 
