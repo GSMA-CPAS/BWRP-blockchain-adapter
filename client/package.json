@@ -6,11 +6,7 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "api:generate": "npm install @openapitools/openapi-generator-cli && openapi-generator generate -g typescript-node -i ../api/openapi.yaml -o ./build/openapi --additional-properties supportsES6=true,npmName=blockchain-adapter-api",
-<<<<<<< HEAD
-    "api:build": "cd build/openapi && npm install  && npm run build",
-=======
     "api:build": "cd build/openapi && npm install && npm run build",
->>>>>>> 7422fdcb2e2c07024fdc5e673b8661bf11926657
     "start": "node index",
     "build": "npm run api:generate && npm run api:build",
     "clean": "rm -rf node_modules && rm -rf build"
