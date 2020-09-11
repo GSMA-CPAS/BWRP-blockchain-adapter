@@ -63,12 +63,19 @@ paths:
         '500':
           description: Internal Error
           content: {}
-  /signatures:
-    post:
-      description: 'store a signature for a given document on the ledger'
+  /signatures/{hash}:
+    put:
+      description: 'store a signature for the document identified by hash on the ledger'
       tags:
         - contract
       operationId: uploadSignature
+      parameters:
+        - in: path
+          name: hash
+          required: true
+          schema:
+            type: string
+          description: The document hash
       responses:
         '200':
           description: 'successful operation, returns transaction hash'

@@ -1,8 +1,10 @@
 # About
 
-This is a POC for the blockchain-adapter.
+This is a POC for the blockchain-adapter and a proposal for its REST Api..
 
-The REST interface is defined using the openAPI standard (see api/openapi.yaml).
+NOTE: the API is a WIP and is subject to change!
+
+The REST interface is defined using the openAPI standard (see [definition file](./api/openapi.yam)).
 The [server code](./server/README.md) is created by the nodejs-express-server codegen.
 The [client code](./client/README.md) is created by the typescript-node codegen.
 See api/generate.sh for details.
@@ -17,3 +19,7 @@ alternative: the full online api specification can be accessed via http://localh
 - this ist just a POC, DO NOT USE in production!
 - the certificates used here are from the "local setup" distribution [DO NOT USE in production!]
 
+# Useful links
+
+- http://spec.openapis.org/oas/v3.0.3
+- https://restfulapi.net/rest-put-vs-post/

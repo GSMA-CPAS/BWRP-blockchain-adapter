@@ -60,7 +60,7 @@ class BlockchainService {
             const msp = self.connectionProfile.organizations[self.connectionProfile.client.organization].mspid
             
             // configure REST api
-            console.log("> will configure REST of MSP "+msp+" endpoint to " + url)
+            console.log("> will configure REST of MSP " + msp + " endpoint to " + url)
             
             // send transaction
             let tx = contract.createTransaction('SetRESTConfig')
@@ -89,7 +89,7 @@ class BlockchainService {
             const hash = result.toString()
 
             // done
-            console.log("> " + onMSP + " stored data with hash " + hash)
+            console.log("> " + onMSP + " stored data with #" + hash)
 
             return hash
         })
@@ -141,7 +141,7 @@ class BlockchainService {
             network.queryHandler.setFilter("")
 
             const storageKey = result.toString()
-            console.log("> got storage key "+storageKey+ " for MSP " + partnerMSP)
+            console.log("> got storage key " + storageKey + " for MSP " + partnerMSP)
 
             return storageKey;
         })
@@ -160,7 +160,7 @@ class BlockchainService {
             network.queryHandler.setFilter("")
 
             const storageKey = result.toString()
-            console.log("> got storage key "+storageKey+ " for MSP " + partnerMSP)
+            console.log("> got storage key " + storageKey + " for MSP " + partnerMSP)
 
             return storageKey;
         })
@@ -179,9 +179,9 @@ class BlockchainService {
         });
     }
 
-    signDocument(document, signature, signer, pem) {
+    signDocument(document_hash, signature, signer, pem) {
         let self = this
-        console.log("> signDocument(..., ..., " + signer + ", ...)")
+        console.log("> signDocument(#" + document_hash + ", ..., " + signer + ", ...)")
 
         return this.network.then( network => {
             // fetch contract
@@ -214,7 +214,7 @@ class BlockchainService {
             const signatureJSON = '{ "signer" : "' + signer + '", "pem" : "' + pem + '", "signature" : "' + signature + '" }'
 
             // calculate storage key
-            return self.createStorageKey(network, contract, localMSP, document).then( storageKey => {
+            return self.createStorageKeyFromHash(network, contract, localMSP, document_hash).then( storageKey => {
                 return self.storeSignature(network, contract, storageKey, signatureJSON)
             });
         });
@@ -231,7 +231,7 @@ class BlockchainService {
             // reset filter
             network.queryHandler.setFilter("")
 
-            console.log("> reply: GetSignatures("+msp+", "+storageKey + ") = " + jsonSignatures)
+            console.log("> reply: GetSignatures(" + msp + ", " + storageKey + ") = " + jsonSignatures)
 
             // check for error
             if (jsonSignatures == "{}"){
@@ -241,7 +241,7 @@ class BlockchainService {
 
             // parse data
             const txSet = JSON.parse(jsonSignatures);
-            console.log("> "+msp+" found " + Object.keys(txSet).length + " signatures for key "+ storageKey)
+            console.log("> " + msp + " found " + Object.keys(txSet).length + " signatures for key " + storageKey)
 
             var signatures = {}
             for (var txID in txSet) {
@@ -261,7 +261,7 @@ class BlockchainService {
             // fetch contract
             const contract = network.getContract(self.connectionProfile.config.contractID);
             
-            console.log("> fetching signatures for <"+msp+"> and hash "+documentHash)
+            console.log("> fetching signatures for <" + msp + "> and #" + documentHash)
 
             // calculate storage key for our own signatures:
             return self.createStorageKeyFromHash(network, contract, msp, documentHash).then( storageKey => {
@@ -278,7 +278,7 @@ class BlockchainService {
             // fetch contract
             const contract = network.getContract(self.connectionProfile.config.contractID);
             
-            console.log("> fetching document for #"+ documentHash)
+            console.log("> fetching document for #" + documentHash)
 
             // enable filter to execute query on our MSP
             const onMSP = this.connectionProfile.organizations[this.connectionProfile.client.organization].mspid
@@ -288,7 +288,7 @@ class BlockchainService {
                 // reset filter
                 network.queryHandler.setFilter("")
 
-                console.log("> reply: FetchPrivateDocument(" + documentHash + ") = " + document)
+                console.log("> reply: FetchPrivateDocument(#" + documentHash + ") = " + document)
 
                 // check for error
                 if (document == "{}"){

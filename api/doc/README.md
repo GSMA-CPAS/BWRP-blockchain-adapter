@@ -12,7 +12,7 @@ Class | Method | HTTP request | Description
 *ContractApi* | [**fetchSignatures**](Apis/ContractApi.md#fetchsignatures) | **GET** /signatures/{hash}/{msp} | fetch all signatures for a given msp and a given document hash from the ledger
 *ContractApi* | [**signaturesSubscribePost**](Apis/ContractApi.md#signaturessubscribepost) | **POST** /signatures/subscribe | subscribes a client to receive new signature events
 *ContractApi* | [**uploadPrivateDocument**](Apis/ContractApi.md#uploadprivatedocument) | **POST** /private-documents | Upload a private document
-*ContractApi* | [**uploadSignature**](Apis/ContractApi.md#uploadsignature) | **POST** /signatures | store a signature for a given document on the ledger
+*ContractApi* | [**uploadSignature**](Apis/ContractApi.md#uploadsignature) | **PUT** /signatures/{hash} | store a signature for the document identified by hash on the ledger
 
 
 <a name="documentation-for-models"></a>

@@ -69,10 +69,19 @@ paths:
       tags:
       - contract
       x-eov-operation-handler: controllers/ContractController
-  /signatures:
-    post:
-      description: store a signature for a given document on the ledger
+  /signatures/{hash}:
+    put:
+      description: store a signature for the document identified by hash on the ledger
       operationId: uploadSignature
+      parameters:
+      - description: The document hash
+        explode: false
+        in: path
+        name: hash
+        required: true
+        schema:
+          type: string
+        style: simple
       requestBody:
         content:
           application/json:
@@ -241,13 +250,9 @@ components:
     DocumentSignature:
       example:
         signature: signature
-        document: document
         pem: pem
         signer: signer
       properties:
-        document:
-          description: the document in base64 encodin
-          type: string
         signer:
           description: the user that signed it
           type: string
@@ -258,7 +263,6 @@ components:
           description: the signature over the document
           type: string
       required:
-      - document
       - pem
       - signature
       - signer

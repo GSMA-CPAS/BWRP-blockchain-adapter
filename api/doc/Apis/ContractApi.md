@@ -8,7 +8,7 @@ Method | HTTP request | Description
 [**fetchSignatures**](ContractApi.md#fetchSignatures) | **GET** /signatures/{hash}/{msp} | 
 [**signaturesSubscribePost**](ContractApi.md#signaturesSubscribePost) | **POST** /signatures/subscribe | 
 [**uploadPrivateDocument**](ContractApi.md#uploadPrivateDocument) | **POST** /private-documents | 
-[**uploadSignature**](ContractApi.md#uploadSignature) | **POST** /signatures | 
+[**uploadSignature**](ContractApi.md#uploadSignature) | **PUT** /signatures/{hash} | 
 
 
 <a name="fetchPrivateDocument"></a>
@@ -122,16 +122,17 @@ No authorization required
 
 <a name="uploadSignature"></a>
 # **uploadSignature**
-> String uploadSignature(body)
+> String uploadSignature(hash, body)
 
 
 
-    store a signature for a given document on the ledger
+    store a signature for the document identified by hash on the ledger
 
 ### Parameters
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
+ **hash** | **String**| The document hash | [default to null]
  **body** | [**DocumentSignature**](../Models/DocumentSignature.md)| a document signature that should be uploaded |
 
 ### Return type

@@ -1,9 +1,6 @@
 title: DocumentSignature
 type: object
 properties:
-  document:
-    type: string
-    description: the document in base64 encodin
   signer:
     type: string
     description: the user that signed it
@@ -14,7 +11,6 @@ properties:
     type: string
     description: the signature over the document
 required:
-  - document
   - signature
   - signer
   - pem

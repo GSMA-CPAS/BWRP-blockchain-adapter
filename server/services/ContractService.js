@@ -1,7 +1,6 @@
 const Service = require('./Service');
 var { BlockchainService } = require('../hyperledger/blockchain_service');
 
-
 /**
 * Fetch a private document from the database
 *
@@ -23,6 +22,7 @@ const fetchPrivateDocument = ({ hash }) => new Promise(
       })
   },
 );
+
 /**
 * fetch all signatures for a given msp and a given document hash from the ledger
 *
@@ -45,26 +45,7 @@ const fetchSignatures = ({ hash, msp }) => new Promise(
       });
   },
 );
-/**
-* subscribes a client to receive new signature events
-*
-* callbackUrl URI the location where data will be sent
-* returns Object
-* */
-const signaturesSubscribePOST = ({ callbackUrl }) => new Promise(
-  async (resolve, reject) => {
-    try {
-      resolve(Service.successResponse({
-        callbackUrl,
-      }));
-    } catch (e) {
-      reject(Service.rejectResponse(
-        e.message || 'Invalid input',
-        e.status || 405,
-      ));
-    }
-  },
-);
+
 /**
 * Upload a private document
 *
@@ -90,16 +71,17 @@ const uploadPrivateDocument = ({ body }) => new Promise(
     },
 );
 /**
-* store a signature for a given document on the ledger
+* store a signature for the document identified by hash on the ledger
 *
+* hash String The document hash
 * body DocumentSignature a document signature that should be uploaded
 * returns String
 * */
-const uploadSignature = ({ body }) => new Promise(
+const uploadSignature = ({ hash, body }) => new Promise(
   async (resolve, reject) => {
     const blockchain_connection = new BlockchainService(process.env.BSA_CCP);
 
-    blockchain_connection.signDocument(body["document"], body["signature"], body["signer"], body["pem"])
+    blockchain_connection.signDocument(hash, body["signature"], body["signer"], body["pem"])
       .then( txID => {
         var resJSON = {};
         resJSON['txID'] = txID;
@@ -113,6 +95,28 @@ const uploadSignature = ({ body }) => new Promise(
       });
   },
 );
+
+/**
+* subscribes a client to receive new signature events
+*
+* callbackUrl URI the location where data will be sent
+* returns Object
+* */
+const signaturesSubscribePOST = ({ callbackUrl }) => new Promise(
+  async (resolve, reject) => {
+    try {
+      resolve(Service.successResponse({
+        callbackUrl,
+      }));
+    } catch (e) {
+      reject(Service.rejectResponse(
+        e.message || 'Invalid input',
+        e.status || 405,
+      ));
+    }
+  },
+);
+
 
 module.exports = {
   fetchPrivateDocument,

@@ -35,15 +35,15 @@ function request {
 
 echo "###################################################"
 echo "> setting rest uri on dtag"
-request "PUT" '{"rest_uri": "http://offchain-db-adapter-dtag:3333"}' http://${BSA_DTAG}/config/offchain-db-adapter
+request "PUT" '{"rest_uri": "http://offchain-db-adapter-dtag:3333"}' http://$BSA_DTAG/config/offchain-db-adapter
 
 echo "###################################################"
 echo "> setting rest uri on tmus"
-request "PUT" '{"rest_uri": "http://offchain-db-adapter-tmus:3334"}' http://${BSA_TMUS}/config/offchain-db-adapter
+request "PUT" '{"rest_uri": "http://offchain-db-adapter-tmus:3334"}' http://$BSA_TMUS/config/offchain-db-adapter
 
 echo "###################################################"
 echo "> storing document on both parties"
-request "POST" '{"partner_msp": "TMUS", "document": "'$DOCUMENT64'" }'  http://${BSA_DTAG}/private-documents
+request "POST" '{"partner_msp": "TMUS", "document": "'$DOCUMENT64'" }'  http://$BSA_DTAG/private-documents
 
 echo "###################################################"
 echo "> dtag signs contract"
@@ -56,7 +56,7 @@ openssl x509 -pubkey -in $CRT > $PUB_DTAG
 # do the signing
 SIGNATURE=$(echo -ne $DOCUMENT | openssl dgst -sha256 -sign $KEY | openssl base64 | tr -d '\n')
 # call blockchain adapter
-request "POST" '{"signer": "'$SIGNER_DTAG'", "pem" : "'"${PEM}"'", "signature" : "'$SIGNATURE'", "document": "'$DOCUMENT64'" }'  http://${BSA_DTAG}/signatures
+request "PUT" '{"signer": "'$SIGNER_DTAG'", "pem" : "'"${PEM}"'", "signature" : "'$SIGNATURE'" }'  http://$BSA_DTAG/signatures/$DOCUMENTSHA256
 
 echo "###################################################"
 echo "> tmus signs contract"
@@ -69,11 +69,11 @@ openssl x509 -pubkey -in $CRT > $PUB_TMUS
 # do the signing
 SIGNATURE=$(echo -ne $DOCUMENT | openssl dgst -sha256 -sign $KEY | openssl base64  | tr -d '\n')
 # call the blockchain adapter
-request "POST" '{"signer": "'$SIGNER_TMUS'", "pem" : "'"${PEM}"'", "signature" : "'$SIGNATURE'", "document": "'$DOCUMENT64'" }'  http://${BSA_TMUS}/signatures
+request "PUT" '{"signer": "'$SIGNER_TMUS'", "pem" : "'"${PEM}"'", "signature" : "'$SIGNATURE'" }'  http://$BSA_TMUS/signatures/$DOCUMENTSHA256
 
 echo "###################################################"
 echo "> fetching contract from dtag"
-RES=$(request "GET" "" http://${BSA_DTAG}/private-documents/$DOCUMENTSHA256)
+RES=$(request "GET" "" http://$BSA_DTAG/private-documents/$DOCUMENTSHA256)
 FETCHED_DOC64=$(echo "$RES" | jq -r .Data)
 FETCHED_TS=$(echo "$RES" | jq -r .Timestamp)
 FETCHED_FROM=$(echo "$RES" | jq -r .FromMSP)
@@ -82,7 +82,7 @@ echo "> $FETCHED_TS: $FETCHED_FROM -> $FETCHED_TO, document data b64 = '$FETCHED
 
 echo "###################################################"
 echo "> fetching dtag signatures"
-SIGNATURES=$(request "GET" "" http://${BSA_DTAG}/signatures/$DOCUMENTSHA256/DTAG)
+SIGNATURES=$(request "GET" "" http://$BSA_DTAG/signatures/$DOCUMENTSHA256/DTAG)
 DTAG_SIGNATURE=$(echo $SIGNATURES | jq -r .[].signature)
 echo "> got DTAG signature $DTAG_SIGNATURE"
 
@@ -93,7 +93,7 @@ echo $DTAG_SIGNATURE | openssl base64 -d | openssl dgst -sha256 -verify $PUB_DTA
 
 echo "###################################################"
 echo "> fetching tmus signatures"
-SIGNATURES=$(request "GET" "" http://${BSA_DTAG}/signatures/$DOCUMENTSHA256/TMUS)
+SIGNATURES=$(request "GET" "" http://$BSA_DTAG/signatures/$DOCUMENTSHA256/TMUS)
 TMUS_SIGNATURE=$(echo $SIGNATURES | jq -r .[].signature)
 echo "> got TMUS signature $TMUS_SIGNATURE"
 
