@@ -1,6 +1,6 @@
 # codegen
 api/bin
-api/codegen
+api/codegen_server
 
 # Logs
 logs

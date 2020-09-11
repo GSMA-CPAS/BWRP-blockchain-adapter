@@ -1,5 +1,5 @@
 /**
- * The OffchainDbAdapterConfigController file is a very simple one, which does not need to be changed manually,
+ * The ConfigController file is a very simple one, which does not need to be changed manually,
  * unless there's a case where business logic reoutes the request to an entity which is not
  * the service.
  * The heavy lifting of the Controller item is done in Request.js - that is where request
@@ -7,7 +7,7 @@
  */
 
 const Controller = require('./Controller');
-const service = require('../services/OffchainDbAdapterConfigService');
+const service = require('../services/ConfigService');
 const setOffchainDBAdapterConfig = async (request, response) => {
   await Controller.handleRequest(request, response, service.setOffchainDBAdapterConfig);
 };

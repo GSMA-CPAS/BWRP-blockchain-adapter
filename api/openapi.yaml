@@ -7,18 +7,16 @@ info:
     name: Simon Schulz
     email: Simon.Schulz01@telekom.de
 tags:
-  - name: offchain-db-adapter-config
-    description: Configuration for the offchain-db-adapter
-  - name: private-document
-    description: Access to private documents
-  - name: upload-signature
-    description: Upload a signature for a document
+  - name: contract
+    description: Access to smartcontract data
+  - name: config
+    description: Access to configuration
 paths:
   /private-documents:
     post:
       description: Upload a private document
       tags:
-        - private-document
+        - contract
       operationId: uploadPrivateDocument
       requestBody:
         description: A document that should be uploaded
@@ -46,7 +44,7 @@ paths:
     get:
       description: Fetch a private document from the database
       tags:
-        - private-document
+        - contract
       parameters:
         - in: path
           name: hash
@@ -65,36 +63,11 @@ paths:
         '500':
           description: Internal Error
           content: {}
-  /config/offchain-db-adapter:
-    put:
-      description: Update the configuration of the offchain-db-adapter
-      tags:
-        - offchain-db-adapter-config
-      operationId: setOffchainDBAdapterConfig
-      requestBody:
-        description: A configuration for the offchain-db-adapter
-        content:
-          application/json:
-            schema:
-              $ref: models/OffchainDBAdapterConfig.yaml
-        required: true
-      responses:
-        '200':
-          description: 'successful operation, returns transaction hash'
-          content:
-            text/plain:
-              schema:
-                type: string
-                x-content-type: text/plain
-        '500':
-          description: Internal Error
-          content: {}
-      x-codegen-request-body-name: body
   /signatures:
     post:
       description: 'store a signature for a given document on the ledger'
       tags:
-        - upload-signature
+        - contract
       operationId: uploadSignature
       responses:
         '200':
@@ -119,7 +92,7 @@ paths:
     get:
       description: 'fetch all signatures for a given msp and a given document hash from the ledger'
       tags:
-        - fetch-signatures
+        - contract
       parameters:
         - in: path
           name: hash
@@ -148,6 +121,8 @@ paths:
   /signatures/subscribe:
     post:
       description: subscribes a client to receive new signature events
+      tags:
+        - contract
       parameters:
         - in: query
           name: callbackUrl          
@@ -195,3 +170,28 @@ paths:
                   description: the app should return this when the data was received successfully
                 '204':
                   description: the app should return this when it is no longer interested in further updates
+  /config/offchain-db-adapter:
+    put:
+      description: Update the configuration of the offchain-db-adapter
+      tags:
+        - config
+      operationId: setOffchainDBAdapterConfig
+      requestBody:
+        description: A configuration for the offchain-db-adapter
+        content:
+          application/json:
+            schema:
+              $ref: models/OffchainDBAdapterConfig.yaml
+        required: true
+      responses:
+        '200':
+          description: 'successful operation, returns transaction hash'
+          content:
+            text/plain:
+              schema:
+                type: string
+                x-content-type: text/plain
+        '500':
+          description: Internal Error
+          content: {}
+      x-codegen-request-body-name: body

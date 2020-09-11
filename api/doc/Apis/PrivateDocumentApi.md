@@ -5,6 +5,7 @@ All URIs are relative to *http://localhost*
 Method | HTTP request | Description
 ------------- | ------------- | -------------
 [**fetchPrivateDocument**](PrivateDocumentApi.md#fetchPrivateDocument) | **GET** /private-documents/{hash} | 
+[**setOffchainDBAdapterConfig**](PrivateDocumentApi.md#setOffchainDBAdapterConfig) | **PUT** /config/offchain-db-adapter | 
 [**uploadPrivateDocument**](PrivateDocumentApi.md#uploadPrivateDocument) | **POST** /private-documents | 
 
 
@@ -34,6 +35,33 @@ No authorization required
 
 - **Content-Type**: Not defined
 - **Accept**: application/json
+
+<a name="setOffchainDBAdapterConfig"></a>
+# **setOffchainDBAdapterConfig**
+> String setOffchainDBAdapterConfig(body)
+
+
+
+    Update the configuration of the offchain-db-adapter
+
+### Parameters
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **body** | [**OffchainDBAdapterConfig**](../Models/OffchainDBAdapterConfig.md)| A configuration for the offchain-db-adapter |
+
+### Return type
+
+[**String**](../Models/string.md)
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+- **Content-Type**: application/json
+- **Accept**: text/plain
 
 <a name="uploadPrivateDocument"></a>
 # **uploadPrivateDocument**

@@ -12,11 +12,11 @@ if [ ! -f bin/${OPENAPI_JAR} ]; then
 	cd ..
 fi
 
-echo "> generating api stubs"
-rm -rf codegen
-mkdir -p codegen
-java -jar bin/${OPENAPI_JAR} generate  -i openapi.yaml  -g nodejs-express-server -o codegen
-cp codegen/api/openapi.yaml ./openapi.definition.out
+echo "> generating server api stubs"
+rm -rf codegen_server
+mkdir -p codegen_server
+java -jar bin/${OPENAPI_JAR} generate  -i openapi.yaml  -g nodejs-express-server -o codegen_server
+cp codegen_server/api/openapi.yaml ../server/api/openapi.definition
 
 echo "> generating markdown"
 java -jar bin/${OPENAPI_JAR} generate  -i openapi.yaml  -g markdown -o doc

@@ -1,8 +1,8 @@
 FROM alpine:3.9
 
-COPY .. /app
+COPY . /app
 
-WORKDIR /app/server
+WORKDIR /app
 
 ENV SERVICE_USER nomad
 

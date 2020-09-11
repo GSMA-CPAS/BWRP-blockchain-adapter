@@ -17,7 +17,7 @@ if (process.env.BSA_CCP == undefined){
 
 const launchServer = async () => {
   try {
-    this.expressServer = new ExpressServer(serverPort, '../api/openapi.definition.out');
+    this.expressServer = new ExpressServer(serverPort, 'api/openapi.definition');
     this.expressServer.launch();
     logger.info('Express server running');
   } catch (error) {

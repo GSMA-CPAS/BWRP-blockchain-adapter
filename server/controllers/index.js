@@ -1,13 +1,7 @@
-const DefaultController = require('./DefaultController');
-const FetchSignaturesController = require('./FetchSignaturesController');
-const OffchainDbAdapterConfigController = require('./OffchainDbAdapterConfigController');
-const PrivateDocumentController = require('./PrivateDocumentController');
-const UploadSignatureController = require('./UploadSignatureController');
+const ConfigController = require('./ConfigController');
+const ContractController = require('./ContractController');
 
 module.exports = {
-  DefaultController,
-  FetchSignaturesController,
-  OffchainDbAdapterConfigController,
-  PrivateDocumentController,
-  UploadSignatureController,
+  ConfigController,
+  ContractController,
 };

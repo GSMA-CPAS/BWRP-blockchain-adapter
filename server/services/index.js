@@ -1,13 +1,7 @@
-const DefaultService = require('./DefaultService');
-const FetchSignaturesService = require('./FetchSignaturesService');
-const OffchainDbAdapterConfigService = require('./OffchainDbAdapterConfigService');
-const PrivateDocumentService = require('./PrivateDocumentService');
-const UploadSignatureService = require('./UploadSignatureService');
+const ConfigService = require('./ConfigService');
+const ContractService = require('./ContractService');
 
 module.exports = {
-  DefaultService,
-  FetchSignaturesService,
-  OffchainDbAdapterConfigService,
-  PrivateDocumentService,
-  UploadSignatureService,
+  ConfigService,
+  ContractService,
 };
