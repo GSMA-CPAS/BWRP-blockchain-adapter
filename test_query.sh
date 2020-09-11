@@ -12,7 +12,7 @@ SIGNER_TMUS="simon@tmus"
 
 #DOCUMENT="MYDOCUMENT_DATA_123456..."
 # create a unique document:
-DOCUMENT="xx" #$(date +%s) 
+DOCUMENT=$(date +%s) 
 DOCUMENT64=$(echo $DOCUMENT | openssl base64 | tr -d '\n')
 DOCUMENTSHA256=$(echo -n $DOCUMENT64 | openssl dgst -sha256 -r | cut -d " " -f1)
 echo "> calculated hash $DOCUMENTSHA256 for document"
