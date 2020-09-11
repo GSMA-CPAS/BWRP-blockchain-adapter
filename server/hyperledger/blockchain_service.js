@@ -211,7 +211,7 @@ class BlockchainService {
             const localMSP = self.connectionProfile.organizations[self.connectionProfile.client.organization].mspid
 
             // create signature object
-            const signatureJSON = '{ "Signer" : "' + signer + '", "PEM" : "' + pem + '", "Signature" : "' + signature + '" }'
+            const signatureJSON = '{ "signer" : "' + signer + '", "pem" : "' + pem + '", "signature" : "' + signature + '" }'
 
             // calculate storage key
             return self.createStorageKeyFromHash(network, contract, localMSP, document_hash).then( storageKey => {
