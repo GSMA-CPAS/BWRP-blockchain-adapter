@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "api:generate": "npm install @openapitools/openapi-generator-cli && openapi-generator generate -g typescript-node -i ../api/openapi.yaml -o ./build/openapi --additional-properties npmName=blockchain-adapter-api",
+    "api:generate": "npm install @openapitools/openapi-generator-cli && openapi-generator generate -g typescript-node -i ../api/openapi.yaml -o ./build/openapi --additional-properties supportsES6=true,npmName=blockchain-adapter-api",
     "api:build": "cd build/openapi && npm install --only=dev && npm run build",
     "start": "node index",
     "build": "npm run api:generate && npm run api:build",
@@ -14,6 +14,7 @@
   "author": "Sebastian Meyer zu Borgsen",
   "dependencies": {
     "@openapitools/openapi-generator-cli": "^1.0.18-4.3.1",
-    "blockchain-adapter-api": "file:./build/openapi"
+    "blockchain-adapter-api": "file:./build/openapi",
+    "btoa": "^1.2.1"
   }
 }
