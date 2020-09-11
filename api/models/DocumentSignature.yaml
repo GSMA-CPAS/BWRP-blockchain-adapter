@@ -1,16 +1,16 @@
 title: DocumentSignature
 type: object
 properties:
-  signer:
+  Signer:
     type: string
     description: the user that signed it
-  pem:
+  PEM:
     type: string
     description: the certificate of the signer in pem format
-  signature:
+  Signature:
     type: string
     description: the signature over the document
 required:
-  - signature
-  - signer
-  - pem
+  - Signer
+  - PEM
+  - Signature  

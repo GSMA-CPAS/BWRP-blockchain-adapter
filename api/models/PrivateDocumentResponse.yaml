@@ -1,0 +1,32 @@
+title: PrivateDocument
+type: object
+properties:
+  FromMSP:
+    type: string
+    description: The MSP that creates this document
+  ToMSP:
+    type: string
+    description: The partner MSP that is also involved
+  SenderID:
+    type: string
+    description: The hyperledger senderID of the TX 
+  Data:
+    type: string
+    description: A base64 encoded document
+  DataHash:
+    type: string
+    description: The hash over the document
+  Timestamp: 
+    type: string
+    description: The timestamp when the document was stored in the local database.
+  ID:
+    type: integer
+    description: The internal ID from mySQL (not really necessary, to be removed)
+required:
+  - FromMSP
+  - ToMSP
+  - SenderID
+  - Data
+  - DataHash
+  - Timestamp
+  - ID

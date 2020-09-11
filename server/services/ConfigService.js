@@ -11,7 +11,7 @@ const setOffchainDBAdapterConfig = ({ body }) => new Promise(
   async (resolve, reject) => {
     const blockchain_connection = new BlockchainService(process.env.BSA_CCP);
   
-    blockchain_connection.setRESTConfig(body["rest_uri"])
+    blockchain_connection.setRESTConfig(body["RestURI"])
       .then( txID => {
         var resJSON = {};
         resJSON['txID'] = txID;

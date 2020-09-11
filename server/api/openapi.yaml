@@ -16,7 +16,8 @@ tags:
 paths:
   /private-documents:
     post:
-      description: Upload a private document
+      description: Upload a private document, shared between our own organization
+        and a partner MSP
       operationId: uploadPrivateDocument
       requestBody:
         content:
@@ -61,7 +62,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/PrivateDocument'
+                $ref: '#/components/schemas/PrivateDocumentResponse'
           description: successful operation, returns document
         "500":
           content: {}
@@ -95,7 +96,6 @@ paths:
             text/plain:
               schema:
                 type: string
-                x-content-type: text/plain
           description: successful operation, returns transaction hash
         "500":
           content: {}
@@ -234,51 +234,93 @@ components:
   schemas:
     PrivateDocument:
       example:
-        document: document
-        partner_msp: partner_msp
+        Data: Data
+        ToMSP: ToMSP
       properties:
-        partner_msp:
-          description: The partner MSP that should receive this document as well
+        ToMSP:
+          description: The partner MSP that is also involved
           type: string
-        document:
+        Data:
           description: A base64 encoded document
           type: string
       required:
-      - document
+      - Data
+      - ToMSP
+      title: PrivateDocument
+      type: object
+    PrivateDocumentResponse:
+      example:
+        Data: Data
+        FromMSP: FromMSP
+        ID: 0
+        ToMSP: ToMSP
+        SenderID: SenderID
+        Timestamp: Timestamp
+        DataHash: DataHash
+      properties:
+        FromMSP:
+          description: The MSP that creates this document
+          type: string
+        ToMSP:
+          description: The partner MSP that is also involved
+          type: string
+        SenderID:
+          description: The hyperledger senderID of the TX
+          type: string
+        Data:
+          description: A base64 encoded document
+          type: string
+        DataHash:
+          description: The hash over the document
+          type: string
+        Timestamp:
+          description: The timestamp when the document was stored in the local database.
+          type: string
+        ID:
+          description: The internal ID from mySQL (not really necessary, to be removed)
+          type: integer
+      required:
+      - Data
+      - DataHash
+      - FromMSP
+      - ID
+      - SenderID
+      - Timestamp
+      - ToMSP
       title: PrivateDocument
       type: object
     DocumentSignature:
       example:
-        signature: signature
-        pem: pem
-        signer: signer
+        Signer: Signer
+        Signature: Signature
+        PEM: PEM
       properties:
-        signer:
+        Signer:
           description: the user that signed it
           type: string
-        pem:
+        PEM:
           description: the certificate of the signer in pem format
           type: string
-        signature:
+        Signature:
           description: the signature over the document
           type: string
       required:
-      - pem
-      - signature
-      - signer
+      - PEM
+      - Signature
+      - Signer
       title: DocumentSignature
       type: object
     OffchainDBAdapterConfig:
       example:
-        rest_uri: http://blockchain-adapter:3333/documents
+        RestURI: http://blockchain-adapter:3333/documents
       properties:
-        rest_uri:
+        RestURI:
           description: URL
           example: http://blockchain-adapter:3333/documents
           format: uri
           type: string
       required:
-      - rest_uri
+      - RestURI
       title: OffchainDBAdapterConfig
       type: object
     inline_object:

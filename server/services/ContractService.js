@@ -47,16 +47,17 @@ const fetchSignatures = ({ hash, msp }) => new Promise(
 );
 
 /**
-* Upload a private document
+* Upload a private document, shared between our own organization and <partnermsp>
 *
-* body PrivateDocument A document that should be uploaded
+* partnermsp String The partner MSP name
+* body String A document that should be uploaded in base64 encoding
 * returns String
 * */
 const uploadPrivateDocument = ({ body }) => new Promise(
   async (resolve, reject) => {
     const blockchain_connection = new BlockchainService(process.env.BSA_CCP);
-      
-    blockchain_connection.addDocument(body["partner_msp"], body["document"])
+    
+    blockchain_connection.addDocument(body["ToMSP"], body["Data"])
       .then( hash => {
         var resJSON = {};
         resJSON['DataHash'] = hash;
@@ -70,6 +71,7 @@ const uploadPrivateDocument = ({ body }) => new Promise(
       });
     },
 );
+
 /**
 * store a signature for the document identified by hash on the ledger
 *
@@ -81,7 +83,7 @@ const uploadSignature = ({ hash, body }) => new Promise(
   async (resolve, reject) => {
     const blockchain_connection = new BlockchainService(process.env.BSA_CCP);
 
-    blockchain_connection.signDocument(hash, body["signature"], body["signer"], body["pem"])
+    blockchain_connection.signDocument(hash, body["Signature"], body["Signer"], body["PEM"])
       .then( txID => {
         var resJSON = {};
         resJSON['txID'] = txID;

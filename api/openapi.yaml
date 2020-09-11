@@ -14,7 +14,7 @@ tags:
 paths:
   /private-documents:
     post:
-      description: Upload a private document
+      description: Upload a private document, shared between our own organization and a partner MSP
       tags:
         - contract
       operationId: uploadPrivateDocument
@@ -22,8 +22,8 @@ paths:
         description: A document that should be uploaded
         content:
           application/json:
-            schema:
-              $ref: models/PrivateDocument.yaml
+              schema:
+                $ref: models/PrivateDocument.yaml
         required: true
       responses:
         '200':
@@ -59,7 +59,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: models/PrivateDocument.yaml
+                $ref: models/PrivateDocumentResponse.yaml
         '500':
           description: Internal Error
           content: {}
@@ -83,7 +83,6 @@ paths:
             text/plain:
               schema:
                 type: string
-                x-content-type: text/plain
         '500':
           description: Internal Server Error
           content: {}

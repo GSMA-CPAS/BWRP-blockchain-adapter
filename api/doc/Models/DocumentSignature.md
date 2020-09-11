@@ -3,9 +3,9 @@
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**signer** | [**String**](string.md) | the user that signed it | [default to null]
-**pem** | [**String**](string.md) | the certificate of the signer in pem format | [default to null]
-**signature** | [**String**](string.md) | the signature over the document | [default to null]
+**Signer** | [**String**](string.md) | the user that signed it | [default to null]
+**PEM** | [**String**](string.md) | the certificate of the signer in pem format | [default to null]
+**Signature** | [**String**](string.md) | the signature over the document | [default to null]
 
 [[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)
 

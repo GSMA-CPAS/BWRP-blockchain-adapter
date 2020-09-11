@@ -13,7 +13,7 @@ Method | HTTP request | Description
 
 <a name="fetchPrivateDocument"></a>
 # **fetchPrivateDocument**
-> PrivateDocument fetchPrivateDocument(hash)
+> PrivateDocumentResponse fetchPrivateDocument(hash)
 
 
 
@@ -27,7 +27,7 @@ Name | Type | Description  | Notes
 
 ### Return type
 
-[**PrivateDocument**](../Models/PrivateDocument.md)
+[**PrivateDocumentResponse**](../Models/PrivateDocumentResponse.md)
 
 ### Authorization
 
@@ -99,7 +99,7 @@ No authorization required
 
 
 
-    Upload a private document
+    Upload a private document, shared between our own organization and a partner MSP
 
 ### Parameters
 
