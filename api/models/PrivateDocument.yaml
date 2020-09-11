@@ -1,12 +1,12 @@
 title: PrivateDocument
 type: object
 properties:
-  ToMSP:
+  toMSP:
     type: string
     description: The partner MSP that is also involved
-  Data:
+  data:
     type: string
     description: A base64 encoded document
 required:
-  - ToMSP
-  - Data
+  - toMSP
+  - data

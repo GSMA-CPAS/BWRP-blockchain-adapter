@@ -57,7 +57,7 @@ const uploadPrivateDocument = ({ body }) => new Promise(
   async (resolve, reject) => {
     const blockchain_connection = new BlockchainService(process.env.BSA_CCP);
     
-    blockchain_connection.addDocument(body["ToMSP"], body["Data"])
+    blockchain_connection.addDocument(body["toMSP"], body["data"])
       .then( hash => {
         var resJSON = {};
         resJSON['DataHash'] = hash;
@@ -83,7 +83,7 @@ const uploadSignature = ({ hash, body }) => new Promise(
   async (resolve, reject) => {
     const blockchain_connection = new BlockchainService(process.env.BSA_CCP);
 
-    blockchain_connection.signDocument(hash, body["Signature"], body["Signer"], body["PEM"])
+    blockchain_connection.signDocument(hash, body["signature"], body["signer"], body["pem"])
       .then( txID => {
         var resJSON = {};
         resJSON['txID'] = txID;

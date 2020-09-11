@@ -1,32 +1,26 @@
-title: PrivateDocument
+title: PrivateDocumentResponse
 type: object
+required:
+  - fromMSP
+  - senderID
+  - dataHash
+  - timestamp
+  - id
+allOf:
+  - $ref: 'PrivateDocument.yaml'
 properties:
-  FromMSP:
+  fromMSP:
     type: string
-    description: The MSP that creates this document
-  ToMSP:
-    type: string
-    description: The partner MSP that is also involved
-  SenderID:
+    description: The MSP that creates this document (optional on request)
+  senderID:
     type: string
     description: The hyperledger senderID of the TX 
-  Data:
-    type: string
-    description: A base64 encoded document
-  DataHash:
+  dataHash:
     type: string
     description: The hash over the document
-  Timestamp: 
+  timestamp: 
     type: string
     description: The timestamp when the document was stored in the local database.
-  ID:
+  id:
     type: integer
     description: The internal ID from mySQL (not really necessary, to be removed)
-required:
-  - FromMSP
-  - ToMSP
-  - SenderID
-  - Data
-  - DataHash
-  - Timestamp
-  - ID

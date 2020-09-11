@@ -1,10 +1,10 @@
 title: OffchainDBAdapterConfig
 type: object
 properties:
-  RestURI:
+  restURI:
     type: string
-    description: URL
+    description: URL of the offchain db adapter
     format: uri
-    example: 'http://blockchain-adapter:3333/documents'
+    example: 'http://offchain-db-adapter:3333/documents'
 required:
-  - RestURI
+  - restURI

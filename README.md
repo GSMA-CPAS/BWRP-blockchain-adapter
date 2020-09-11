@@ -21,5 +21,6 @@ alternative: the full online api specification can be accessed via http://localh
 
 # Useful links
 
-- http://spec.openapis.org/oas/v3.0.3
-- https://restfulapi.net/rest-put-vs-post/
+- [OpenAPI 3.0.3](http://spec.openapis.org/oas/v3.0.3)
+- [Google JSON styleguide](https://google.github.io/styleguide/jsoncstyleguide.xml)
+- [PUT vs POST](https://restfulapi.net/rest-put-vs-post/)

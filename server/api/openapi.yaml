@@ -234,93 +234,85 @@ components:
   schemas:
     PrivateDocument:
       example:
-        Data: Data
-        ToMSP: ToMSP
+        data: data
+        toMSP: toMSP
       properties:
-        ToMSP:
+        toMSP:
           description: The partner MSP that is also involved
           type: string
-        Data:
+        data:
           description: A base64 encoded document
           type: string
       required:
-      - Data
-      - ToMSP
+      - data
+      - toMSP
       title: PrivateDocument
       type: object
     PrivateDocumentResponse:
+      allOf:
+      - $ref: '#/components/schemas/PrivateDocument'
       example:
-        Data: Data
-        FromMSP: FromMSP
-        ID: 0
-        ToMSP: ToMSP
-        SenderID: SenderID
-        Timestamp: Timestamp
-        DataHash: DataHash
+        fromMSP: fromMSP
+        senderID: senderID
+        dataHash: dataHash
+        id: 0
+        timestamp: timestamp
       properties:
-        FromMSP:
-          description: The MSP that creates this document
+        fromMSP:
+          description: The MSP that creates this document (optional on request)
           type: string
-        ToMSP:
-          description: The partner MSP that is also involved
-          type: string
-        SenderID:
+        senderID:
           description: The hyperledger senderID of the TX
           type: string
-        Data:
-          description: A base64 encoded document
-          type: string
-        DataHash:
+        dataHash:
           description: The hash over the document
           type: string
-        Timestamp:
+        timestamp:
           description: The timestamp when the document was stored in the local database.
           type: string
-        ID:
+        id:
           description: The internal ID from mySQL (not really necessary, to be removed)
           type: integer
       required:
-      - Data
-      - DataHash
-      - FromMSP
-      - ID
-      - SenderID
-      - Timestamp
-      - ToMSP
-      title: PrivateDocument
+      - dataHash
+      - fromMSP
+      - id
+      - senderID
+      - timestamp
+      title: PrivateDocumentResponse
       type: object
     DocumentSignature:
       example:
-        Signer: Signer
-        Signature: Signature
-        PEM: PEM
+        signature: signature
+        pem: pem
+        signer: signer
       properties:
-        Signer:
+        signer:
           description: the user that signed it
           type: string
-        PEM:
+        pem:
           description: the certificate of the signer in pem format
           type: string
-        Signature:
+        signature:
           description: the signature over the document
           type: string
       required:
-      - PEM
-      - Signature
-      - Signer
+      - pem
+      - signature
+      - signer
       title: DocumentSignature
       type: object
     OffchainDBAdapterConfig:
       example:
-        RestURI: http://blockchain-adapter:3333/documents
+        restURI: http://offchain-db-adapter:3333/documents
       properties:
-        RestURI:
-          description: URL
-          example: http://blockchain-adapter:3333/documents
+        restURI:
+          description: URL of the offchain db adapter
+          example: http://offchain-db-adapter:3333/documents
           format: uri
           type: string
       required:
-      - RestURI
+      - restURI
       title: OffchainDBAdapterConfig
       type: object
     inline_object:
