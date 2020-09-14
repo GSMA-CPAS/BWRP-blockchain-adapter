@@ -9,7 +9,8 @@
     "api:build": "cd build/openapi && npm install && npm run build",
     "start": "node index",
     "build": "npm run api:generate && npm run api:build",
-    "clean": "rm -rf node_modules && rm -rf build"
+    "clean": "rm -rf node_modules && rm -rf build",
+    "lint": "eslint ."
   },
   "author": "Sebastian Meyer zu Borgsen",
   "dependencies": {
@@ -19,5 +20,12 @@
     "atob": "^2.1.2",
     "openssl-nodejs": "^1.0.5",
     "lodash": "4.17.20"
+  },
+  "devDependencies": {
+    "@typescript-eslint/eslint-plugin": "^4.1.0",
+    "@typescript-eslint/parser": "^4.1.0",
+    "eslint": "^7.9.0",
+    "eslint-config-google": "^0.14.0",
+    "typescript": "^3.7.0-beta"
   }
 }
