@@ -15,11 +15,11 @@
   "author": "Sebastian Meyer zu Borgsen",
   "dependencies": {
     "@openapitools/openapi-generator-cli": "^1.0.18-4.3.1",
+    "atob": "^2.1.2",
     "blockchain-adapter-api": "file:./build/openapi",
     "btoa": "^1.2.1",
-    "atob": "^2.1.2",
-    "openssl-nodejs": "^1.0.5",
-    "lodash": "4.17.20"
+    "lodash": "4.17.20",
+    "openssl-nodejs": "^1.0.5"
   },
   "devDependencies": {
     "@typescript-eslint/eslint-plugin": "^4.1.0",
