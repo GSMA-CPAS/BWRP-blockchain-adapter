@@ -78,11 +78,11 @@ class BlockchainService {
         });
     }
 
-    storeDocument(network, contract, onMSP, partnerMSP, document){
+    storeDocument(network, contract, onMSP, partnerMSP, documentID, documentBase64){
         // enable filter
         network.queryHandler.setFilter(onMSP)
         
-        return contract.evaluateTransaction("StorePrivateDocument", ...[partnerMSP, document]).then( result => {
+        return contract.evaluateTransaction("StorePrivateDocument", ...[partnerMSP, documentID, documentBase64]).then( result => {
             // reset filter
             network.queryHandler.setFilter("")
 
@@ -95,7 +95,7 @@ class BlockchainService {
         })
     }
 
-    addDocument(partnerMSP, document) {
+    addDocument(documentID, partnerMSP, documentBase64) {
         let self = this
         
         return this.network.then( network => {
@@ -103,20 +103,20 @@ class BlockchainService {
             const contract = network.getContract(self.connectionProfile.config.contractID);
             
             // calc expected hash
-            const expectedHash = crypto.createHash('sha256').update(document).digest('hex');
+            const expectedHash = crypto.createHash('sha256').update(documentBase64).digest('hex');
     
             // fetch our MSP name
             const fromMSP = self.connectionProfile.organizations[self.connectionProfile.client.organization].mspid
             
             // EVALUATE store document on fromMSP (local)
-            return self.storeDocument(network, contract, fromMSP, partnerMSP, document).then( hash => {
+            return self.storeDocument(network, contract, fromMSP, partnerMSP, documentID, documentBase64).then( hash => {
                 // check hash
                 if (expectedHash != hash){
                     return Promise.reject(fromMSP + " stored invalid hash: " + hash + " != " + expectedHash)
                 }
 
                 // EVALUATE store document on partnerMSP (remote)
-                return self.storeDocument(network, contract, partnerMSP, partnerMSP, document).then( () => {
+                return self.storeDocument(network, contract, partnerMSP, partnerMSP, documentID, documentBase64).then( () => {
                     // check hash
                     if (expectedHash != hash){
                         return Promise.reject(partnerMSP + " stored invalid hash: " + hash + " != " + expectedHash)
@@ -129,33 +129,14 @@ class BlockchainService {
     }
 
     // this will always be run locally
-    createStorageKey(network, contract, partnerMSP, document){
+    createStorageKey(network, contract, partnerMSP, documentID){
         // fetch our MSP name
         const localMSP = this.connectionProfile.organizations[this.connectionProfile.client.organization].mspid
         
         // enable filter
         network.queryHandler.setFilter(localMSP)
         
-        return contract.evaluateTransaction("CreateStorageKey", ...[partnerMSP, document]).then( result => {
-            // reset filter
-            network.queryHandler.setFilter("")
-
-            const storageKey = result.toString()
-            console.log("> got storage key " + storageKey + " for MSP " + partnerMSP)
-
-            return storageKey;
-        })
-    }
-
-    // this will always be run locally
-    createStorageKeyFromHash(network, contract, partnerMSP, documentHash){
-        // fetch our MSP name
-        const localMSP = this.connectionProfile.organizations[this.connectionProfile.client.organization].mspid
-
-        // enable filter
-        network.queryHandler.setFilter(localMSP)
-        
-        return contract.evaluateTransaction("CreateStorageKeyFromHash", ...[partnerMSP, documentHash]).then( result => {
+        return contract.evaluateTransaction("CreateStorageKey", ...[partnerMSP, documentID]).then( result => {
             // reset filter
             network.queryHandler.setFilter("")
 
@@ -179,9 +160,9 @@ class BlockchainService {
         });
     }
 
-    signDocument(document_hash, signature, signer, pem) {
+    signDocument(documentID, signature, signer, pem) {
         let self = this
-        console.log("> signDocument(#" + document_hash + ", ..., " + signer + ", ...)")
+        console.log("> signDocument(" + documentID + ", ..., " + signer + ", ...)")
 
         return this.network.then( network => {
             // fetch contract
@@ -214,7 +195,7 @@ class BlockchainService {
             const signatureJSON = '{ "signer" : "' + signer + '", "pem" : "' + pem + '", "signature" : "' + signature + '" }'
 
             // calculate storage key
-            return self.createStorageKeyFromHash(network, contract, localMSP, document_hash).then( storageKey => {
+            return self.createStorageKey(network, contract, localMSP, documentID).then( storageKey => {
                 return self.storeSignature(network, contract, storageKey, signatureJSON)
             });
         });
@@ -254,41 +235,41 @@ class BlockchainService {
         })
     }
 
-    fetchSignatures(documentHash, msp) {
+    fetchSignatures(msp, documentID) {
         let self = this
         
         return this.network.then( network => {
             // fetch contract
             const contract = network.getContract(self.connectionProfile.config.contractID);
             
-            console.log("> fetching signatures for <" + msp + "> and #" + documentHash)
+            console.log("> fetching signatures for <" + msp + "> and document id " + documentID)
 
             // calculate storage key for our own signatures:
-            return self.createStorageKeyFromHash(network, contract, msp, documentHash).then( storageKey => {
+            return self.createStorageKey(network, contract, msp, documentID).then( storageKey => {
                 console.log("> accessing data using storage key " + storageKey)
                 return self.getSignatures(network, contract, msp, storageKey)
             });
         });
     }
 
-    fetchPrivateDocument(documentHash) {
+    fetchPrivateDocument(documentID) {
         let self = this
         
         return this.network.then( network => {
             // fetch contract
             const contract = network.getContract(self.connectionProfile.config.contractID);
             
-            console.log("> fetching document for #" + documentHash)
+            console.log("> fetching document for id " + documentID)
 
             // enable filter to execute query on our MSP
             const onMSP = this.connectionProfile.organizations[this.connectionProfile.client.organization].mspid
             network.queryHandler.setFilter(onMSP)
 
-            return contract.evaluateTransaction("FetchPrivateDocument", ...[documentHash]).then( document => {
+            return contract.evaluateTransaction("FetchPrivateDocument", ...[documentID]).then( document => {
                 // reset filter
                 network.queryHandler.setFilter("")
 
-                console.log("> reply: FetchPrivateDocument(#" + documentHash + ") = " + document)
+                console.log("> reply: FetchPrivateDocument(#" + documentID + ") = " + document)
 
                 // check for error
                 if (document == "{}"){

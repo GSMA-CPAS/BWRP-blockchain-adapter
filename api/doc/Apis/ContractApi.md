@@ -4,26 +4,26 @@ All URIs are relative to *http://localhost*
 
 Method | HTTP request | Description
 ------------- | ------------- | -------------
-[**fetchPrivateDocument**](ContractApi.md#fetchPrivateDocument) | **GET** /private-documents/{hash} | 
-[**fetchSignatures**](ContractApi.md#fetchSignatures) | **GET** /signatures/{hash}/{msp} | 
+[**fetchPrivateDocument**](ContractApi.md#fetchPrivateDocument) | **GET** /private-documents/{id} | 
+[**fetchSignatures**](ContractApi.md#fetchSignatures) | **GET** /signatures/{id}/{msp} | 
 [**signaturesSubscribePost**](ContractApi.md#signaturesSubscribePost) | **POST** /signatures/subscribe | 
-[**uploadPrivateDocument**](ContractApi.md#uploadPrivateDocument) | **POST** /private-documents | 
-[**uploadSignature**](ContractApi.md#uploadSignature) | **PUT** /signatures/{hash} | 
+[**uploadPrivateDocument**](ContractApi.md#uploadPrivateDocument) | **PUT** /private-documents/{id} | 
+[**uploadSignature**](ContractApi.md#uploadSignature) | **PUT** /signatures/{id} | 
 
 
 <a name="fetchPrivateDocument"></a>
 # **fetchPrivateDocument**
-> PrivateDocumentResponse fetchPrivateDocument(hash)
+> PrivateDocumentResponse fetchPrivateDocument(id)
 
 
 
-    Fetch a private document from the database
+    Fetch a private document from the database, identified by its id
 
 ### Parameters
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **hash** | **String**| The document hash | [default to null]
+ **id** | **String**| The document ID | [default to null]
 
 ### Return type
 
@@ -40,17 +40,17 @@ No authorization required
 
 <a name="fetchSignatures"></a>
 # **fetchSignatures**
-> String fetchSignatures(hash, msp)
+> String fetchSignatures(id, msp)
 
 
 
-    fetch all signatures for a given msp and a given document hash from the ledger
+    fetch all signatures for a given msp and a given document id from the ledger
 
 ### Parameters
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **hash** | **String**| The document hash | [default to null]
+ **id** | **String**| The document ID | [default to null]
  **msp** | **String**| A MSP name | [default to null]
 
 ### Return type
@@ -95,7 +95,7 @@ No authorization required
 
 <a name="uploadPrivateDocument"></a>
 # **uploadPrivateDocument**
-> String uploadPrivateDocument(body)
+> String uploadPrivateDocument(id, body)
 
 
 
@@ -105,6 +105,7 @@ No authorization required
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
+ **id** | **String**| The document ID | [default to null]
  **body** | [**PrivateDocument**](../Models/PrivateDocument.md)| A document that should be uploaded |
 
 ### Return type
@@ -122,17 +123,17 @@ No authorization required
 
 <a name="uploadSignature"></a>
 # **uploadSignature**
-> String uploadSignature(hash, body)
+> String uploadSignature(id, body)
 
 
 
-    store a signature for the document identified by hash on the ledger
+    store a signature for the document identified by id on the ledger
 
 ### Parameters
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **hash** | **String**| The document hash | [default to null]
+ **id** | **String**| The document ID | [default to null]
  **body** | [**DocumentSignature**](../Models/DocumentSignature.md)| a document signature that should be uploaded |
 
 ### Return type

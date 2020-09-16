@@ -23,4 +23,4 @@ properties:
     description: The timestamp when the document was stored in the local database.
   id:
     type: integer
-    description: The internal ID from mySQL (not really necessary, to be removed)
+    description: The document ID

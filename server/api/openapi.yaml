@@ -14,11 +14,45 @@ tags:
 - description: Access to configuration
   name: config
 paths:
-  /private-documents:
-    post:
+  /private-documents/{id}:
+    get:
+      description: Fetch a private document from the database, identified by its id
+      operationId: fetchPrivateDocument
+      parameters:
+      - description: The document ID
+        explode: false
+        in: path
+        name: id
+        required: true
+        schema:
+          type: string
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PrivateDocumentResponse'
+          description: successful operation, returns document
+        "500":
+          content: {}
+          description: Internal Error
+      tags:
+      - contract
+      x-eov-operation-handler: controllers/ContractController
+    put:
       description: Upload a private document, shared between our own organization
         and a partner MSP
       operationId: uploadPrivateDocument
+      parameters:
+      - description: The document ID
+        explode: false
+        in: path
+        name: id
+        required: true
+        schema:
+          type: string
+        style: simple
       requestBody:
         content:
           application/json:
@@ -44,41 +78,15 @@ paths:
       - contract
       x-codegen-request-body-name: body
       x-eov-operation-handler: controllers/ContractController
-  /private-documents/{hash}:
-    get:
-      description: Fetch a private document from the database
-      operationId: fetchPrivateDocument
-      parameters:
-      - description: The document hash
-        explode: false
-        in: path
-        name: hash
-        required: true
-        schema:
-          type: string
-        style: simple
-      responses:
-        "200":
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/PrivateDocumentResponse'
-          description: successful operation, returns document
-        "500":
-          content: {}
-          description: Internal Error
-      tags:
-      - contract
-      x-eov-operation-handler: controllers/ContractController
-  /signatures/{hash}:
+  /signatures/{id}:
     put:
-      description: store a signature for the document identified by hash on the ledger
+      description: store a signature for the document identified by id on the ledger
       operationId: uploadSignature
       parameters:
-      - description: The document hash
+      - description: The document ID
         explode: false
         in: path
-        name: hash
+        name: id
         required: true
         schema:
           type: string
@@ -104,16 +112,16 @@ paths:
       - contract
       x-codegen-request-body-name: body
       x-eov-operation-handler: controllers/ContractController
-  /signatures/{hash}/{msp}:
+  /signatures/{id}/{msp}:
     get:
-      description: fetch all signatures for a given msp and a given document hash
-        from the ledger
+      description: fetch all signatures for a given msp and a given document id from
+        the ledger
       operationId: fetchSignatures
       parameters:
-      - description: The document hash
+      - description: The document ID
         explode: false
         in: path
-        name: hash
+        name: id
         required: true
         schema:
           type: string
@@ -232,22 +240,6 @@ components:
           schema:
             $ref: '#/components/schemas/inline_object'
   schemas:
-    PrivateDocument:
-      example:
-        data: data
-        toMSP: toMSP
-      properties:
-        toMSP:
-          description: The partner MSP that is also involved
-          type: string
-        data:
-          description: A base64 encoded document
-          type: string
-      required:
-      - data
-      - toMSP
-      title: PrivateDocument
-      type: object
     PrivateDocumentResponse:
       allOf:
       - $ref: '#/components/schemas/PrivateDocument'
@@ -271,7 +263,7 @@ components:
           description: The timestamp when the document was stored in the local database.
           type: string
         id:
-          description: The internal ID from mySQL (not really necessary, to be removed)
+          description: The document ID
           type: integer
       required:
       - dataHash
@@ -280,6 +272,22 @@ components:
       - senderID
       - timestamp
       title: PrivateDocumentResponse
+      type: object
+    PrivateDocument:
+      example:
+        data: data
+        toMSP: toMSP
+      properties:
+        toMSP:
+          description: The partner MSP that is also involved
+          type: string
+        data:
+          description: A base64 encoded document
+          type: string
+      required:
+      - data
+      - toMSP
+      title: PrivateDocument
       type: object
     DocumentSignature:
       example:

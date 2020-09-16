@@ -12,12 +12,19 @@ tags:
   - name: config
     description: Access to configuration
 paths:
-  /private-documents:
-    post:
+  /private-documents/{id}:
+    put:
       description: Upload a private document, shared between our own organization and a partner MSP
       tags:
         - contract
       operationId: uploadPrivateDocument
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+          description: The document ID
       requestBody:
         description: A document that should be uploaded
         content:
@@ -40,18 +47,17 @@ paths:
           description: Internal Error
           content: {}
       x-codegen-request-body-name: body 
-  /private-documents/{hash}:
     get:
-      description: Fetch a private document from the database
+      description: Fetch a private document from the database, identified by its id
       tags:
         - contract
       parameters:
         - in: path
-          name: hash
+          name: id
           required: true
           schema:
             type: string
-          description: The document hash
+          description: The document ID
       operationId: fetchPrivateDocument
       responses:
         '200':
@@ -63,19 +69,19 @@ paths:
         '500':
           description: Internal Error
           content: {}
-  /signatures/{hash}:
+  /signatures/{id}:
     put:
-      description: 'store a signature for the document identified by hash on the ledger'
+      description: 'store a signature for the document identified by id on the ledger'
       tags:
         - contract
       operationId: uploadSignature
       parameters:
         - in: path
-          name: hash
+          name: id
           required: true
           schema:
             type: string
-          description: The document hash
+          description: The document ID
       responses:
         '200':
           description: 'successful operation, returns transaction hash'
@@ -94,18 +100,18 @@ paths:
               $ref: models/DocumentSignature.yaml
         required: true
       x-codegen-request-body-name: body
-  /signatures/{hash}/{msp}:
+  /signatures/{id}/{msp}:
     get:
-      description: 'fetch all signatures for a given msp and a given document hash from the ledger'
+      description: 'fetch all signatures for a given msp and a given document id from the ledger'
       tags:
         - contract
       parameters:
         - in: path
-          name: hash
+          name: id
           required: true
           schema:
             type: string
-          description: The document hash
+          description: The document ID
         - in: path
           name: msp
           required: true

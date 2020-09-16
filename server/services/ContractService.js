@@ -2,16 +2,16 @@ const Service = require('./Service');
 var { BlockchainService } = require('../hyperledger/blockchain_service');
 
 /**
-* Fetch a private document from the database
+* Fetch a private document from the database, identified by its id
 *
-* hash String The document hash
-* returns PrivateDocument
+* id String The document ID
+* returns PrivateDocumentResponse
 * */
-const fetchPrivateDocument = ({ hash }) => new Promise(
+const fetchPrivateDocument = ({ id }) => new Promise(
   async (resolve, reject) => {
     const blockchain_connection = new BlockchainService(process.env.BSA_CCP);
 
-    blockchain_connection.fetchPrivateDocument(hash)
+    blockchain_connection.fetchPrivateDocument(id)
       .then( document => {
         resolve(Service.successResponse(document, 200))
       }).catch(error => {
@@ -24,17 +24,17 @@ const fetchPrivateDocument = ({ hash }) => new Promise(
 );
 
 /**
-* fetch all signatures for a given msp and a given document hash from the ledger
+* fetch all signatures for a given msp and a given document id from the ledger
 *
-* hash String The document hash
+* id String The document ID
 * msp String A MSP name
 * returns String
 * */
-const fetchSignatures = ({ hash, msp }) => new Promise(
+const fetchSignatures = ({ id, msp }) => new Promise(
   async (resolve, reject) => {
     const blockchain_connection = new BlockchainService(process.env.BSA_CCP);
 
-    blockchain_connection.fetchSignatures(hash, msp)
+    blockchain_connection.fetchSignatures(msp, id)
       .then( signatures => {
         resolve(Service.successResponse(signatures, 200))
       }).catch(error => {
@@ -47,17 +47,17 @@ const fetchSignatures = ({ hash, msp }) => new Promise(
 );
 
 /**
-* Upload a private document, shared between our own organization and <partnermsp>
+* Upload a private document, shared between our own organization and a partner MSP
 *
-* partnermsp String The partner MSP name
-* body String A document that should be uploaded in base64 encoding
+* id String The document ID
+* body PrivateDocument A document that should be uploaded
 * returns String
 * */
-const uploadPrivateDocument = ({ body }) => new Promise(
+const uploadPrivateDocument = ({ id, body }) => new Promise(
   async (resolve, reject) => {
     const blockchain_connection = new BlockchainService(process.env.BSA_CCP);
     
-    blockchain_connection.addDocument(body["toMSP"], body["data"])
+    blockchain_connection.addDocument(id, body["toMSP"], body["data"])
       .then( hash => {
         var resJSON = {};
         resJSON['DataHash'] = hash;
@@ -73,17 +73,17 @@ const uploadPrivateDocument = ({ body }) => new Promise(
 );
 
 /**
-* store a signature for the document identified by hash on the ledger
+* store a signature for the document identified by id on the ledger
 *
-* hash String The document hash
+* id String The document ID
 * body DocumentSignature a document signature that should be uploaded
 * returns String
 * */
-const uploadSignature = ({ hash, body }) => new Promise(
+const uploadSignature = ({ id, body }) => new Promise(
   async (resolve, reject) => {
     const blockchain_connection = new BlockchainService(process.env.BSA_CCP);
 
-    blockchain_connection.signDocument(hash, body["signature"], body["signer"], body["pem"])
+    blockchain_connection.signDocument(id, body["signature"], body["signer"], body["pem"])
       .then( txID => {
         var resJSON = {};
         resJSON['txID'] = txID;
