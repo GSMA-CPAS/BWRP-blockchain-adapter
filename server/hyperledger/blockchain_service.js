@@ -95,7 +95,7 @@ class BlockchainService {
         })
     }
 
-    addDocument(documentID, partnerMSP, documentBase64) {
+    addDocument(partnerMSP, documentBase64) {
         let self = this
         
         return this.network.then( network => {
@@ -107,22 +107,25 @@ class BlockchainService {
     
             // fetch our MSP name
             const fromMSP = self.connectionProfile.organizations[self.connectionProfile.client.organization].mspid
-            
-            // EVALUATE store document on fromMSP (local)
-            return self.storeDocument(network, contract, fromMSP, partnerMSP, documentID, documentBase64).then( hash => {
-                // check hash
-                if (expectedHash != hash){
-                    return Promise.reject(fromMSP + " stored invalid hash: " + hash + " != " + expectedHash)
-                }
 
-                // EVALUATE store document on partnerMSP (remote)
-                return self.storeDocument(network, contract, partnerMSP, partnerMSP, documentID, documentBase64).then( () => {
+            // fetch document ID
+            return self.createDocumentID(network, contract).then( documentID => {
+                // EVALUATE store document on fromMSP (local)
+                return self.storeDocument(network, contract, fromMSP, partnerMSP, documentID, documentBase64).then( hash => {
                     // check hash
                     if (expectedHash != hash){
-                        return Promise.reject(partnerMSP + " stored invalid hash: " + hash + " != " + expectedHash)
+                        return Promise.reject(fromMSP + " stored invalid hash: " + hash + " != " + expectedHash)
                     }
 
-                    return hash
+                    // EVALUATE store document on partnerMSP (remote)
+                    return self.storeDocument(network, contract, partnerMSP, partnerMSP, documentID, documentBase64).then( () => {
+                        // check hash
+                        if (expectedHash != hash){
+                            return Promise.reject(partnerMSP + " stored invalid hash: " + hash + " != " + expectedHash)
+                        }
+
+                        return documentID
+                    });
                 });
             });
         });
@@ -144,6 +147,25 @@ class BlockchainService {
             console.log("> got storage key " + storageKey + " for MSP " + partnerMSP)
 
             return storageKey;
+        })
+    }
+
+    // this will always be run locally
+    createDocumentID(network, contract){
+        // fetch our MSP name
+        const localMSP = this.connectionProfile.organizations[this.connectionProfile.client.organization].mspid
+        
+        // enable filter
+        network.queryHandler.setFilter(localMSP)
+        
+        return contract.evaluateTransaction("CreateDocumentID", ...[]).then( result => {
+            // reset filter
+            network.queryHandler.setFilter("")
+
+            const documentID = result.toString()
+            console.log("> got documentID " + documentID)
+
+            return documentID;
         })
     }
 

@@ -49,19 +49,18 @@ const fetchSignatures = ({ id, msp }) => new Promise(
 /**
 * Upload a private document, shared between our own organization and a partner MSP
 *
-* id String The document ID
 * body PrivateDocument A document that should be uploaded
 * returns String
 * */
-const uploadPrivateDocument = ({ id, body }) => new Promise(
+const uploadPrivateDocument = ({ body }) => new Promise(
   async (resolve, reject) => {
     const blockchain_connection = new BlockchainService(process.env.BSA_CCP);
     
-    blockchain_connection.addDocument(id, body["toMSP"], body["data"])
-      .then( hash => {
+    blockchain_connection.addDocument(body["toMSP"], body["data"])
+      .then( documentID => {
         var resJSON = {};
-        resJSON['DataHash'] = hash;
-        console.log("> both parties stored data with hash " + hash)
+        resJSON['documentID'] = documentID;
+        console.log("> both parties stored data with ID " + documentID)
         resolve(Service.successResponse(resJSON, 200))
       }).catch(error => {
         console.log("ERROR: " + error)

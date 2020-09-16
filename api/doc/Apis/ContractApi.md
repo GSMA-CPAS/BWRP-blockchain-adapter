@@ -7,7 +7,7 @@ Method | HTTP request | Description
 [**fetchPrivateDocument**](ContractApi.md#fetchPrivateDocument) | **GET** /private-documents/{id} | 
 [**fetchSignatures**](ContractApi.md#fetchSignatures) | **GET** /signatures/{id}/{msp} | 
 [**signaturesSubscribePost**](ContractApi.md#signaturesSubscribePost) | **POST** /signatures/subscribe | 
-[**uploadPrivateDocument**](ContractApi.md#uploadPrivateDocument) | **PUT** /private-documents/{id} | 
+[**uploadPrivateDocument**](ContractApi.md#uploadPrivateDocument) | **POST** /private-documents | 
 [**uploadSignature**](ContractApi.md#uploadSignature) | **PUT** /signatures/{id} | 
 
 
@@ -95,7 +95,7 @@ No authorization required
 
 <a name="uploadPrivateDocument"></a>
 # **uploadPrivateDocument**
-> String uploadPrivateDocument(id, body)
+> String uploadPrivateDocument(body)
 
 
 
@@ -105,7 +105,6 @@ No authorization required
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **id** | **String**| The document ID | [default to null]
  **body** | [**PrivateDocument**](../Models/PrivateDocument.md)| A document that should be uploaded |
 
 ### Return type

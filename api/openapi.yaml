@@ -12,19 +12,12 @@ tags:
   - name: config
     description: Access to configuration
 paths:
-  /private-documents/{id}:
-    put:
+  /private-documents:
+    post:
       description: Upload a private document, shared between our own organization and a partner MSP
       tags:
         - contract
       operationId: uploadPrivateDocument
-      parameters:
-        - in: path
-          name: id
-          required: true
-          schema:
-            type: string
-          description: The document ID
       requestBody:
         description: A document that should be uploaded
         content:
@@ -33,8 +26,8 @@ paths:
                 $ref: models/PrivateDocument.yaml
         required: true
       responses:
-        '200':
-          description: 'successful operation, returns hash of stored document'
+        '200':  
+          description: 'successful operation, returns ID of stored document'
           content:
             text/plain:
               schema:
@@ -47,6 +40,7 @@ paths:
           description: Internal Error
           content: {}
       x-codegen-request-body-name: body 
+  /private-documents/{id}:
     get:
       description: Fetch a private document from the database, identified by its id
       tags:

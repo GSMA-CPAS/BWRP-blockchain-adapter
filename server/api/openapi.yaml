@@ -14,6 +14,36 @@ tags:
 - description: Access to configuration
   name: config
 paths:
+  /private-documents:
+    post:
+      description: Upload a private document, shared between our own organization
+        and a partner MSP
+      operationId: uploadPrivateDocument
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PrivateDocument'
+        description: A document that should be uploaded
+        required: true
+      responses:
+        "200":
+          content:
+            text/plain:
+              schema:
+                type: string
+                x-content-type: text/plain
+          description: successful operation, returns ID of stored document
+        "400":
+          content: {}
+          description: Bad Request
+        "500":
+          content: {}
+          description: Internal Error
+      tags:
+      - contract
+      x-codegen-request-body-name: body
+      x-eov-operation-handler: controllers/ContractController
   /private-documents/{id}:
     get:
       description: Fetch a private document from the database, identified by its id
@@ -39,44 +69,6 @@ paths:
           description: Internal Error
       tags:
       - contract
-      x-eov-operation-handler: controllers/ContractController
-    put:
-      description: Upload a private document, shared between our own organization
-        and a partner MSP
-      operationId: uploadPrivateDocument
-      parameters:
-      - description: The document ID
-        explode: false
-        in: path
-        name: id
-        required: true
-        schema:
-          type: string
-        style: simple
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/PrivateDocument'
-        description: A document that should be uploaded
-        required: true
-      responses:
-        "200":
-          content:
-            text/plain:
-              schema:
-                type: string
-                x-content-type: text/plain
-          description: successful operation, returns hash of stored document
-        "400":
-          content: {}
-          description: Bad Request
-        "500":
-          content: {}
-          description: Internal Error
-      tags:
-      - contract
-      x-codegen-request-body-name: body
       x-eov-operation-handler: controllers/ContractController
   /signatures/{id}:
     put:
@@ -240,6 +232,22 @@ components:
           schema:
             $ref: '#/components/schemas/inline_object'
   schemas:
+    PrivateDocument:
+      example:
+        data: data
+        toMSP: toMSP
+      properties:
+        toMSP:
+          description: The partner MSP that is also involved
+          type: string
+        data:
+          description: A base64 encoded document
+          type: string
+      required:
+      - data
+      - toMSP
+      title: PrivateDocument
+      type: object
     PrivateDocumentResponse:
       allOf:
       - $ref: '#/components/schemas/PrivateDocument'
@@ -272,22 +280,6 @@ components:
       - senderID
       - timestamp
       title: PrivateDocumentResponse
-      type: object
-    PrivateDocument:
-      example:
-        data: data
-        toMSP: toMSP
-      properties:
-        toMSP:
-          description: The partner MSP that is also involved
-          type: string
-        data:
-          description: A base64 encoded document
-          type: string
-      required:
-      - data
-      - toMSP
-      title: PrivateDocument
       type: object
     DocumentSignature:
       example:
