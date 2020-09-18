@@ -182,9 +182,9 @@ class BlockchainService {
         });
     }
 
-    signDocument(documentID, signature, signer, pem) {
+    signDocument(documentID, signatureJSON) {
         let self = this
-        console.log("> signDocument(" + documentID + ", ..., " + signer + ", ...)")
+        console.log("> signDocument(" + documentID + ", ..., " + algorithm + ", ...)")
 
         return this.network.then( network => {
             // fetch contract
@@ -212,9 +212,6 @@ class BlockchainService {
 
             // fetch our MSP name
             const localMSP = self.connectionProfile.organizations[self.connectionProfile.client.organization].mspid
-
-            // create signature object
-            const signatureJSON = '{ "signer" : "' + signer + '", "pem" : "' + pem + '", "signature" : "' + signature + '" }'
 
             // calculate storage key
             return self.createStorageKey(network, contract, localMSP, documentID).then( storageKey => {

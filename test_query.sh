@@ -52,26 +52,26 @@ echo "> dtag signs contract"
 # generate key and crt
 openssl req -x509 -newkey ec -pkeyopt ec_paramgen_curve:secp384r1 -nodes -keyout $KEY -out $CRT -subj "/CN=${SIGNER_DTAG}/C=DE/ST=NRW/L=Bielefeld/O=ORG/OU=ORGOU" -addext keyUsage=digitalSignature
 # create pem formatted with \n
-PEM=$(cat $CRT | awk 1 ORS='\\n')
+CERT=$(cat $CRT | awk 1 ORS='\\n')
 # extract public key
 openssl x509 -pubkey -in $CRT > $PUB_DTAG
 # do the signing
 SIGNATURE=$(echo -ne $DOCUMENT | openssl dgst -sha256 -sign $KEY | openssl base64 | tr -d '\n')
 # call blockchain adapter
-request "PUT" '{"signer": "'$SIGNER_DTAG'", "pem" : "'"${PEM}"'", "signature" : "'$SIGNATURE'" }'  http://$BSA_DTAG/signatures/$DOCUMENT_ID
+request "PUT" '{"algorithm": "secp384r1", "certificate" : "'"${CERT}"'", "signature" : "'$SIGNATURE'" }'  http://$BSA_DTAG/signatures/$DOCUMENT_ID
 
 echo "###################################################"
 echo "> tmus signs contract"
 # generate key and crt 
 openssl req -x509 -newkey ec -pkeyopt ec_paramgen_curve:secp384r1 -nodes -keyout $KEY -out $CRT -subj "/CN=${SIGNER_TMUS}/C=DE/ST=NRW/L=Bielefeld/O=ORG/OU=ORGOU" -addext keyUsage=digitalSignature
 # create pem formatted with \n
-PEM=$(cat $CRT | awk 1 ORS='\\n')
+CERT=$(cat $CRT | awk 1 ORS='\\n')
 # extract public key
 openssl x509 -pubkey -in $CRT > $PUB_TMUS
 # do the signing
 SIGNATURE=$(echo -ne $DOCUMENT | openssl dgst -sha256 -sign $KEY | openssl base64  | tr -d '\n')
 # call the blockchain adapter
-request "PUT" '{"signer": "'$SIGNER_TMUS'", "pem" : "'"${PEM}"'", "signature" : "'$SIGNATURE'" }'  http://$BSA_TMUS/signatures/$DOCUMENT_ID
+request "PUT" '{"algorithm": "secp384r1", "certificate" : "'"${CERT}"'", "signature" : "'$SIGNATURE'" }'  http://$BSA_TMUS/signatures/$DOCUMENT_ID
 
 echo "###################################################"
 echo "> fetching contract from dtag"

@@ -1,16 +1,18 @@
 title: DocumentSignature
 type: object
 properties:
-  signer:
+  algorithm:
     type: string
-    description: the user that signed it
-  pem:
+    description: The algorithm used to sign
+    example: secp384r1
+  certificate:
     type: string
-    description: the certificate of the signer in pem format
+    description: The certificate of the signer in pem format
+    example: "-----BEGIN CERTIFICATE-----\nMIICYjCCAemgAwIBA..."
   signature:
     type: string
-    description: the signature over the document
+    description: The digital signature over the document
 required:
-  - signer
-  - pem
+  - algorithm
+  - certificate
   - signature  

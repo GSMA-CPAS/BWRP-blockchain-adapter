@@ -284,22 +284,28 @@ components:
     DocumentSignature:
       example:
         signature: signature
-        pem: pem
-        signer: signer
+        certificate: |-
+          -----BEGIN CERTIFICATE-----
+          MIICYjCCAemgAwIBA...
+        algorithm: secp384r1
       properties:
-        signer:
-          description: the user that signed it
+        algorithm:
+          description: The algorithm used to sign
+          example: secp384r1
           type: string
-        pem:
-          description: the certificate of the signer in pem format
+        certificate:
+          description: The certificate of the signer in pem format
+          example: |-
+            -----BEGIN CERTIFICATE-----
+            MIICYjCCAemgAwIBA...
           type: string
         signature:
-          description: the signature over the document
+          description: The digital signature over the document
           type: string
       required:
-      - pem
+      - algorithm
+      - certificate
       - signature
-      - signer
       title: DocumentSignature
       type: object
     OffchainDBAdapterConfig:

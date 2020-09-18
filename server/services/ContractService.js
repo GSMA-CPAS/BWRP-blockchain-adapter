@@ -82,7 +82,14 @@ const uploadSignature = ({ id, body }) => new Promise(
   async (resolve, reject) => {
     const blockchain_connection = new BlockchainService(process.env.BSA_CCP);
 
-    blockchain_connection.signDocument(id, body["signature"], body["signer"], body["pem"])
+    // for security reasons, rewrite the json here:
+    const signatureJSON = {
+      "algorithm" : body["algorithm"],
+      "certificate" : body["certificate"],
+      "signature" : body["signature"],
+    }
+
+    blockchain_connection.signDocument(id, signatureJSON)
       .then( txID => {
         var resJSON = {};
         resJSON['txID'] = txID;

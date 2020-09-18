@@ -98,8 +98,8 @@ function signContract(signer, document) {
 */
 function verifySignature(document, pem, signature64) {
   console.log('document:    ' + document + '.');
-  //console.log('pem:         ' + pem);
-  //console.log('signature64: ' + signature64);
+  // console.log('pem:         ' + pem);
+  // console.log('signature64: ' + signature64);
 
   return new Promise((resolve, reject) => {
     const docBuf = Buffer.from(document);
