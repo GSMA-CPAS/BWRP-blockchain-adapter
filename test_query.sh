@@ -50,7 +50,7 @@ DOCUMENT_ID=$(echo "$RES" | jq -r .documentID)
 echo "###################################################"
 echo "> dtag signs contract"
 # generate key and crt
-openssl req -x509 -newkey ec:<(openssl ecparam -name secp384r1) -nodes -keyout $KEY -out $CRT -subj "/CN=${SIGNER_DTAG}/C=DE/ST=NRW/L=Bielefeld/O=ORG/OU=ORGOU" -addext keyUsage=digitalSignature 2> /dev/null
+openssl req -x509 -newkey ec -pkeyopt ec_paramgen_curve:secp384r1 -nodes -keyout $KEY -out $CRT -subj "/CN=${SIGNER_DTAG}/C=DE/ST=NRW/L=Bielefeld/O=ORG/OU=ORGOU" -addext keyUsage=digitalSignature
 # create pem formatted with \n
 PEM=$(cat $CRT | awk 1 ORS='\\n')
 # extract public key
@@ -62,8 +62,8 @@ request "PUT" '{"signer": "'$SIGNER_DTAG'", "pem" : "'"${PEM}"'", "signature" : 
 
 echo "###################################################"
 echo "> tmus signs contract"
-# generate key and crt
-openssl req -x509 -newkey ec:<(openssl ecparam -name secp384r1) -nodes -keyout $KEY -out $CRT -subj "/CN=${SIGNER_TMUS}/C=DE/ST=NRW/L=Bielefeld/O=ORG/OU=ORGOU" -addext keyUsage=digitalSignature 2> /dev/null
+# generate key and crt 
+openssl req -x509 -newkey ec -pkeyopt ec_paramgen_curve:secp384r1 -nodes -keyout $KEY -out $CRT -subj "/CN=${SIGNER_TMUS}/C=DE/ST=NRW/L=Bielefeld/O=ORG/OU=ORGOU" -addext keyUsage=digitalSignature
 # create pem formatted with \n
 PEM=$(cat $CRT | awk 1 ORS='\\n')
 # extract public key
