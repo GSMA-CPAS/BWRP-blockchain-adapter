@@ -5,7 +5,7 @@ info:
     name: Simon Schulz
   description: This is the REST api specification for the blockchain-adapter
   title: Blockchain-Adapter
-  version: 1.0.0
+  version: 0.0.1
 servers:
 - url: /
 tags:
@@ -13,7 +13,27 @@ tags:
   name: contract
 - description: Access to configuration
   name: config
+- description: Access to status information
+  name: status
 paths:
+  /status:
+    get:
+      description: Show version information of the API
+      operationId: getStatus
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: string
+                x-content-type: application/json
+          description: the status of the service
+        "500":
+          content: {}
+          description: Internal Error
+      tags:
+      - status
+      x-eov-operation-handler: controllers/StatusController
   /private-documents:
     post:
       description: Upload a private document, shared between our own organization

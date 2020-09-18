@@ -184,7 +184,7 @@ class BlockchainService {
 
     signDocument(documentID, signatureJSON) {
         let self = this
-        console.log("> signDocument(" + documentID + ", ..., " + algorithm + ", ...)")
+        console.log("> signDocument(" + documentID + ", ...)")
 
         return this.network.then( network => {
             // fetch contract

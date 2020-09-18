@@ -4,8 +4,7 @@
   "description": "This is the REST api specification for the blockchain-adapter",
   "main": "index.js",
   "scripts": {
-    "prestart": "npm install",
-    "start": "node index.js",
+    "start": "./tools/make_tag.sh; node index.js",
     "lint": "eslint ."
   },
   "keywords": [

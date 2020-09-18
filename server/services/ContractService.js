@@ -83,11 +83,12 @@ const uploadSignature = ({ id, body }) => new Promise(
     const blockchain_connection = new BlockchainService(process.env.BSA_CCP);
 
     // for security reasons, rewrite the json here:
-    const signatureJSON = {
+    const signature = {
       "algorithm" : body["algorithm"],
       "certificate" : body["certificate"],
       "signature" : body["signature"],
     }
+    const signatureJSON = JSON.stringify(signature);
 
     blockchain_connection.signDocument(id, signatureJSON)
       .then( txID => {

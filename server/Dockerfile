@@ -6,6 +6,8 @@ WORKDIR /app
 
 ENV SERVICE_USER nomad
 
+ARG BSA_COMMIT_HASH
+
 RUN addgroup -S ${SERVICE_USER} \
     && adduser -S ${SERVICE_USER} -G ${SERVICE_USER} \
     && apk update \
@@ -15,6 +17,7 @@ RUN addgroup -S ${SERVICE_USER} \
     && apk add --no-cache --virtual .node-dev-deps python make g++ gcc \
     && npm config set unsafe-perm true \
     && npm install \
+    && /app/tools/make_tags.sh ${BSA_COMMIT_HASH} \
     && apk del .node-dev-deps
 
 ENV NODE_ENV=production
@@ -23,4 +26,4 @@ EXPOSE 3000
 
 USER $SERVICE_USER
 
-CMD ["./run.sh"]
+CMD ["./tools/run.sh"]

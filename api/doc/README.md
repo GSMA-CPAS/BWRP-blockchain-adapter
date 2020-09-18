@@ -13,6 +13,7 @@ Class | Method | HTTP request | Description
 *ContractApi* | [**signaturesSubscribePost**](Apis/ContractApi.md#signaturessubscribepost) | **POST** /signatures/subscribe | subscribes a client to receive new signature events
 *ContractApi* | [**uploadPrivateDocument**](Apis/ContractApi.md#uploadprivatedocument) | **POST** /private-documents | Upload a private document, shared between our own organization and a partner MSP
 *ContractApi* | [**uploadSignature**](Apis/ContractApi.md#uploadsignature) | **PUT** /signatures/{id} | store a signature for the document identified by id on the ledger
+*StatusApi* | [**getStatus**](Apis/StatusApi.md#getstatus) | **GET** /status | Show version information of the API
 
 
 <a name="documentation-for-models"></a>

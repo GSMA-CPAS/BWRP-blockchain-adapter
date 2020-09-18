@@ -30,7 +30,7 @@ trap "{ rm -fr $DIR; }" EXIT
 function request {
     RET=$(curl -s -S -X $1 -H "Content-Type: application/json" -d "$2" "$3")
     echo $RET
-    echo $RET | grep -i "error" > /dev/null && exit 1 || : 
+    echo $RET | grep -i "error" > /dev/null && echo $RET > /dev/stderr && exit 1 || : 
 }  
 
 echo "###################################################"
