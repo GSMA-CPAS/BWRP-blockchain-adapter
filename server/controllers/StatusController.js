@@ -8,11 +8,11 @@
 
 const Controller = require('./Controller');
 const service = require('../services/StatusService');
-const getStatus = async (request, response) => {
-  await Controller.handleRequest(request, response, service.getStatus);
+const getApiStatus = async (request, response) => {
+  await Controller.handleRequest(request, response, service.getApiStatus);
 };
 
 
 module.exports = {
-  getStatus,
+  getApiStatus,
 };

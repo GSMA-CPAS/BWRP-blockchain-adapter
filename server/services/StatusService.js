@@ -16,17 +16,19 @@ try {
   console.log("could not parse version info: " + e)
 }
 
+
 /**
 * Show version information of the API
 *
 * returns String
 * */
-const getStatus = () => new Promise(
+const getApiStatus = () => new Promise(
   async (resolve, reject) => {
     resolve(Service.successResponse(JSON.stringify(statusInfo)));
   },
 );
 
+
 module.exports = {
-  getStatus,
+  getApiStatus,
 };

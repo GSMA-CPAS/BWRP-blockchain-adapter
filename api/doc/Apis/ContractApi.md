@@ -44,7 +44,7 @@ No authorization required
 
 
 
-    fetch all signatures for a given msp and a given document id from the ledger
+    Fetch all signatures for a given msp and a given document id from the ledger
 
 ### Parameters
 
@@ -78,7 +78,7 @@ No authorization required
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **callbackUrl** | **URI**| the location where data will be sent | [default to null]
+ **callbackUrl** | **URI**| The location where data will be sent | [default to null]
 
 ### Return type
 

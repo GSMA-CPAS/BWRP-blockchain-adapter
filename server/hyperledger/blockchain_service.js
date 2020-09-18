@@ -300,6 +300,22 @@ class BlockchainService {
             });
         });
     }
+
+    getDiscoveryMSPs() {
+        let self = this
+        
+        return this.network.then( network => {
+            return(network.getChannel().getMspids());
+        });
+    }
+    
+    getDiscoveryMSP(mspID) {
+        let self = this
+        
+        return this.network.then( network => {
+            return network.getChannel().getMsp(mspID);
+        });
+    }
 }
 
 module.exports = { BlockchainService };

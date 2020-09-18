@@ -5,7 +5,7 @@ info:
     name: Simon Schulz
   description: This is the REST api specification for the blockchain-adapter
   title: Blockchain-Adapter
-  version: 0.0.1
+  version: 0.0.2
 servers:
 - url: /
 tags:
@@ -15,11 +15,13 @@ tags:
   name: config
 - description: Access to status information
   name: status
+- description: Access to discovery information
+  name: discovery
 paths:
-  /status:
+  /discovery/msps:
     get:
-      description: Show version information of the API
-      operationId: getStatus
+      description: Show a list of all MSPs
+      operationId: getDiscoveryMSPs
       responses:
         "200":
           content:
@@ -27,7 +29,52 @@ paths:
               schema:
                 type: string
                 x-content-type: application/json
-          description: the status of the service
+          description: A list of all discovered MSPs
+        "500":
+          content: {}
+          description: Internal Error
+      tags:
+      - discovery
+      x-eov-operation-handler: controllers/DiscoveryController
+  /discovery/msps/{mspid}:
+    get:
+      description: Show details for a specific MSP
+      operationId: getDiscoveryMSP
+      parameters:
+      - description: Name of a MSP
+        explode: false
+        in: path
+        name: mspid
+        required: true
+        schema:
+          type: string
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: string
+                x-content-type: application/json
+          description: Details about the requested MSP
+        "500":
+          content: {}
+          description: Internal Error
+      tags:
+      - discovery
+      x-eov-operation-handler: controllers/DiscoveryController
+  /status:
+    get:
+      description: Show version information of the API
+      operationId: getApiStatus
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: string
+                x-content-type: application/json
+          description: The status of the service
         "500":
           content: {}
           description: Internal Error
@@ -53,7 +100,7 @@ paths:
               schema:
                 type: string
                 x-content-type: text/plain
-          description: successful operation, returns ID of stored document
+          description: Successful operation, returns ID of stored document
         "400":
           content: {}
           description: Bad Request
@@ -83,7 +130,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/PrivateDocumentResponse'
-          description: successful operation, returns document
+          description: Successful operation, returns document
         "500":
           content: {}
           description: Internal Error
@@ -116,7 +163,7 @@ paths:
             text/plain:
               schema:
                 type: string
-          description: successful operation, returns transaction hash
+          description: Successful operation, returns transaction hash
         "500":
           content: {}
           description: Internal Server Error
@@ -126,7 +173,7 @@ paths:
       x-eov-operation-handler: controllers/ContractController
   /signatures/{id}/{msp}:
     get:
-      description: fetch all signatures for a given msp and a given document id from
+      description: Fetch all signatures for a given msp and a given document id from
         the ledger
       operationId: fetchSignatures
       parameters:
@@ -153,7 +200,7 @@ paths:
               schema:
                 type: string
                 x-content-type: text/plain
-          description: successful operation, returns json of signatures
+          description: Successful operation, returns json of signatures
         "500":
           content: {}
           description: Internal Server Error
@@ -191,7 +238,7 @@ paths:
       description: subscribes a client to receive new signature events
       operationId: signaturesSubscribePOST
       parameters:
-      - description: the location where data will be sent
+      - description: The location where data will be sent
         explode: true
         in: query
         name: callbackUrl
@@ -209,7 +256,7 @@ paths:
                 description: subscription information
                 properties:
                   subscriptionId:
-                    description: this unique identifier allows management of the subscription
+                    description: This unique identifier allows management of the subscription
                     example: 2531329f-fb09-4ef7-887e-84e648214436
                     type: string
                 required:
@@ -236,7 +283,7 @@ paths:
               schema:
                 type: string
                 x-content-type: text/plain
-          description: successful operation, returns transaction hash
+          description: Successful operation, returns transaction hash
         "500":
           content: {}
           description: Internal Error
