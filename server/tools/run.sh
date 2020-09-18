@@ -27,6 +27,7 @@ fi
 unset http_proxy
 unset https_proxy
 
-./make_tags.sh || echo "skipped make tag"
+BASE="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
+$BASE/make_tags.sh || echo "skipped make tag"
 
 npm run start
