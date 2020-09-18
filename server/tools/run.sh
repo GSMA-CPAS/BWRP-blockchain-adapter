@@ -27,6 +27,6 @@ fi
 unset http_proxy
 unset https_proxy
 
-./make_tag.sh || echo "skipped make tag"
+./make_tags.sh || echo "skipped make tag"
 
 npm run start
