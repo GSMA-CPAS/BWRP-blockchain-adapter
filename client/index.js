@@ -54,7 +54,6 @@ function setOffchainDBAdapterConfig(config, name, uri) {
 function signContract(signer, document) {
   return new Promise((resolve, reject) => {
     const documentSig = new api.DocumentSignature();
-    documentSig.signer = signer;
 
     // create key
     openssl('openssl req -x509 -newkey ec -pkeyopt ec_paramgen_curve:secp384r1 -nodes -keyout key_' + signer + ' -out crt -subj /CN=' + signer + '/C=DE/ST=NRW/L=Bielefeld/O=ORG/OU=ORGOU -addext keyUsage=digitalSignature', function(e, b) {
@@ -66,7 +65,8 @@ function signContract(signer, document) {
     // extract pem
     openssl(['x509', '-pubkey', '-in', 'crt'], function(e, b) {
       if ((e) && (e != '')) reject(new Error(e.toString()));
-      documentSig.pem = b.toString();
+      documentSig.certificate = b.toString();
+      documentSig.algorithm = 'secp384r1';
 
       const docBuf = Buffer.from(document);
       const sigBuf = Buffer.alloc(0);
@@ -172,7 +172,7 @@ const launchClient = async () => {
 
     _.each(sig, function(entry, key) {
       console.log('> verifying signature[' + key + '] = ' + entry.signature);
-      verifySignature(doc.data, entry.pem, entry.signature).then( (result) => {
+      verifySignature(doc.data, entry.certificate, entry.signature).then( (result) => {
         console.log('> result: ' + result);
       }).catch((x) => {
         console.log(' FAILED: ' + x);
