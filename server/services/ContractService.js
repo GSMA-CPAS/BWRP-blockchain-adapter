@@ -6,7 +6,7 @@ const webhookService = new Webhook('signature_data');
 
 // set up listener for contract events
 const blockchainConnection = new BlockchainService(process.env.BSA_CCP);
-blockchainConnection.subscribeSignatureEvents(function(val){ webhookService.processEvent(val); });
+blockchainConnection.subscribeLedgerEvents(function(val){ webhookService.processEvent(val); });
 
 /**
 * Fetch a private document from the database, identified by its id

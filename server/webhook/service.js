@@ -40,7 +40,7 @@ Webhook.prototype.processEvent = function (eventData) {
   }
 }
 
-Webhook.prototype.sendNotification = function(uuid, url, data){
+Webhook.prototype.sendNotification = function(uuid, url, eventData){
   debugx('['+uuid+'] sending data to ' + url);
   
   var options = {

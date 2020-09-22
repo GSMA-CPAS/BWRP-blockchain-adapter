@@ -79,6 +79,8 @@ class BlockchainService {
     }
 
     storeDocument(network, contract, onMSP, partnerMSP, documentID, documentBase64){
+        console.log("> storing document with id " + documentID)
+
         // enable filter
         network.queryHandler.setFilter(onMSP)
         
@@ -138,7 +140,7 @@ class BlockchainService {
                         }
 
                         // calculate storage key
-                        return self.createStorageKey(network, contract, localMSP, documentID).then( storageKey => {
+                        return self.createStorageKey(network, contract, fromMSP, documentID).then( storageKey => {
                             return self.storeDocumentHash(network, contract, storageKey, hash).then( _ => {
                                 // finally return document id
                                 return documentID

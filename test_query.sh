@@ -5,6 +5,7 @@ export no_proxy="localhost,$no_proxy"
 # allow env override
 [ -z "$BSA_DTAG" ] && BSA_DTAG="localhost:8081"
 [ -z "$BSA_TMUS" ] && BSA_TMUS="localhost:8082"
+[ ! -z "$BSA_DEBUG" ] && set -e -x
 
 # SOME OPTIONS
 SIGNER_DTAG="simon@dtag"
