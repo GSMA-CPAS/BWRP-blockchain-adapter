@@ -1,5 +1,12 @@
 const Service = require('./Service');
 var { BlockchainService } = require('../hyperledger/blockchain_service');
+var Webhook = require('../webhook/service');
+
+const webhookService = new Webhook('signature_data');
+
+// set up listener for contract events
+const blockchainConnection = new BlockchainService(process.env.BSA_CCP);
+blockchainConnection.subscribeSignatureEvents(function(val){ webhookService.processEvent(val); });
 
 /**
 * Fetch a private document from the database, identified by its id
@@ -9,16 +16,16 @@ var { BlockchainService } = require('../hyperledger/blockchain_service');
 * */
 const fetchPrivateDocument = ({ id }) => new Promise(
   async (resolve, reject) => {
-    const blockchain_connection = new BlockchainService(process.env.BSA_CCP);
+    const blockchainConnection = new BlockchainService(process.env.BSA_CCP);
 
-    blockchain_connection.fetchPrivateDocument(id)
+    blockchainConnection.fetchPrivateDocument(id)
       .then( document => {
         resolve(Service.successResponse(document, 200))
       }).catch(error => {
         console.log("ERROR: " + error)
         reject(Service.rejectResponse({"message" : error.toString()}, 500))
       }).finally( () => {
-        blockchain_connection.disconnect()
+        blockchainConnection.disconnect()
       })
   },
 );
@@ -32,16 +39,16 @@ const fetchPrivateDocument = ({ id }) => new Promise(
 * */
 const fetchSignatures = ({ id, msp }) => new Promise(
   async (resolve, reject) => {
-    const blockchain_connection = new BlockchainService(process.env.BSA_CCP);
+    const blockchainConnection = new BlockchainService(process.env.BSA_CCP);
 
-    blockchain_connection.fetchSignatures(msp, id)
+    blockchainConnection.fetchSignatures(msp, id)
       .then( signatures => {
         resolve(Service.successResponse(signatures, 200))
       }).catch(error => {
         console.log("ERROR: " + error)
         reject(Service.rejectResponse( {"message" : error.toString()}, 500))
       }).finally( () => {
-        blockchain_connection.disconnect()
+        blockchainConnection.disconnect()
       });
   },
 );
@@ -54,9 +61,9 @@ const fetchSignatures = ({ id, msp }) => new Promise(
 * */
 const uploadPrivateDocument = ({ body }) => new Promise(
   async (resolve, reject) => {
-    const blockchain_connection = new BlockchainService(process.env.BSA_CCP);
+    const blockchainConnection = new BlockchainService(process.env.BSA_CCP);
     
-    blockchain_connection.addDocument(body["toMSP"], body["data"])
+    blockchainConnection.addDocument(body["toMSP"], body["data"])
       .then( documentID => {
         var resJSON = {};
         resJSON['documentID'] = documentID;
@@ -66,7 +73,7 @@ const uploadPrivateDocument = ({ body }) => new Promise(
         console.log("ERROR: " + error)
         reject(Service.rejectResponse({"message" : error.toString()}, 500))
       }).finally( () => {
-        blockchain_connection.disconnect()
+        blockchainConnection.disconnect()
       });
     },
 );
@@ -80,7 +87,7 @@ const uploadPrivateDocument = ({ body }) => new Promise(
 * */
 const uploadSignature = ({ id, body }) => new Promise(
   async (resolve, reject) => {
-    const blockchain_connection = new BlockchainService(process.env.BSA_CCP);
+    const blockchainConnection = new BlockchainService(process.env.BSA_CCP);
 
     // for security reasons, rewrite the json here:
     const signature = {
@@ -90,7 +97,7 @@ const uploadSignature = ({ id, body }) => new Promise(
     }
     const signatureJSON = JSON.stringify(signature);
 
-    blockchain_connection.signDocument(id, signatureJSON)
+    blockchainConnection.signDocument(id, signatureJSON)
       .then( txID => {
         var resJSON = {};
         resJSON['txID'] = txID;
@@ -100,7 +107,7 @@ const uploadSignature = ({ id, body }) => new Promise(
         console.log("ERROR: " + error)
         reject(Service.rejectResponse({"message" : error.toString()}, 500))
       }).finally( () => {
-        blockchain_connection.disconnect()
+        blockchainConnection.disconnect()
       });
   },
 );
@@ -113,19 +120,13 @@ const uploadSignature = ({ id, body }) => new Promise(
 * */
 const signaturesSubscribePOST = ({ callbackUrl }) => new Promise(
   async (resolve, reject) => {
-    try {
-      resolve(Service.successResponse({
-        callbackUrl,
-      }));
-    } catch (e) {
-      reject(Service.rejectResponse(
-        e.message || 'Invalid input',
-        e.status || 405,
-      ));
-    }
+    webhookService.addSubscription(callbackUrl).then ( (uuid) => {
+      resolve(Service.successResponse(uuid, 201))
+    }, (error) => {
+      reject(Service.rejectResponse({"message" : error.toString()}, 500))
+    });
   },
 );
-
 
 module.exports = {
   fetchPrivateDocument,

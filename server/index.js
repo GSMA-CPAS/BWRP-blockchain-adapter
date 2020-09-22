@@ -1,7 +1,6 @@
 const config = require('./config');
 const logger = require('./logger');
 const ExpressServer = require('./expressServer');
-const {BlockchainService} = require('./hyperledger/blockchain_service')
 
 if (process.env.BSA_PORT == undefined){
   console.log("> port not defined, please set env var BSA_PORT")

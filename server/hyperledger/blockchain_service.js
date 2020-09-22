@@ -95,6 +95,19 @@ class BlockchainService {
         })
     }
 
+    storeDocumentHash(network, contract, storageKey, documentHash){
+        // send transaction
+        let tx = contract.createTransaction('StoreDocumentHash')
+        console.log("> will store signature at key " + storageKey)
+
+        return tx.submit(...[storageKey, documentHash]).then( _ => {
+            return tx.getTransactionId()
+        }).catch( error => {
+            // forward error to main app
+            return Promise.reject(error);
+        });
+    }
+
     addDocument(partnerMSP, documentBase64) {
         let self = this
         
@@ -124,7 +137,13 @@ class BlockchainService {
                             return Promise.reject(partnerMSP + " stored invalid hash: " + hash + " != " + expectedHash)
                         }
 
-                        return documentID
+                        // calculate storage key
+                        return self.createStorageKey(network, contract, localMSP, documentID).then( storageKey => {
+                            return self.storeDocumentHash(network, contract, storageKey, hash).then( _ => {
+                                // finally return document id
+                                return documentID
+                            })
+                        });
                     });
                 });
             });
@@ -190,26 +209,6 @@ class BlockchainService {
             // fetch contract
             const contract = network.getContract(self.connectionProfile.config.contractID);
             
-            // test the event API
-            const listener = async (event) => {
-                if (event.eventName === 'STORE:SIGNATURE') {
-                    const details = event.payload.toString()
-                    const msp = event.getTransactionEvent().transactionData.actions[0].header.creator.mspid
-
-                    console.log("> INCOMING EVENT: [" + msp + "] store signature <" + event.eventName + "> --> " + details)
-                    if (0) {
-                        // for debugging why i see a previous event replayed, see my bug report
-                        // https://jira.hyperledger.org/browse/FABN-1634
-                        console.log(event.getTransactionEvent())
-                        console.log(event.getTransactionEvent().transactionData)
-                        console.log(event.getTransactionEvent().transactionData.actions[0].header)
-                        console.log(event.getTransactionEvent().transactionData.actions[0].payload)
-                        console.log(event.getTransactionEvent().getBlockEvent())
-                    }
-                }
-            };
-            contract.addContractListener(listener)
-
             // fetch our MSP name
             const localMSP = self.connectionProfile.organizations[self.connectionProfile.client.organization].mspid
 
@@ -316,6 +315,29 @@ class BlockchainService {
             return network.getChannel().getMsp(mspID);
         });
     }
+
+    subscribeLedgerEvents(callback) {
+        let self = this
+        
+        return this.network.then( network => {
+            // fetch contract
+            const contract = network.getContract(self.connectionProfile.config.contractID);
+            
+            // construct listener 
+            const listener = async (event) => {
+                if ((event.eventName === 'STORE:SIGNATURE') || (event.eventName === 'STORE:DOCUMENTHASH')) {
+                    const eventDataRaw = event.payload.toString()
+                    const eventData = JSON.parse(eventDataRaw)
+                    const msp = event.getTransactionEvent().transactionData.actions[0].header.creator.mspid
+                    
+                    console.log("> INCOMING EVENT: [" + msp + "] store signature <" + event.eventName + "> --> " + eventDataRaw)
+
+                    callback(eventData);
+                }
+            };
+            return contract.addContractListener(listener);
+        });
+    };
 }
 
 module.exports = { BlockchainService };

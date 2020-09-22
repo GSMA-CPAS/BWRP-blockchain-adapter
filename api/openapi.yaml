@@ -202,24 +202,21 @@ paths:
             example: https://myapp.local
       responses:
         '201':
-          description: subscription successfully created
+          description: Subscription successfully created
           content:
-            application/json:
+            text/plain:
               schema:
-                description: subscription information
-                required:
-                  - subscriptionId
-                properties:
-                  subscriptionId:
-                    description: This unique identifier allows management of the subscription
-                    type: string
-                    example: 2531329f-fb09-4ef7-887e-84e648214436
+                type: string
+                description: The unique identifier of the associated subscription
+                example: 2531329f-fb09-4ef7-887e-84e648214436
+        '500':
+          description: Internal Server Error
+          content: {}
       callbacks:
         # the name `onData` is a convenience locator
         onData:
           # when data is sent, it will be sent to the `callbackUrl` provided
-          # when making the subscription PLUS the suffix `/data`
-          '{$request.query.callbackUrl}/signature_data':
+          '{$request.query.callbackUrl}':
             post:
               requestBody:
                 description: subscription payload
@@ -229,9 +226,14 @@ paths:
                       type: object
                       properties:
                         timestamp:
+                          description: The timestamp when the tx was created on the ledger (RFC3339)
                           type: string
                           format: date-time
-                        userData:
+                        msp:
+                          type: string
+                        eventName:
+                          type: string
+                        storageKey:
                           type: string
               responses:
                 '202':
