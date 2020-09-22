@@ -14,5 +14,13 @@
   },
   "plugins": [
       "@typescript-eslint"
+  ],
+  "overrides": [
+    {
+      "files": "*.js",
+      "rules": {
+        "max-len": "off"
+      }
+    }
   ]
 }

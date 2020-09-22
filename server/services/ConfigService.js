@@ -1,29 +1,27 @@
 const Service = require('./Service');
-var { BlockchainService } = require('../hyperledger/blockchain_service');
+const {BlockchainService} = require('../hyperledger/blockchain_service');
 
-/**
-* Update the configuration of the offchain-db-adapter
-*
-* body OffchainDBAdapterConfig A configuration for the offchain-db-adapter
-* returns String
-* */
-const setOffchainDBAdapterConfig = ({ body }) => new Promise(
-  async (resolve, reject) => {
-    const blockchain_connection = new BlockchainService(process.env.BSA_CCP);
-  
-    blockchain_connection.setRESTConfig(body["restURI"])
-      .then( txID => {
-        var resJSON = {};
-        resJSON['txID'] = txID;
-        console.log("> stored data with txID " + txID)
-        resolve(Service.successResponse(resJSON, 200))
-      }).catch(error => {
-        console.log("ERROR: " + error)
-        reject(Service.rejectResponse({"message" : error.toString()}, 500))
-      }).finally( () => {
-        blockchain_connection.disconnect()
-      });
-  },
+/** Update the configuration of the offchain-db-adapter
+   * @param {OffchainDBAdapterConfig} body - A configuration for the offchain-db-adapter
+   * @return {string}
+  */
+const setOffchainDBAdapterConfig = ({body}) => new Promise(
+    async (resolve, reject) => {
+      const blockchainConnection = new BlockchainService(process.env.BSA_CCP);
+
+      blockchainConnection.setRESTConfig(body['restURI'])
+          .then( (txID) => {
+            const resJSON = {};
+            resJSON['txID'] = txID;
+            console.log('> stored data with txID ' + txID);
+            resolve(Service.successResponse(resJSON, 200));
+          }).catch((error) => {
+            console.log('ERROR: ' + error);
+            reject(Service.rejectResponse({'message': error.toString()}, 500));
+          }).finally( () => {
+            blockchainConnection.disconnect();
+          });
+    },
 );
 
 module.exports = {
