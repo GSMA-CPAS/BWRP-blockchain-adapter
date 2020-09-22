@@ -2,7 +2,7 @@ openapi: 3.0.1
 info:
   title: Blockchain-Adapter
   description: This is the REST api specification for the blockchain-adapter
-  version: 0.0.3
+  version: 0.0.4
   contact:
     name: Simon Schulz
     email: Simon.Schulz01@telekom.de

@@ -11,6 +11,7 @@ package.json
 README.md
 config.js
 Dockerfile
+.eslintrc.json
 
 # Use this file to prevent files from being overwritten by the generator.
 # The patterns follow closely to .gitignore or .dockerignore.

@@ -68,7 +68,7 @@ No authorization required
 
 <a name="signaturesSubscribePost"></a>
 # **signaturesSubscribePost**
-> Object signaturesSubscribePost(callbackUrl)
+> String signaturesSubscribePost(callbackUrl)
 
 
 
@@ -82,7 +82,7 @@ Name | Type | Description  | Notes
 
 ### Return type
 
-[**Object**](../Models/object.md)
+[**String**](../Models/string.md)
 
 ### Authorization
 
@@ -91,7 +91,7 @@ No authorization required
 ### HTTP request headers
 
 - **Content-Type**: Not defined
-- **Accept**: application/json
+- **Accept**: text/plain
 
 <a name="uploadPrivateDocument"></a>
 # **uploadPrivateDocument**

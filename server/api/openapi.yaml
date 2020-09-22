@@ -5,7 +5,7 @@ info:
     name: Simon Schulz
   description: This is the REST api specification for the blockchain-adapter
   title: Blockchain-Adapter
-  version: 0.0.2
+  version: 0.0.4
 servers:
 - url: /
 tags:
@@ -211,9 +211,9 @@ paths:
     post:
       callbacks:
         onData:
-          '{$request.query.callbackUrl}/signature_data':
+          '{$request.query.callbackUrl}':
             post:
-              operationId: onData_SignatureDataPost
+              operationId: onData_Post
               requestBody:
                 $ref: '#/components/requestBodies/inline_object'
                 content:
@@ -221,9 +221,15 @@ paths:
                     schema:
                       properties:
                         timestamp:
+                          description: The timestamp when the tx was created on the
+                            ledger (RFC3339)
                           format: date-time
                           type: string
-                        userData:
+                        msp:
+                          type: string
+                        eventName:
+                          type: string
+                        storageKey:
                           type: string
                       type: object
                 description: subscription payload
@@ -251,17 +257,15 @@ paths:
       responses:
         "201":
           content:
-            application/json:
+            text/plain:
               schema:
-                description: subscription information
-                properties:
-                  subscriptionId:
-                    description: This unique identifier allows management of the subscription
-                    example: 2531329f-fb09-4ef7-887e-84e648214436
-                    type: string
-                required:
-                - subscriptionId
-          description: subscription successfully created
+                description: The unique identifier of the associated subscription
+                example: 2531329f-fb09-4ef7-887e-84e648214436
+                type: string
+          description: Subscription successfully created
+        "500":
+          content: {}
+          description: Internal Server Error
       tags:
       - contract
       x-eov-operation-handler: controllers/ContractController
@@ -391,8 +395,13 @@ components:
     inline_object:
       properties:
         timestamp:
+          description: The timestamp when the tx was created on the ledger (RFC3339)
           format: date-time
           type: string
-        userData:
+        msp:
+          type: string
+        eventName:
+          type: string
+        storageKey:
           type: string
       type: object
