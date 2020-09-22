@@ -318,6 +318,18 @@ class BlockchainService {
         });
     }
 
+    getDocumentID(network, contract, storageLocation) {
+        // this will always be run locally
+        // enable filter to execute query on our MSP
+        const onMSP = this.connectionProfile.organizations[this.connectionProfile.client.organization].mspid
+        network.queryHandler.setFilter(onMSP)
+        
+        return contract.evaluateTransaction("GetDocumentID", ...[storageLocation]).then( response => {
+            const data = JSON.parse(response)
+            return data.documentID
+        })
+    }
+
     subscribeLedgerEvents(callback) {
         let self = this
         
@@ -334,7 +346,19 @@ class BlockchainService {
                     
                     console.log("> INCOMING EVENT: [" + msp + "] store signature <" + event.eventName + "> --> " + eventDataRaw)
 
-                    callback(eventData);
+                    // resolve documentID from storageLocation
+                    self.getDocumentID(network, contract, eventData.data.storageKey).then( (documentID) => {
+                        // append documentID to event and notify listeners:
+                        eventData["documentID"] = documentID
+                        callback(eventData);
+                    }).catch( (err) => {
+                        console.log("ERROR: " + err)
+                        
+                        // append documentID to event and notify listeners:
+                        eventData["documentID"] = "could_not_resolve_storage_key"
+                        callback(eventData);
+                    })
+                    
                 }
             };
             return contract.addContractListener(listener);

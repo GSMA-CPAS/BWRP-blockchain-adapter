@@ -229,7 +229,7 @@ paths:
                           type: string
                         eventName:
                           type: string
-                        storageKey:
+                        data:
                           type: string
                       type: object
                 description: subscription payload
@@ -402,6 +402,6 @@ components:
           type: string
         eventName:
           type: string
-        storageKey:
+        data:
           type: string
       type: object
