@@ -101,9 +101,17 @@ function subscribe() {
       res.setEncoding('utf8');
       res.on('data', (id) => {
         console.log('> done. got subscription id ' + id);
-        resolve(id);
+        if (res.statusCode == 201) {
+          resolve(id);
+        }
       });
+
+      if (res.statusCode != 201) {
+        reject(res.statusCode);
+      }
     });
+
+    
 
     req.on('error', (e) => {
       reject(e);
