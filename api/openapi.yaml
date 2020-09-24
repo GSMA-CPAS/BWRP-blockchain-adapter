@@ -277,3 +277,18 @@ paths:
           description: Internal Error
           content: {}
       x-codegen-request-body-name: body
+    get:
+      description: Read back the configuration of the offchain-db-adapter
+      tags:
+        - config
+      operationId: getOffchainDBAdapterConfig
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: models/OffchainDBAdapterConfig.yaml
+          description: The current configuration for the offchain-db-adapter
+        '500':
+          description: Internal Error
+          content: {}

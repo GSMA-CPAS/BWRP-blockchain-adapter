@@ -7,6 +7,7 @@ All URIs are relative to *http://localhost*
 
 Class | Method | HTTP request | Description
 ------------ | ------------- | ------------- | -------------
+*ConfigApi* | [**getOffchainDBAdapterConfig**](Apis/ConfigApi.md#getoffchaindbadapterconfig) | **GET** /config/offchain-db-adapter | Read back the configuration of the offchain-db-adapter
 *ConfigApi* | [**setOffchainDBAdapterConfig**](Apis/ConfigApi.md#setoffchaindbadapterconfig) | **PUT** /config/offchain-db-adapter | Update the configuration of the offchain-db-adapter
 *ContractApi* | [**fetchPrivateDocument**](Apis/ContractApi.md#fetchprivatedocument) | **GET** /private-documents/{id} | Fetch a private document from the database, identified by its id
 *ContractApi* | [**fetchSignatures**](Apis/ContractApi.md#fetchsignatures) | **GET** /signatures/{id}/{msp} | Fetch all signatures for a given msp and a given document id from the ledger

@@ -283,6 +283,22 @@ paths:
       - contract
       x-eov-operation-handler: controllers/ContractController
   /config/offchain-db-adapter:
+    get:
+      description: Read back the configuration of the offchain-db-adapter
+      operationId: getOffchainDBAdapterConfig
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OffchainDBAdapterConfig'
+          description: The current configuration for the offchain-db-adapter
+        "500":
+          content: {}
+          description: Internal Error
+      tags:
+      - config
+      x-eov-operation-handler: controllers/ConfigController
     put:
       description: Update the configuration of the offchain-db-adapter
       operationId: setOffchainDBAdapterConfig

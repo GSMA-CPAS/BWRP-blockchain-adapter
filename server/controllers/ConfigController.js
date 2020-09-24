@@ -8,11 +8,16 @@
 
 const Controller = require('./Controller');
 const service = require('../services/ConfigService');
+const getOffchainDBAdapterConfig = async (request, response) => {
+  await Controller.handleRequest(request, response, service.getOffchainDBAdapterConfig);
+};
+
 const setOffchainDBAdapterConfig = async (request, response) => {
   await Controller.handleRequest(request, response, service.setOffchainDBAdapterConfig);
 };
 
 
 module.exports = {
+  getOffchainDBAdapterConfig,
   setOffchainDBAdapterConfig,
 };
