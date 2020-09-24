@@ -5,7 +5,6 @@ const crypto = require('crypto');
 const {Gateway, Wallets} = require('fabric-network');
 const SingleMSPQueryHandler = require('./query_handler');
 
-
 /** BlockChainService class
 */
 class BlockchainService {
@@ -411,7 +410,7 @@ class BlockchainService {
 
   /** subscribe to ledger events
    * @param {function} callback - your callback function
-   * @return {Promise}
+   * @return {Promise} listener object
   */
   subscribeLedgerEvents(callback) {
     const self = this;
@@ -422,25 +421,28 @@ class BlockchainService {
 
       // construct listener
       const listener = async (event) => {
-        if ((event.eventName === 'STORE:SIGNATURE') || (event.eventName === 'STORE:DOCUMENTHASH')) {
-          const eventDataRaw = event.payload.toString();
-          const eventData = JSON.parse(eventDataRaw);
-          const msp = event.getTransactionEvent().transactionData.actions[0].header.creator.mspid;
+        const eventDataRaw = event.payload.toString();
+        const eventData = JSON.parse(eventDataRaw);
+        const msp = event.getTransactionEvent().transactionData.actions[0].header.creator.mspid;
 
-          console.log('> INCOMING EVENT: [' + msp + '] store signature <' + event.eventName + '> --> ' + eventDataRaw);
+        console.log('> INCOMING EVENT: [' + msp + '] <' + event.eventName + '> --> ' + eventDataRaw);
 
-          // resolve documentID from storageLocation
+        // resolve documentID from storageLocation if given
+        if (eventData.data.storageKey != '') {
           self.getDocumentID(network, contract, eventData.data.storageKey).then( (documentID) => {
             // append documentID to event and notify listeners:
-            eventData['documentID'] = documentID;
-            callback(eventData);
+            eventData.data['documentID'] = documentID;
           }).catch( (err) => {
             console.log('ERROR: ' + err);
-
             // append documentID to event and notify listeners:
-            eventData['documentID'] = 'could_not_resolve_storage_key';
-            callback(eventData);
+            eventData.data['documentID'] = 'could_not_resolve_storage_key';
+          }).finally( () => {
+            // finasend event
+            callback(eventData.eventName, eventData);
           });
+        } else {
+          // not storageKey in data, publish data as it is
+          callback(eventData.eventName, eventData);
         }
       };
       return contract.addContractListener(listener);

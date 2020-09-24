@@ -1,14 +1,5 @@
 const Service = require('./Service');
 const {BlockchainService} = require('../hyperledger/blockchain_service');
-const Webhook = require('../webhook/service');
-
-const webhookService = new Webhook('signature_data');
-
-// set up listener for contract events
-const blockchainConnection = new BlockchainService(process.env.BSA_CCP);
-blockchainConnection.subscribeLedgerEvents(function(val) {
-  webhookService.processEvent(val);
-});
 
 /** Fetch a private document from the database, identified by its id
    * @param {string} id - The document ID
@@ -107,24 +98,9 @@ const uploadSignature = ({id, body}) => new Promise(
     },
 );
 
-/** Subscribes a client to receive new signature events
-   * @param {URI} callbackUrl - the location where data will be sent
-   * @return {object}
-  */
-const signaturesSubscribePOST = ({callbackUrl}) => new Promise(
-    async (resolve, reject) => {
-      webhookService.addSubscription(callbackUrl).then( (uuid) => {
-        resolve(Service.successResponse(uuid, 201));
-      }, (error) => {
-        reject(Service.rejectResponse({'message': error.toString()}, 500));
-      });
-    },
-);
-
 module.exports = {
   fetchPrivateDocument,
   fetchSignatures,
-  signaturesSubscribePOST,
   uploadPrivateDocument,
   uploadSignature,
 };

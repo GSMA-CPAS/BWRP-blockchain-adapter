@@ -2,7 +2,7 @@ openapi: 3.0.1
 info:
   title: Blockchain-Adapter
   description: This is the REST api specification for the blockchain-adapter
-  version: 0.0.4
+  version: 0.0.5
   contact:
     name: Simon Schulz
     email: Simon.Schulz01@telekom.de
@@ -15,6 +15,8 @@ tags:
     description: Access to status information
   - name: discovery
     description: Access to discovery information
+  - name: webhook
+    description: Access to webhooks for event subscription
 paths:
   /discovery/msps:
     get: 
@@ -84,8 +86,8 @@ paths:
         description: A document that should be uploaded
         content:
           application/json:
-              schema:
-                $ref: models/PrivateDocument.yaml
+            schema:
+              $ref: models/PrivateDocument.yaml
         required: true
       responses:
         '200':  
@@ -125,6 +127,70 @@ paths:
         '500':
           description: Internal Error
           content: {}
+  /webhooks/subscribe:
+    post:
+      description: subscribes a client to receive the specified event
+      tags:
+        - webhook
+      requestBody:
+        description: A document that should be uploaded
+        content:
+          application/json:
+            schema:
+              $ref: models/SubscriptionRequest.yaml
+      responses:
+        '201':
+          description: Subscription successfully created
+          content:
+            text/plain:
+              schema:
+                type: string
+                description: The unique identifier of the associated subscription (subscriptionID)
+                example: 2531329f-fb09-4ef7-887e-84e648214436
+        '500':
+          description: Internal Server Error
+          content: {}
+      callbacks:
+        # the name `onData` is a convenience locator
+        onData:
+          # when data is sent, it will be sent to the `callbackUrl` provided
+          '{$request.query.callbackUrl}':
+            post:
+              requestBody:
+                description: subscription payload
+                content:
+                  application/json:
+                    schema:
+                      $ref: models/SubscriptionPayload.yaml
+              responses:
+                '202':
+                  description: the app should return this when the data was received successfully
+                '204':
+                  description: the app should return this when it is no longer interested in further updates
+  /webhooks/{subscriptionID}:
+    delete:
+      description: unsubscribes a client from the specified event
+      tags:
+        - webhook
+      parameters:
+        - in: path
+          name: subscriptionID          
+          required: true
+          description: The unique identifier of the subscription you want to unsubscribe from
+          schema:
+            type: string
+            example: 2531329f-fb09-4ef7-887e-84e648214436
+      responses:
+        '200':
+          description: Subscription successfully deleted
+          content: {}
+        '404':
+          description: Subscription not found
+          content: {}
+        '500':
+          description: Internal Server Error
+          content: {}
+
   /signatures/{id}:
     put:
       description: 'store a signature for the document identified by id on the ledger'
@@ -186,60 +252,6 @@ paths:
         '500':
           description: Internal Server Error
           content: {}
-  /signatures/subscribe:
-    post:
-      description: subscribes a client to receive new signature events
-      tags:
-        - contract
-      parameters:
-        - in: query
-          name: callbackUrl          
-          required: true
-          description: The location where data will be sent
-          schema:
-            type: string
-            format: uri
-            example: https://myapp.local
-      responses:
-        '201':
-          description: Subscription successfully created
-          content:
-            text/plain:
-              schema:
-                type: string
-                description: The unique identifier of the associated subscription
-                example: 2531329f-fb09-4ef7-887e-84e648214436
-        '500':
-          description: Internal Server Error
-          content: {}
-      callbacks:
-        # the name `onData` is a convenience locator
-        onData:
-          # when data is sent, it will be sent to the `callbackUrl` provided
-          '{$request.query.callbackUrl}':
-            post:
-              requestBody:
-                description: subscription payload
-                content:
-                  application/json:
-                    schema:
-                      type: object
-                      properties:
-                        timestamp:
-                          description: The timestamp when the tx was created on the ledger (RFC3339)
-                          type: string
-                          format: date-time
-                        msp:
-                          type: string
-                        eventName:
-                          type: string
-                        data:
-                          type: string
-              responses:
-                '202':
-                  description: the app should return this when the data was received successfully
-                '204':
-                  description: the app should return this when it is no longer interested in further updates
   /config/offchain-db-adapter:
     put:
       description: Update the configuration of the offchain-db-adapter

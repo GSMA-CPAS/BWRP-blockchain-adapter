@@ -1,4 +1,4 @@
-# InlineObject
+# SubscriptionRequest
 ## Properties
 
 Name | Type | Description | Notes

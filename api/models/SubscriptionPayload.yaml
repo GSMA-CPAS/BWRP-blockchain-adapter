@@ -1,0 +1,21 @@
+title: SubscriptionPayload
+type: object
+properties:
+  timestamp:
+    type: string
+    format: date-time
+    description: The timestamp when the tx was created on the ledger (RFC3339)
+  eventName:
+    type: string
+    description: The Event name
+  msp:
+    type: string
+    description: The MSP that triggered the event
+  data:
+    type: string
+    description: The data payload
+required:
+  - timestamp
+  - eventName
+  - msp
+  - data

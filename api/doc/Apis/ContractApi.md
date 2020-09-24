@@ -6,7 +6,6 @@ Method | HTTP request | Description
 ------------- | ------------- | -------------
 [**fetchPrivateDocument**](ContractApi.md#fetchPrivateDocument) | **GET** /private-documents/{id} | 
 [**fetchSignatures**](ContractApi.md#fetchSignatures) | **GET** /signatures/{id}/{msp} | 
-[**signaturesSubscribePost**](ContractApi.md#signaturesSubscribePost) | **POST** /signatures/subscribe | 
 [**uploadPrivateDocument**](ContractApi.md#uploadPrivateDocument) | **POST** /private-documents | 
 [**uploadSignature**](ContractApi.md#uploadSignature) | **PUT** /signatures/{id} | 
 
@@ -52,33 +51,6 @@ Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
  **id** | **String**| The document ID | [default to null]
  **msp** | **String**| A MSP name | [default to null]
-
-### Return type
-
-[**String**](../Models/string.md)
-
-### Authorization
-
-No authorization required
-
-### HTTP request headers
-
-- **Content-Type**: Not defined
-- **Accept**: text/plain
-
-<a name="signaturesSubscribePost"></a>
-# **signaturesSubscribePost**
-> String signaturesSubscribePost(callbackUrl)
-
-
-
-    subscribes a client to receive new signature events
-
-### Parameters
-
-Name | Type | Description  | Notes
-------------- | ------------- | ------------- | -------------
- **callbackUrl** | **URI**| The location where data will be sent | [default to null]
 
 ### Return type
 

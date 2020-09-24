@@ -5,7 +5,7 @@ info:
     name: Simon Schulz
   description: This is the REST api specification for the blockchain-adapter
   title: Blockchain-Adapter
-  version: 0.0.4
+  version: 0.0.5
 servers:
 - url: /
 tags:
@@ -17,6 +17,8 @@ tags:
   name: status
 - description: Access to discovery information
   name: discovery
+- description: Access to webhooks for event subscription
+  name: webhook
 paths:
   /discovery/msps:
     get:
@@ -137,6 +139,79 @@ paths:
       tags:
       - contract
       x-eov-operation-handler: controllers/ContractController
+  /webhooks/subscribe:
+    post:
+      callbacks:
+        onData:
+          '{$request.query.callbackUrl}':
+            post:
+              operationId: onData_Post
+              requestBody:
+                content:
+                  application/json:
+                    schema:
+                      $ref: '#/components/schemas/SubscriptionPayload'
+                description: subscription payload
+              responses:
+                "202":
+                  description: the app should return this when the data was received
+                    successfully
+                "204":
+                  description: the app should return this when it is no longer interested
+                    in further updates
+              x-callback-request: true
+      description: subscribes a client to receive the specified event
+      operationId: webhooksSubscribePOST
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SubscriptionRequest'
+        description: A document that should be uploaded
+      responses:
+        "201":
+          content:
+            text/plain:
+              schema:
+                description: The unique identifier of the associated subscription
+                  (subscriptionID)
+                example: 2531329f-fb09-4ef7-887e-84e648214436
+                type: string
+          description: Subscription successfully created
+        "500":
+          content: {}
+          description: Internal Server Error
+      tags:
+      - webhook
+      x-eov-operation-handler: controllers/WebhookController
+  /webhooks/{subscriptionID}:
+    delete:
+      description: unsubscribes a client from the specified event
+      operationId: webhooksSubscriptionIDDELETE
+      parameters:
+      - description: The unique identifier of the subscription you want to unsubscribe
+          from
+        explode: false
+        in: path
+        name: subscriptionID
+        required: true
+        schema:
+          example: 2531329f-fb09-4ef7-887e-84e648214436
+          type: string
+        style: simple
+      responses:
+        "200":
+          content: {}
+          description: Subscription successfully deleted
+        "404":
+          content: {}
+          description: Subscription not found
+        "500":
+          content: {}
+          description: Internal Server Error
+      tags:
+      - webhook
+      x-eov-operation-handler: controllers/WebhookController
   /signatures/{id}:
     put:
       description: store a signature for the document identified by id on the ledger
@@ -207,68 +282,6 @@ paths:
       tags:
       - contract
       x-eov-operation-handler: controllers/ContractController
-  /signatures/subscribe:
-    post:
-      callbacks:
-        onData:
-          '{$request.query.callbackUrl}':
-            post:
-              operationId: onData_Post
-              requestBody:
-                $ref: '#/components/requestBodies/inline_object'
-                content:
-                  application/json:
-                    schema:
-                      properties:
-                        timestamp:
-                          description: The timestamp when the tx was created on the
-                            ledger (RFC3339)
-                          format: date-time
-                          type: string
-                        msp:
-                          type: string
-                        eventName:
-                          type: string
-                        data:
-                          type: string
-                      type: object
-                description: subscription payload
-              responses:
-                "202":
-                  description: the app should return this when the data was received
-                    successfully
-                "204":
-                  description: the app should return this when it is no longer interested
-                    in further updates
-              x-callback-request: true
-      description: subscribes a client to receive new signature events
-      operationId: signaturesSubscribePOST
-      parameters:
-      - description: The location where data will be sent
-        explode: true
-        in: query
-        name: callbackUrl
-        required: true
-        schema:
-          example: https://myapp.local
-          format: uri
-          type: string
-        style: form
-      responses:
-        "201":
-          content:
-            text/plain:
-              schema:
-                description: The unique identifier of the associated subscription
-                example: 2531329f-fb09-4ef7-887e-84e648214436
-                type: string
-          description: Subscription successfully created
-        "500":
-          content: {}
-          description: Internal Server Error
-      tags:
-      - contract
-      x-eov-operation-handler: controllers/ContractController
   /config/offchain-db-adapter:
     put:
       description: Update the configuration of the offchain-db-adapter
@@ -296,12 +309,6 @@ paths:
       x-codegen-request-body-name: body
       x-eov-operation-handler: controllers/ConfigController
 components:
-  requestBodies:
-    inline_object:
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/inline_object'
   schemas:
     PrivateDocument:
       example:
@@ -352,6 +359,54 @@ components:
       - timestamp
       title: PrivateDocumentResponse
       type: object
+    SubscriptionRequest:
+      example:
+        eventName: STORE:SIGNATURE
+        callbackUrl: https://myapp.local
+      properties:
+        eventName:
+          description: The Event name
+          enum:
+          - STORE:SIGNATURE
+          - STORE:DOCUMENTHASH
+          type: string
+        callbackUrl:
+          description: The location where data will be sent
+          example: https://myapp.local
+          format: uri
+          type: string
+      required:
+      - callbackUrl
+      - eventName
+      title: Subscription
+      type: object
+    SubscriptionPayload:
+      example:
+        data: data
+        eventName: eventName
+        msp: msp
+        timestamp: 2000-01-23T04:56:07.000+00:00
+      properties:
+        timestamp:
+          description: The timestamp when the tx was created on the ledger (RFC3339)
+          format: date-time
+          type: string
+        eventName:
+          description: The Event name
+          type: string
+        msp:
+          description: The MSP that triggered the event
+          type: string
+        data:
+          description: The data payload
+          type: string
+      required:
+      - data
+      - eventName
+      - msp
+      - timestamp
+      title: SubscriptionPayload
+      type: object
     DocumentSignature:
       example:
         signature: signature
@@ -391,17 +446,4 @@ components:
       required:
       - restURI
       title: OffchainDBAdapterConfig
-      type: object
-    inline_object:
-      properties:
-        timestamp:
-          description: The timestamp when the tx was created on the ledger (RFC3339)
-          format: date-time
-          type: string
-        msp:
-          type: string
-        eventName:
-          type: string
-        data:
-          type: string
       type: object

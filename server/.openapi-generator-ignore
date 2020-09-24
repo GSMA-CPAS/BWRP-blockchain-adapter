@@ -4,6 +4,7 @@ services/ContractService.js
 services/ConfigService.js
 services/StatusService.js
 services/DiscoveryService.js
+services/WebhookService.js
 index.js
 hyperledger/*
 ccp/*

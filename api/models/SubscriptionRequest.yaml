@@ -1,0 +1,15 @@
+title: Subscription
+type: object
+properties:
+  eventName:
+    description: The Event name
+    type: string
+    enum: [STORE:SIGNATURE, STORE:DOCUMENTHASH]
+  callbackUrl:
+    description: The location where data will be sent
+    type: string
+    format: uri
+    example: https://myapp.local
+required:
+  - eventName
+  - callbackUrl

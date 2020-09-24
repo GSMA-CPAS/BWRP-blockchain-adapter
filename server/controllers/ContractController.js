@@ -16,10 +16,6 @@ const fetchSignatures = async (request, response) => {
   await Controller.handleRequest(request, response, service.fetchSignatures);
 };
 
-const signaturesSubscribePOST = async (request, response) => {
-  await Controller.handleRequest(request, response, service.signaturesSubscribePOST);
-};
-
 const uploadPrivateDocument = async (request, response) => {
   await Controller.handleRequest(request, response, service.uploadPrivateDocument);
 };
@@ -32,7 +28,6 @@ const uploadSignature = async (request, response) => {
 module.exports = {
   fetchPrivateDocument,
   fetchSignatures,
-  signaturesSubscribePOST,
   uploadPrivateDocument,
   uploadSignature,
 };

@@ -5,3 +5,4 @@ services/Service.js
 services/index.js
 index.js
 expressServer.js
+logger.js

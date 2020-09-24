@@ -15,6 +15,9 @@ Three env variables can be used to configure the blockchain-adapter:
   - default serer config is verbose, stack traces should be removed from responses
   - ...
 
+- testing webhooks
+  - for debugging/developing there is a small test script in server/tools/webhook_dummy_sever
+
 # tutorial:
 
 - [this is preleminary, please wait for the integration into the local setup]
