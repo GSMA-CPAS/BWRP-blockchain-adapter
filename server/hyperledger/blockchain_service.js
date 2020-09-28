@@ -90,6 +90,32 @@ class BlockchainService {
     });
   }
 
+  /** get the rest url
+   * @return {string}
+  */
+  getRESTConfig() {
+    const self = this;
+
+    return this.network.then( (network) => {
+    // fetch contract
+      const contract = network.getContract(self.connectionProfile.config.contractID);
+
+      // fetch our MSP name
+      const localMSP = this.connectionProfile.organizations[this.connectionProfile.client.organization].mspid;
+
+      // enable filter
+      network.queryHandler.setFilter(localMSP);
+
+      return contract.evaluateTransaction('GetRESTConfig', ...[]).then( (result) => {
+        // reset filter
+        network.queryHandler.setFilter('');
+
+        console.log('> got REST config ' + result);
+        return result.toString(); ;
+      });
+    });
+  }
+
   /** store a document
    * @param {Network} network - a fabric network object
    * @param {Contract} contract - a fabric contract object
