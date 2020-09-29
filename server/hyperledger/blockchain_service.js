@@ -397,6 +397,39 @@ class BlockchainService {
     });
   }
 
+  /** get private documents
+   * @return {Promise}
+  */
+  fetchPrivateDocuments() {
+    const self = this;
+
+    return this.network.then( (network) => {
+    // fetch contract
+      const contract = network.getContract(self.connectionProfile.config.contractID);
+
+      console.log('> fetching documents');
+
+      // enable filter to execute query on our MSP
+      const onMSP = this.connectionProfile.organizations[this.connectionProfile.client.organization].mspid;
+      network.queryHandler.setFilter(onMSP);
+
+      return contract.evaluateTransaction('FetchPrivateDocuments', ...[]).then( (documents) => {
+        // reset filter
+        network.queryHandler.setFilter('');
+
+        console.log(documents.toString());
+
+        // check for error
+        if (documents == '{}') {
+          console.log('> got no results');
+          return {};
+        }
+
+        return documents.toString();
+      });
+    });
+  }
+
   /** get discovery results as msp list
    * @return {Promise}
   */

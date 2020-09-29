@@ -103,7 +103,24 @@ paths:
         '500':
           description: Internal Error
           content: {}
-      x-codegen-request-body-name: body 
+      x-codegen-request-body-name: body
+    get:
+      description: show last n private documents
+      tags:
+        - contract
+      operationId: fetchPrivateDocuments
+      responses:
+        '200':  
+          description: Successful operation, returns stored documents
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties:
+                  $ref: models/PrivateDocument.yaml
+        '500':
+          description: Internal Error
+          content: {}
   /private-documents/{id}:
     get:
       description: Fetch a private document from the database, identified by its id

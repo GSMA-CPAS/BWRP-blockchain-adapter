@@ -5,6 +5,7 @@ All URIs are relative to *http://localhost*
 Method | HTTP request | Description
 ------------- | ------------- | -------------
 [**fetchPrivateDocument**](ContractApi.md#fetchPrivateDocument) | **GET** /private-documents/{id} | 
+[**fetchPrivateDocuments**](ContractApi.md#fetchPrivateDocuments) | **GET** /private-documents | 
 [**fetchSignatures**](ContractApi.md#fetchSignatures) | **GET** /signatures/{id}/{msp} | 
 [**uploadPrivateDocument**](ContractApi.md#uploadPrivateDocument) | **POST** /private-documents | 
 [**uploadSignature**](ContractApi.md#uploadSignature) | **PUT** /signatures/{id} | 
@@ -27,6 +28,30 @@ Name | Type | Description  | Notes
 ### Return type
 
 [**PrivateDocumentResponse**](../Models/PrivateDocumentResponse.md)
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+- **Content-Type**: Not defined
+- **Accept**: application/json
+
+<a name="fetchPrivateDocuments"></a>
+# **fetchPrivateDocuments**
+> Map fetchPrivateDocuments()
+
+
+
+    show last n private documents
+
+### Parameters
+This endpoint does not need any parameter.
+
+### Return type
+
+[**Map**](../Models/PrivateDocument.md)
 
 ### Authorization
 

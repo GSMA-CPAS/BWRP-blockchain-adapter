@@ -21,6 +21,25 @@ const fetchPrivateDocument = ({id}) => new Promise(
     },
 );
 
+/** show last n private documents
+   * @return {PrivateDocumentResponse[]}
+  */
+const fetchPrivateDocuments = () => new Promise(
+    async (resolve, reject) => {
+      const blockchainConnection = new BlockchainService(process.env.BSA_CCP);
+
+      blockchainConnection.fetchPrivateDocuments()
+          .then( (documents) => {
+            resolve(Service.successResponse(documents, 200));
+          }).catch((error) => {
+            console.log('ERROR: ' + error);
+            reject(Service.rejectResponse({'message': error.toString()}, 500));
+          }).finally( () => {
+            blockchainConnection.disconnect();
+          });
+    },
+);
+
 /** Fetch all signatures for a given msp and a given document id from the ledger
    * @param {string} id - The document ID
    * @param {string} msp - A MSP name
@@ -100,6 +119,7 @@ const uploadSignature = ({id, body}) => new Promise(
 
 module.exports = {
   fetchPrivateDocument,
+  fetchPrivateDocuments,
   fetchSignatures,
   uploadPrivateDocument,
   uploadSignature,

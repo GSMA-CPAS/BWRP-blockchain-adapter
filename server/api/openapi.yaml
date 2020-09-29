@@ -84,6 +84,24 @@ paths:
       - status
       x-eov-operation-handler: controllers/StatusController
   /private-documents:
+    get:
+      description: show last n private documents
+      operationId: fetchPrivateDocuments
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                additionalProperties:
+                  $ref: '#/components/schemas/PrivateDocument'
+                type: object
+          description: Successful operation, returns stored documents
+        "500":
+          content: {}
+          description: Internal Error
+      tags:
+      - contract
+      x-eov-operation-handler: controllers/ContractController
     post:
       description: Upload a private document, shared between our own organization
         and a partner MSP

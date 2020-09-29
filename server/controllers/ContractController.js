@@ -12,6 +12,10 @@ const fetchPrivateDocument = async (request, response) => {
   await Controller.handleRequest(request, response, service.fetchPrivateDocument);
 };
 
+const fetchPrivateDocuments = async (request, response) => {
+  await Controller.handleRequest(request, response, service.fetchPrivateDocuments);
+};
+
 const fetchSignatures = async (request, response) => {
   await Controller.handleRequest(request, response, service.fetchSignatures);
 };
@@ -27,6 +31,7 @@ const uploadSignature = async (request, response) => {
 
 module.exports = {
   fetchPrivateDocument,
+  fetchPrivateDocuments,
   fetchSignatures,
   uploadPrivateDocument,
   uploadSignature,
