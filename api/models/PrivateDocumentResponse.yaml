@@ -2,7 +2,6 @@ title: PrivateDocumentResponse
 type: object
 required:
   - fromMSP
-  - senderID
   - dataHash
   - timestamp
   - id
@@ -12,9 +11,6 @@ properties:
   fromMSP:
     type: string
     description: The MSP that creates this document (optional on request)
-  senderID:
-    type: string
-    description: The hyperledger senderID of the TX 
   dataHash:
     type: string
     description: The hash over the document

@@ -32,7 +32,7 @@ const getOffchainDBAdapterConfig = () => new Promise(
 
       blockchainConnection.getRESTConfig().then( (uri) => {
         const resJSON = {};
-        resJSON['uri'] = uri;
+        resJSON['restURI'] = uri;
         resolve(Service.successResponse(resJSON, 200));
       }).catch((error) => {
         console.log('ERROR: ' + error);
