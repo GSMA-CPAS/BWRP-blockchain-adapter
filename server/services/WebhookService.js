@@ -27,24 +27,32 @@ setInterval(
         const peers = network.getChannel().getEndorsers(localMSP);
 
         // check all peers
+        let nowConnected = true;
+        connectedPromises = [];
         for (const peer of peers) {
           // check connection status
-          peer.checkConnection().then( (connected) => {
-            // console.log('>' + peer.name + '  status ' + connected + 'PREV='+prevConnected);
-
-            // if one of the peers is "down", shut down this application
-            if (!connected) {
-              console.log('> FATAL ERROR: peer ' + peer.name + ' is down!');
-            }
-
-            // need to reconnect event listner?
-            if ((!prevConnected) && (connected)) {
-              console.log('> ' + peer.name + ' is ready again. -> RESUBSCRIBING to chaincode events!');
-              blockchainConnection.subscribeLedgerEvents(eventCB);
-            }
-            prevConnected = connected;
-          });
+          connectedPromises.push(peer.checkConnection());
         }
+
+        Promise.all(connectedPromises).then( (result) => {
+          for (i in result) {
+            if (!result[i]) {
+              console.log('> FATAL ERROR: peer ' + peers[i].name + ' is down! connected = ' + result[i]);
+              nowConnected = false;
+            }
+          }
+
+          // do we need to reconnect the event listener?
+          if ((!prevConnected) && (nowConnected)) {
+          // previous status was disconnected, now connected again:
+            console.log('> connection restored -> RESUBSCRIBING to chaincode events!');
+            blockchainConnection.subscribeLedgerEvents(eventCB);
+          }
+
+          prevConnected = nowConnected;
+        }).catch( (error) => {
+          console.log('Error checking connection status: ' + error);
+        });
       });
     },
     10 * 1000);
