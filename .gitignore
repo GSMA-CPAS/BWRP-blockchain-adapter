@@ -1,9 +1,13 @@
 # codegen
 api/bin
+api/.bin
 api/codegen_server
 
 #server
 server/.git_info
+
+.openapi-generator
+.vscode
 
 # Logs
 logs

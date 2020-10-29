@@ -63,11 +63,12 @@ setInterval(
   */
 const webhooksSubscribePOST = ({subscriptionRequest}) => new Promise(
     async (resolve, reject) => {
-      webhookService.addSubscription(subscriptionRequest.eventName, subscriptionRequest.callbackUrl).then( (uuid) => {
+      try {
+        const uuid = webhookService.addSubscription(subscriptionRequest.eventName, subscriptionRequest.callbackUrl);
         resolve(Service.successResponse(uuid, 201));
-      }, (error) => {
+      } catch (error) {
         reject(Service.rejectResponse({'message': error.toString()}, 500));
-      });
+      }
     },
 );
 
@@ -78,15 +79,33 @@ const webhooksSubscribePOST = ({subscriptionRequest}) => new Promise(
   */
 const webhooksSubscriptionIDDELETE = ({subscriptionID}) => new Promise(
     async (resolve, reject) => {
-      webhookService.removeSubscription(subscriptionID).then( () => {
+      try {
+        webhookService.removeSubscription(subscriptionID);
         resolve(Service.successResponse('', 200));
-      }, (error) => {
+      } catch (error) {
         reject(Service.rejectResponse({'message': error.toString()}, 500));
-      });
+      }
+    },
+);
+
+
+/** show all subscriptions
+*
+* @return {string} JSON string describing all subscriptions
+* */
+const webhooksGET = () => new Promise(
+    async (resolve, reject) => {
+      try {
+        const subscriptions = webhookService.getSubscriptions();
+        resolve(Service.successResponse(JSON.stringify(subscriptions), 200));
+      } catch (error) {
+        reject(Service.rejectResponse({'message': error.toString()}, 500));
+      }
     },
 );
 
 module.exports = {
   webhooksSubscribePOST,
   webhooksSubscriptionIDDELETE,
+  webhooksGET,
 };
