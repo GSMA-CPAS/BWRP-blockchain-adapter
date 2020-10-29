@@ -4,7 +4,7 @@ const got = require('got');
 const fs = require('fs');
 const jsonfile = require('jsonfile');
 
-const _db = './webhook_subscriptions.json';
+const _db = process.env.BSA_CONFIG_DIR + '/webhook_subscriptions.json';
 
 /** constructor
  * @param {string} eventName - name of events to subscribe to

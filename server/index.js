@@ -1,6 +1,13 @@
 const logger = require('./logger');
 const ExpressServer = require('./expressServer');
 
+
+if (process.env.BSA_CONFIG_DIR == undefined) {
+  console.log('> config directory not defined, please set env var BSA_CONFIG_DIR');
+  process.exit(1);
+}
+
+
 if (process.env.BSA_PORT == undefined) {
   console.log('> port not defined, please set env var BSA_PORT');
   process.exit(1);
