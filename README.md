@@ -4,7 +4,7 @@ This is a POC for the blockchain-adapter and a proposal for its REST Api..
 
 NOTE: the API is a WIP and is subject to change!
 
-The REST interface is defined using the openAPI standard (see [definition file](./api/openapi.yam)).
+The REST interface is defined using the openAPI standard (see [definition file](./api/openapi.yaml)).
 The [server code](./server/README.md) is created by the nodejs-express-server codegen.
 The [client code](./client/README.md) is created by the typescript-node codegen.
 See api/generate.sh for details.
