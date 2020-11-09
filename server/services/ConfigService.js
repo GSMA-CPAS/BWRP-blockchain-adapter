@@ -2,14 +2,14 @@ const Service = require('./Service');
 const {BlockchainService} = require('../hyperledger/blockchain_service');
 
 /** Update the configuration of the offchain-db-adapter
-   * @param {OffchainDBAdapterConfig} body - A configuration for the offchain-db-adapter
+   * @param {OffchainDBConfig} body - A configuration for the offchain-db-adapter
    * @return {string}
   */
-const setOffchainDBAdapterConfig = ({body}) => new Promise(
+const setOffchainDBConfig = ({body}) => new Promise(
     async (resolve, reject) => {
       const blockchainConnection = new BlockchainService(process.env.BSA_CCP);
 
-      blockchainConnection.setRESTConfig(body['restURI']).then( (txID) => {
+      blockchainConnection.setOffchainDBConfig(body['URI']).then( (txID) => {
         const resJSON = {};
         resJSON['txID'] = txID;
         console.log('> stored data with txID ' + txID);
@@ -24,15 +24,15 @@ const setOffchainDBAdapterConfig = ({body}) => new Promise(
 );
 
 /** Read back the configuration of the offchain-db-adapter
-   * @return {OffchainDBAdapterConfig}
+   * @return {OffchainDBConfig}
   */
-const getOffchainDBAdapterConfig = () => new Promise(
+const getOffchainDBConfig = () => new Promise(
     async (resolve, reject) => {
       const blockchainConnection = new BlockchainService(process.env.BSA_CCP);
 
-      blockchainConnection.getRESTConfig().then( (uri) => {
+      blockchainConnection.getOffchainDBConfig().then( (uri) => {
         const resJSON = {};
-        resJSON['restURI'] = uri;
+        resJSON['URI'] = uri;
         resolve(Service.successResponse(resJSON, 200));
       }).catch((error) => {
         console.log('ERROR: ' + error);
@@ -45,6 +45,6 @@ const getOffchainDBAdapterConfig = () => new Promise(
 
 
 module.exports = {
-  setOffchainDBAdapterConfig,
-  getOffchainDBAdapterConfig,
+  setOffchainDBConfig,
+  getOffchainDBConfig,
 };

@@ -303,18 +303,18 @@ paths:
         '500':
           description: Internal Server Error
           content: {}
-  /config/offchain-db-adapter:
+  /config/offchain-db:
     put:
-      description: Update the configuration of the offchain-db-adapter
+      description: Update the configuration of the offchain-db
       tags:
         - config
-      operationId: setOffchainDBAdapterConfig
+      operationId: setOffchainDBConfig
       requestBody:
-        description: A configuration for the offchain-db-adapter
+        description: A configuration for the offchain-db
         content:
           application/json:
             schema:
-              $ref: models/OffchainDBAdapterConfig.yaml
+              $ref: models/OffchainDBConfig.yaml
         required: true
       responses:
         '200':
@@ -329,17 +329,17 @@ paths:
           content: {}
       x-codegen-request-body-name: body
     get:
-      description: Read back the configuration of the offchain-db-adapter
+      description: Read back the configuration of the offchain-db
       tags:
         - config
-      operationId: getOffchainDBAdapterConfig
+      operationId: getOffchainDBConfig
       responses:
         '200':
           content:
             application/json:
               schema:
-                $ref: models/OffchainDBAdapterConfig.yaml
-          description: The current configuration for the offchain-db-adapter
+                $ref: models/OffchainDBConfig.yaml
+          description: The current configuration for the offchain-db
         '500':
           description: Internal Error
           content: {}

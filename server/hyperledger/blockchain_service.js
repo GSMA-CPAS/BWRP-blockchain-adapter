@@ -74,11 +74,11 @@ class BlockchainService {
     this.gateway.disconnect();
   }
 
-  /** set the rest url
-   * @param {string} url - the url of a offchain db adapter rest server
+  /** set the offchain url
+   * @param {string} url - the url of the offchain db
    * @return {Promise}
   */
-  setRESTConfig(url) {
+  setOffchainDBConfig(url) {
     const self = this;
 
     return this.network.then( (network) => {
@@ -88,11 +88,11 @@ class BlockchainService {
       // fetch my org
       const msp = self.connectionProfile.organizations[self.connectionProfile.client.organization].mspid;
 
-      // configure REST api
-      console.log('> will configure REST of MSP ' + msp + ' endpoint to ' + url);
+      // configure offchain api
+      console.log('> will configure offchain url of MSP ' + msp + ' endpoint to ' + url);
 
       // send transaction
-      const tx = contract.createTransaction('SetRESTConfig');
+      const tx = contract.createTransaction('SetOffchainDBConfig');
 
       return tx.setTransient({'uri': Buffer.from(url).toString('base64')})
           .setEndorsingOrganizations(msp)
@@ -107,10 +107,10 @@ class BlockchainService {
     });
   }
 
-  /** get the rest url
+  /** get the offchain db url
    * @return {string}
   */
-  getRESTConfig() {
+  getOffchainDBConfig() {
     const self = this;
 
     return this.network.then( (network) => {
@@ -123,11 +123,11 @@ class BlockchainService {
       // enable filter
       network.queryHandler.setFilter(localMSP);
 
-      return contract.evaluateTransaction('GetRESTConfig', ...[]).then( (result) => {
+      return contract.evaluateTransaction('GetOffchainDBConfig', ...[]).then( (result) => {
         // reset filter
         network.queryHandler.setFilter('');
 
-        console.log('> got REST config ' + result);
+        console.log('> got offchain db config ' + result);
         return result.toString(); ;
       });
     });

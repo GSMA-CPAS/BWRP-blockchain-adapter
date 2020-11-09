@@ -1,10 +1,10 @@
-title: OffchainDBAdapterConfig
+title: OffchainDBConfig
 type: object
 properties:
-  restURI:
+  URI:
     type: string
-    description: URL of the offchain db adapter
+    description: URL of the offchain db (couchdb)
     format: uri
-    example: 'http://offchain-db-adapter:3333/documents'
+    example: 'http://user:password@localhost:5984/'
 required:
-  - restURI
+  - URI

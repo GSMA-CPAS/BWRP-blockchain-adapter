@@ -34,11 +34,11 @@ console.log('DOCUMENTSHA256: ' + DOCUMENTSHA256);
  * @param {string} uri - URI of the offchain db adapter server
  * @return {undefined}
 */
-function setOffchainDBAdapterConfig(config, name, uri) {
+function setOffchainDBConfig(config, name, uri) {
   console.log('> ' + name + ': setting offchain db adapter config uri to ' + uri);
-  const obdaConfig = new api.OffchainDBAdapterConfig();
-  obdaConfig.restURI = uri;
-  return config.setOffchainDBAdapterConfig(obdaConfig).then((result) => {
+  const obdaConfig = new api.OffchainDBConfig();
+  obdaConfig.URI = uri;
+  return config.setOffchainDBConfig(obdaConfig).then((result) => {
     console.log('> ok. txID = ' + result.body.txID);
   }).catch((e) => {
     console.log('> failed, response body: ' + JSON.stringify(e.response.body));
@@ -135,8 +135,8 @@ const launchClient = async () => {
 
   try {
     console.log('> configuring offchain-db-adapter uris');
-    await setOffchainDBAdapterConfig(DTAG.config, 'DTAG', 'http://offchain-db-adapter-dtag:3333');
-    await setOffchainDBAdapterConfig(TMUS.config, 'TMUS', 'http://offchain-db-adapter-tmus:3334');
+    await setOffchainDBConfig(DTAG.config, 'DTAG', 'http://offchain-db-adapter-dtag:3333');
+    await setOffchainDBConfig(TMUS.config, 'TMUS', 'http://offchain-db-adapter-tmus:3334');
 
     console.log('> storing document on both parties by calling the function on DTAG with the partner id TMUS');
     privateDocument = new api.PrivateDocument();
