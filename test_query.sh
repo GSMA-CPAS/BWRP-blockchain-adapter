@@ -1,5 +1,5 @@
 #!/bin/bash
-set -e -o errexit
+set -e -o errexit -x
 export no_proxy="localhost,$no_proxy"
 
 # allow env override
@@ -32,15 +32,13 @@ function request {
     RET=$(curl -s -S -X $1 -H "Content-Type: application/json" -d "$2" "$3")
     echo $RET
     echo $RET | grep -i "error" > /dev/null && echo $RET > /dev/stderr && exit 1 || : 
-}  
+}
 
+#TODO: print the following help only if it was not configured already
 echo "###################################################"
-echo "> setting rest uri on dtag"
-request "PUT" '{"restURI": "http://offchain-db-adapter-dtag:3333"}' http://$BSA_DTAG/config/offchain-db-adapter
+echo "> prepare offchain db config with the following call for both orgs if not done already during setup:"
+echo 'curl -s -X PUT http://localhost:8081/config/offchain-db -d "{\"URI\": \"http://${OFFCHAIN_COUCHDB_USER}:${OFFCHAIN_COUCHDB_PASSWORD}@couchdb-offchain-dtag:5984\"}" -H "Content-Type: application/json"'
 
-echo "###################################################"
-echo "> setting rest uri on tmus"
-request "PUT" '{"restURI": "http://offchain-db-adapter-tmus:3334"}' http://$BSA_TMUS/config/offchain-db-adapter
 
 echo "###################################################"
 echo "> storing document on both parties by calling the function on DTAG with the partner id TMUS"
