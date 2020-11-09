@@ -4,12 +4,40 @@ All URIs are relative to *http://localhost*
 
 Method | HTTP request | Description
 ------------- | ------------- | -------------
+[**deletePrivateDocument**](ContractApi.md#deletePrivateDocument) | **DELETE** /private-documents/{id} | 
 [**fetchPrivateDocument**](ContractApi.md#fetchPrivateDocument) | **GET** /private-documents/{id} | 
 [**fetchPrivateDocuments**](ContractApi.md#fetchPrivateDocuments) | **GET** /private-documents | 
 [**fetchSignatures**](ContractApi.md#fetchSignatures) | **GET** /signatures/{id}/{msp} | 
 [**uploadPrivateDocument**](ContractApi.md#uploadPrivateDocument) | **POST** /private-documents | 
 [**uploadSignature**](ContractApi.md#uploadSignature) | **PUT** /signatures/{id} | 
 
+
+<a name="deletePrivateDocument"></a>
+# **deletePrivateDocument**
+> deletePrivateDocument(id)
+
+
+
+    Delete a private document from the database, identified by its id
+
+### Parameters
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **id** | **String**| The document ID | [default to null]
+
+### Return type
+
+null (empty response body)
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+- **Content-Type**: Not defined
+- **Accept**: Not defined
 
 <a name="fetchPrivateDocument"></a>
 # **fetchPrivateDocument**

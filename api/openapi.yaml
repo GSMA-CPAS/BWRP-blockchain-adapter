@@ -144,6 +144,25 @@ paths:
         '500':
           description: Internal Error
           content: {}
+    delete:
+      description: Delete a private document from the database, identified by its id
+      tags:
+        - contract
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+          description: The document ID
+      operationId: deletePrivateDocument
+      responses:
+        '200':
+          description: Successful deletion
+          content: {}
+        '500':
+          description: Internal Error
+          content: {}
   /webhooks/subscribe:
     post:
       description: subscribes a client to receive the specified event

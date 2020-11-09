@@ -132,6 +132,29 @@ paths:
       x-codegen-request-body-name: body
       x-eov-operation-handler: controllers/ContractController
   /private-documents/{id}:
+    delete:
+      description: Delete a private document from the database, identified by its
+        id
+      operationId: deletePrivateDocument
+      parameters:
+      - description: The document ID
+        explode: false
+        in: path
+        name: id
+        required: true
+        schema:
+          type: string
+        style: simple
+      responses:
+        "200":
+          content: {}
+          description: Successful deletion
+        "500":
+          content: {}
+          description: Internal Error
+      tags:
+      - contract
+      x-eov-operation-handler: controllers/ContractController
     get:
       description: Fetch a private document from the database, identified by its id
       operationId: fetchPrivateDocument

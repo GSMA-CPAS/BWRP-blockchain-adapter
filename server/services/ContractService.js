@@ -21,6 +21,28 @@ const fetchPrivateDocument = ({id}) => new Promise(
     },
 );
 
+/**
+* Delete a private document from the database, identified by its id
+*
+* @param {string} id - The document ID
+* @return {string} - no response value expected for this operation
+* */
+const deletePrivateDocument = ({id}) => new Promise(
+    async (resolve, reject) => {
+      const blockchainConnection = new BlockchainService(process.env.BSA_CCP);
+
+      blockchainConnection.deletePrivateDocument(id)
+          .then( () => {
+            resolve(Service.successResponse('', 200));
+          }).catch((error) => {
+            console.log('ERROR: ' + error);
+            reject(Service.rejectResponse({'message': error.toString()}, 500));
+          }).finally( () => {
+            blockchainConnection.disconnect();
+          });
+    },
+);
+
 /** show last n private documents
    * @return {PrivateDocumentResponse[]}
   */
@@ -119,6 +141,7 @@ const uploadSignature = ({id, body}) => new Promise(
 
 module.exports = {
   fetchPrivateDocument,
+  deletePrivateDocument,
   fetchPrivateDocuments,
   fetchSignatures,
   uploadPrivateDocument,

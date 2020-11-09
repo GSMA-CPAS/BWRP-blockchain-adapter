@@ -414,6 +414,34 @@ class BlockchainService {
     });
   }
 
+  /** delete a private document for a given documentID
+   * @param {string} documentID - a document id
+   * @return {void}
+  */
+  deletePrivateDocument(documentID) {
+    const self = this;
+
+    return this.network.then( (network) => {
+      // fetch contract
+      const contract = network.getContract(self.connectionProfile.config.contractID);
+
+      console.log('> deleting document for id ' + documentID);
+
+      // enable filter to execute query on our MSP
+      const onMSP = this.connectionProfile.organizations[this.connectionProfile.client.organization].mspid;
+      network.queryHandler.setFilter(onMSP);
+
+      return contract.evaluateTransaction('DeletePrivateDocument', ...[documentID]).then( () => {
+        // reset filter
+        network.queryHandler.setFilter('');
+
+        console.log('> reply: DeletePrivateDocument(#' + documentID + ')');
+
+        return;
+      });
+    });
+  }
+
   /** get private documents
    * @return {Promise}
   */

@@ -8,6 +8,10 @@
 
 const Controller = require('./Controller');
 const service = require('../services/ContractService');
+const deletePrivateDocument = async (request, response) => {
+  await Controller.handleRequest(request, response, service.deletePrivateDocument);
+};
+
 const fetchPrivateDocument = async (request, response) => {
   await Controller.handleRequest(request, response, service.fetchPrivateDocument);
 };
@@ -30,6 +34,7 @@ const uploadSignature = async (request, response) => {
 
 
 module.exports = {
+  deletePrivateDocument,
   fetchPrivateDocument,
   fetchPrivateDocuments,
   fetchSignatures,
