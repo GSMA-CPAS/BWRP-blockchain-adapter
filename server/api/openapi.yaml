@@ -5,7 +5,7 @@ info:
     name: Simon Schulz
   description: This is the REST api specification for the blockchain-adapter
   title: Blockchain-Adapter
-  version: 0.0.5
+  version: 0.0.6
 servers:
 - url: /
 tags:
@@ -230,6 +230,24 @@ paths:
       tags:
       - webhook
       x-eov-operation-handler: controllers/WebhookController
+  /webhooks:
+    get:
+      description: show all subscriptions
+      operationId: webhooksGET
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: string
+                x-content-type: application/json
+          description: List of Subscriptions
+        "500":
+          content: {}
+          description: Internal Server Error
+      tags:
+      - webhook
+      x-eov-operation-handler: controllers/WebhookController
   /signatures/{id}:
     put:
       description: store a signature for the document identified by id on the ledger
@@ -365,16 +383,12 @@ components:
       - $ref: '#/components/schemas/PrivateDocument'
       example:
         fromMSP: fromMSP
-        senderID: senderID
         dataHash: dataHash
         id: 0
         timestamp: timestamp
       properties:
         fromMSP:
           description: The MSP that creates this document (optional on request)
-          type: string
-        senderID:
-          description: The hyperledger senderID of the TX
           type: string
         dataHash:
           description: The hash over the document
@@ -389,7 +403,6 @@ components:
       - dataHash
       - fromMSP
       - id
-      - senderID
       - timestamp
       title: PrivateDocumentResponse
       type: object

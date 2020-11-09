@@ -4,9 +4,34 @@ All URIs are relative to *http://localhost*
 
 Method | HTTP request | Description
 ------------- | ------------- | -------------
+[**webhooksGet**](WebhookApi.md#webhooksGet) | **GET** /webhooks | 
 [**webhooksSubscribePost**](WebhookApi.md#webhooksSubscribePost) | **POST** /webhooks/subscribe | 
 [**webhooksSubscriptionIDDelete**](WebhookApi.md#webhooksSubscriptionIDDelete) | **DELETE** /webhooks/{subscriptionID} | 
 
+
+<a name="webhooksGet"></a>
+# **webhooksGet**
+> String webhooksGet()
+
+
+
+    show all subscriptions
+
+### Parameters
+This endpoint does not need any parameter.
+
+### Return type
+
+[**String**](../Models/string.md)
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+- **Content-Type**: Not defined
+- **Accept**: application/json
 
 <a name="webhooksSubscribePost"></a>
 # **webhooksSubscribePost**

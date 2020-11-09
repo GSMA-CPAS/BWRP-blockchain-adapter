@@ -8,6 +8,10 @@
 
 const Controller = require('./Controller');
 const service = require('../services/WebhookService');
+const webhooksGET = async (request, response) => {
+  await Controller.handleRequest(request, response, service.webhooksGET);
+};
+
 const webhooksSubscribePOST = async (request, response) => {
   await Controller.handleRequest(request, response, service.webhooksSubscribePOST);
 };
@@ -18,6 +22,7 @@ const webhooksSubscriptionIDDELETE = async (request, response) => {
 
 
 module.exports = {
+  webhooksGET,
   webhooksSubscribePOST,
   webhooksSubscriptionIDDELETE,
 };

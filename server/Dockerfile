@@ -24,6 +24,10 @@ ENV NODE_ENV=production
 
 EXPOSE 3000
 
+RUN mkdir -p /app/config && chown -R $SERVICE_USER /app/config
+
+VOLUME /app/config
+
 USER $SERVICE_USER
 
 CMD ["./tools/run.sh"]

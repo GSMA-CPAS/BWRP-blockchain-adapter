@@ -5,6 +5,8 @@ const crypto = require('crypto');
 const {Gateway, Wallets} = require('fabric-network');
 const SingleMSPQueryHandler = require('./query_handler');
 
+const sleep = require('util').promisify(setTimeout);
+
 /** BlockChainService class
 */
 class BlockchainService {
@@ -46,8 +48,23 @@ class BlockchainService {
     this.gateway = new Gateway();
     await this.gateway.connect(this.connectionProfile, gatewayOptions);
 
-    // obtain the network
-    return await this.gateway.getNetwork(this.connectionProfile.config.channelName);
+    // try to obtain the network
+    let triesToDo = 5;
+    while (triesToDo-- > 1) {
+      try {
+        const network = await this.gateway.getNetwork(this.connectionProfile.config.channelName);
+        return network;
+      } catch (error) {
+        console.log('> failed to access channel ' + this.connectionProfile.config.channelName + ' - ' + error.toString());
+        console.log(error);
+        console.log('> will retry in 5s... ('+triesToDo+' retries left)');
+      }
+      await sleep(5000);
+    }
+
+    // failed to connect
+    console.log('> failed to access channel. giving up.');
+    process.exit(1);
   }
 
   /** close a network connection
@@ -496,7 +513,7 @@ class BlockchainService {
             // append documentID to event and notify listeners:
             eventData.data['documentID'] = 'could_not_resolve_storage_key';
           }).finally( () => {
-            // finasend event
+            // finally send event
             callback(eventData.eventName, eventData);
           });
         } else {
@@ -504,6 +521,7 @@ class BlockchainService {
           callback(eventData.eventName, eventData);
         }
       };
+
       return contract.addContractListener(listener);
     });
   };
