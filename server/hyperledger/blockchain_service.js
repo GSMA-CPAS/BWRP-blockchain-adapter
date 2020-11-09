@@ -5,6 +5,8 @@ const crypto = require('crypto');
 const {Gateway, Wallets} = require('fabric-network');
 const SingleMSPQueryHandler = require('./query_handler');
 
+const sleep = require('util').promisify(setTimeout);
+
 /** BlockChainService class
 */
 class BlockchainService {
@@ -47,14 +49,22 @@ class BlockchainService {
     await this.gateway.connect(this.connectionProfile, gatewayOptions);
 
     // try to obtain the network
-    try {
-      const network = await this.gateway.getNetwork(this.connectionProfile.config.channelName);
-      return network;
-    } catch (error) {
-      console.log('> failed to access channel ' + this.connectionProfile.config.channelName + ' - ' + error.toString());
-      console.log(error);
-      process.exit(1);
+    let triesToDo = 5;
+    while (triesToDo-- > 1) {
+      try {
+        const network = await this.gateway.getNetwork(this.connectionProfile.config.channelName);
+        return network;
+      } catch (error) {
+        console.log('> failed to access channel ' + this.connectionProfile.config.channelName + ' - ' + error.toString());
+        console.log(error);
+        console.log('> will retry in 5s... ('+triesToDo+' retries left)');
+      }
+      await sleep(5000);
     }
+
+    // failed to connect
+    console.log('> failed to access channel. giving up.');
+    process.exit(1);
   }
 
   /** close a network connection
