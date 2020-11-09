@@ -494,24 +494,6 @@ class BlockchainService {
     });
   }
 
-  /** get signatures for a given storage key
-   * @param {Network} network - a fabric network object
-   * @param {Contract} contract - a fabric contract object
-   * @param {string} storageLocation - a storage location
-   * @return {Promise}
-  */
-  getDocumentID(network, contract, storageLocation) {
-    // this will always be run locally
-    // enable filter to execute query on our MSP
-    const onMSP = this.connectionProfile.organizations[this.connectionProfile.client.organization].mspid;
-    network.queryHandler.setFilter(onMSP);
-
-    return contract.evaluateTransaction('GetDocumentID', ...[storageLocation]).then( (response) => {
-      const data = JSON.parse(response);
-      return data.documentID;
-    });
-  }
-
   /** subscribe to ledger events
    * @param {function} callback - your callback function
    * @return {Promise} listener object
@@ -531,23 +513,8 @@ class BlockchainService {
 
         console.log('> INCOMING EVENT: [' + msp + '] <' + event.eventName + '> --> ' + eventDataRaw);
 
-        // resolve documentID from storageLocation if given
-        if (eventData.data.storageKey != '') {
-          self.getDocumentID(network, contract, eventData.data.storageKey).then( (documentID) => {
-            // append documentID to event and notify listeners:
-            eventData.data['documentID'] = documentID;
-          }).catch( (err) => {
-            console.log('ERROR: ' + err);
-            // append documentID to event and notify listeners:
-            eventData.data['documentID'] = 'could_not_resolve_storage_key';
-          }).finally( () => {
-            // finally send event
-            callback(eventData.eventName, eventData);
-          });
-        } else {
-          // not storageKey in data, publish data as it is
-          callback(eventData.eventName, eventData);
-        }
+        // publish evenData
+        callback(eventData.eventName, eventData);
       };
 
       return contract.addContractListener(listener);
