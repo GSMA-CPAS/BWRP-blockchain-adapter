@@ -445,7 +445,7 @@ class BlockchainService {
   /** get private documents
    * @return {Promise}
   */
-  fetchPrivateDocuments() {
+  fetchPrivateDocumentIDs() {
     const self = this;
 
     return this.network.then( (network) => {
@@ -458,19 +458,19 @@ class BlockchainService {
       const onMSP = this.connectionProfile.organizations[this.connectionProfile.client.organization].mspid;
       network.queryHandler.setFilter(onMSP);
 
-      return contract.evaluateTransaction('FetchPrivateDocuments', ...[]).then( (documents) => {
+      return contract.evaluateTransaction('FetchPrivateDocumentIDs', ...[]).then( (documentIDs) => {
         // reset filter
         network.queryHandler.setFilter('');
 
-        console.log(documents.toString());
+        console.log(documentIDs.toString());
 
         // check for error
-        if (documents == '{}') {
+        if (documentIDs == '{}') {
           console.log('> got no results');
           return {};
         }
 
-        return documents.toString();
+        return documentIDs.toString();
       });
     });
   }

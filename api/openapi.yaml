@@ -108,16 +108,14 @@ paths:
       description: show last n private documents
       tags:
         - contract
-      operationId: fetchPrivateDocuments
+      operationId: fetchPrivateDocumentIDs
       responses:
         '200':  
-          description: Successful operation, returns stored documents
+          description: Successful operation, returns stored documentIDs
           content:
             application/json:
               schema:
-                type: object
-                additionalProperties:
-                  $ref: models/PrivateDocument.yaml
+                type: string
         '500':
           description: Internal Error
           content: {}

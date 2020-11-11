@@ -6,7 +6,7 @@ Method | HTTP request | Description
 ------------- | ------------- | -------------
 [**deletePrivateDocument**](ContractApi.md#deletePrivateDocument) | **DELETE** /private-documents/{id} | 
 [**fetchPrivateDocument**](ContractApi.md#fetchPrivateDocument) | **GET** /private-documents/{id} | 
-[**fetchPrivateDocuments**](ContractApi.md#fetchPrivateDocuments) | **GET** /private-documents | 
+[**fetchPrivateDocumentIDs**](ContractApi.md#fetchPrivateDocumentIDs) | **GET** /private-documents | 
 [**fetchSignatures**](ContractApi.md#fetchSignatures) | **GET** /signatures/{id}/{msp} | 
 [**uploadPrivateDocument**](ContractApi.md#uploadPrivateDocument) | **POST** /private-documents | 
 [**uploadSignature**](ContractApi.md#uploadSignature) | **PUT** /signatures/{id} | 
@@ -66,9 +66,9 @@ No authorization required
 - **Content-Type**: Not defined
 - **Accept**: application/json
 
-<a name="fetchPrivateDocuments"></a>
-# **fetchPrivateDocuments**
-> Map fetchPrivateDocuments()
+<a name="fetchPrivateDocumentIDs"></a>
+# **fetchPrivateDocumentIDs**
+> String fetchPrivateDocumentIDs()
 
 
 
@@ -79,7 +79,7 @@ This endpoint does not need any parameter.
 
 ### Return type
 
-[**Map**](../Models/PrivateDocument.md)
+[**String**](../Models/string.md)
 
 ### Authorization
 

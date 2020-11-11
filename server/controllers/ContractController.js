@@ -16,8 +16,8 @@ const fetchPrivateDocument = async (request, response) => {
   await Controller.handleRequest(request, response, service.fetchPrivateDocument);
 };
 
-const fetchPrivateDocuments = async (request, response) => {
-  await Controller.handleRequest(request, response, service.fetchPrivateDocuments);
+const fetchPrivateDocumentIDs = async (request, response) => {
+  await Controller.handleRequest(request, response, service.fetchPrivateDocumentIDs);
 };
 
 const fetchSignatures = async (request, response) => {
@@ -36,7 +36,7 @@ const uploadSignature = async (request, response) => {
 module.exports = {
   deletePrivateDocument,
   fetchPrivateDocument,
-  fetchPrivateDocuments,
+  fetchPrivateDocumentIDs,
   fetchSignatures,
   uploadPrivateDocument,
   uploadSignature,

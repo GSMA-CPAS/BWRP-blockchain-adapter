@@ -44,13 +44,13 @@ const deletePrivateDocument = ({id}) => new Promise(
 );
 
 /** show last n private documents
-   * @return {PrivateDocumentResponse[]}
+   * @return {String[]}
   */
-const fetchPrivateDocuments = () => new Promise(
+const fetchPrivateDocumentIDs = () => new Promise(
     async (resolve, reject) => {
       const blockchainConnection = new BlockchainService(process.env.BSA_CCP);
 
-      blockchainConnection.fetchPrivateDocuments()
+      blockchainConnection.fetchPrivateDocumentIDs()
           .then( (documents) => {
             resolve(Service.successResponse(documents, 200));
           }).catch((error) => {
@@ -142,7 +142,7 @@ const uploadSignature = ({id, body}) => new Promise(
 module.exports = {
   fetchPrivateDocument,
   deletePrivateDocument,
-  fetchPrivateDocuments,
+  fetchPrivateDocumentIDs,
   fetchSignatures,
   uploadPrivateDocument,
   uploadSignature,

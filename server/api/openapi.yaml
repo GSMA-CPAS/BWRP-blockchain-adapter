@@ -86,16 +86,14 @@ paths:
   /private-documents:
     get:
       description: show last n private documents
-      operationId: fetchPrivateDocuments
+      operationId: fetchPrivateDocumentIDs
       responses:
         "200":
           content:
             application/json:
               schema:
-                additionalProperties:
-                  $ref: '#/components/schemas/PrivateDocument'
-                type: object
-          description: Successful operation, returns stored documents
+                type: string
+          description: Successful operation, returns stored documentIDs
         "500":
           content: {}
           description: Internal Error
