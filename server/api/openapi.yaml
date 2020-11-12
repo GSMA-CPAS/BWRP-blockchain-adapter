@@ -86,16 +86,14 @@ paths:
   /private-documents:
     get:
       description: show last n private documents
-      operationId: fetchPrivateDocuments
+      operationId: fetchPrivateDocumentIDs
       responses:
         "200":
           content:
             application/json:
               schema:
-                additionalProperties:
-                  $ref: '#/components/schemas/PrivateDocument'
-                type: object
-          description: Successful operation, returns stored documents
+                type: string
+          description: Successful operation, returns stored documentIDs
         "500":
           content: {}
           description: Internal Error
@@ -132,6 +130,29 @@ paths:
       x-codegen-request-body-name: body
       x-eov-operation-handler: controllers/ContractController
   /private-documents/{id}:
+    delete:
+      description: Delete a private document from the database, identified by its
+        id
+      operationId: deletePrivateDocument
+      parameters:
+      - description: The document ID
+        explode: false
+        in: path
+        name: id
+        required: true
+        schema:
+          type: string
+        style: simple
+      responses:
+        "200":
+          content: {}
+          description: Successful deletion
+        "500":
+          content: {}
+          description: Internal Error
+      tags:
+      - contract
+      x-eov-operation-handler: controllers/ContractController
     get:
       description: Fetch a private document from the database, identified by its id
       operationId: fetchPrivateDocument
@@ -318,17 +339,17 @@ paths:
       tags:
       - contract
       x-eov-operation-handler: controllers/ContractController
-  /config/offchain-db-adapter:
+  /config/offchain-db:
     get:
-      description: Read back the configuration of the offchain-db-adapter
-      operationId: getOffchainDBAdapterConfig
+      description: Read back the configuration of the offchain-db
+      operationId: getOffchainDBConfig
       responses:
         "200":
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/OffchainDBAdapterConfig'
-          description: The current configuration for the offchain-db-adapter
+                $ref: '#/components/schemas/OffchainDBConfig'
+          description: The current configuration for the offchain-db
         "500":
           content: {}
           description: Internal Error
@@ -336,14 +357,14 @@ paths:
       - config
       x-eov-operation-handler: controllers/ConfigController
     put:
-      description: Update the configuration of the offchain-db-adapter
-      operationId: setOffchainDBAdapterConfig
+      description: Update the configuration of the offchain-db
+      operationId: setOffchainDBConfig
       requestBody:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/OffchainDBAdapterConfig'
-        description: A configuration for the offchain-db-adapter
+              $ref: '#/components/schemas/OffchainDBConfig'
+        description: A configuration for the offchain-db
         required: true
       responses:
         "200":
@@ -481,16 +502,16 @@ components:
       - signature
       title: DocumentSignature
       type: object
-    OffchainDBAdapterConfig:
+    OffchainDBConfig:
       example:
-        restURI: http://offchain-db-adapter:3333/documents
+        URI: http://user:password@localhost:5984/
       properties:
-        restURI:
-          description: URL of the offchain db adapter
-          example: http://offchain-db-adapter:3333/documents
+        URI:
+          description: URL of the offchain db (couchdb)
+          example: http://user:password@localhost:5984/
           format: uri
           type: string
       required:
-      - restURI
-      title: OffchainDBAdapterConfig
+      - URI
+      title: OffchainDBConfig
       type: object

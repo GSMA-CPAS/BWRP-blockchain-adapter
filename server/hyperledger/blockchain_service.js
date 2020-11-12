@@ -74,11 +74,11 @@ class BlockchainService {
     this.gateway.disconnect();
   }
 
-  /** set the rest url
-   * @param {string} url - the url of a offchain db adapter rest server
+  /** set the offchain url
+   * @param {string} url - the url of the offchain db
    * @return {Promise}
   */
-  setRESTConfig(url) {
+  setOffchainDBConfig(url) {
     const self = this;
 
     return this.network.then( (network) => {
@@ -88,11 +88,11 @@ class BlockchainService {
       // fetch my org
       const msp = self.connectionProfile.organizations[self.connectionProfile.client.organization].mspid;
 
-      // configure REST api
-      console.log('> will configure REST of MSP ' + msp + ' endpoint to ' + url);
+      // configure offchain api
+      console.log('> will configure offchain url of MSP ' + msp + ' endpoint to ' + url);
 
       // send transaction
-      const tx = contract.createTransaction('SetRESTConfig');
+      const tx = contract.createTransaction('SetOffchainDBConfig');
 
       return tx.setTransient({'uri': Buffer.from(url).toString('base64')})
           .setEndorsingOrganizations(msp)
@@ -107,10 +107,10 @@ class BlockchainService {
     });
   }
 
-  /** get the rest url
+  /** get the offchain db url
    * @return {string}
   */
-  getRESTConfig() {
+  getOffchainDBConfig() {
     const self = this;
 
     return this.network.then( (network) => {
@@ -123,11 +123,11 @@ class BlockchainService {
       // enable filter
       network.queryHandler.setFilter(localMSP);
 
-      return contract.evaluateTransaction('GetRESTConfig', ...[]).then( (result) => {
+      return contract.evaluateTransaction('GetOffchainDBConfig', ...[]).then( (result) => {
         // reset filter
         network.queryHandler.setFilter('');
 
-        console.log('> got REST config ' + result);
+        console.log('> got offchain db config ' + result);
         return result.toString(); ;
       });
     });
@@ -414,10 +414,38 @@ class BlockchainService {
     });
   }
 
+  /** delete a private document for a given documentID
+   * @param {string} documentID - a document id
+   * @return {void}
+  */
+  deletePrivateDocument(documentID) {
+    const self = this;
+
+    return this.network.then( (network) => {
+      // fetch contract
+      const contract = network.getContract(self.connectionProfile.config.contractID);
+
+      console.log('> deleting document for id ' + documentID);
+
+      // enable filter to execute query on our MSP
+      const onMSP = this.connectionProfile.organizations[this.connectionProfile.client.organization].mspid;
+      network.queryHandler.setFilter(onMSP);
+
+      return contract.evaluateTransaction('DeletePrivateDocument', ...[documentID]).then( () => {
+        // reset filter
+        network.queryHandler.setFilter('');
+
+        console.log('> reply: DeletePrivateDocument(#' + documentID + ')');
+
+        return;
+      });
+    });
+  }
+
   /** get private documents
    * @return {Promise}
   */
-  fetchPrivateDocuments() {
+  fetchPrivateDocumentIDs() {
     const self = this;
 
     return this.network.then( (network) => {
@@ -430,19 +458,19 @@ class BlockchainService {
       const onMSP = this.connectionProfile.organizations[this.connectionProfile.client.organization].mspid;
       network.queryHandler.setFilter(onMSP);
 
-      return contract.evaluateTransaction('FetchPrivateDocuments', ...[]).then( (documents) => {
+      return contract.evaluateTransaction('FetchPrivateDocumentIDs', ...[]).then( (documentIDs) => {
         // reset filter
         network.queryHandler.setFilter('');
 
-        console.log(documents.toString());
+        console.log(documentIDs.toString());
 
         // check for error
-        if (documents == '{}') {
+        if (documentIDs == '{}') {
           console.log('> got no results');
           return {};
         }
 
-        return documents.toString();
+        return documentIDs.toString();
       });
     });
   }
@@ -466,24 +494,6 @@ class BlockchainService {
     });
   }
 
-  /** get signatures for a given storage key
-   * @param {Network} network - a fabric network object
-   * @param {Contract} contract - a fabric contract object
-   * @param {string} storageLocation - a storage location
-   * @return {Promise}
-  */
-  getDocumentID(network, contract, storageLocation) {
-    // this will always be run locally
-    // enable filter to execute query on our MSP
-    const onMSP = this.connectionProfile.organizations[this.connectionProfile.client.organization].mspid;
-    network.queryHandler.setFilter(onMSP);
-
-    return contract.evaluateTransaction('GetDocumentID', ...[storageLocation]).then( (response) => {
-      const data = JSON.parse(response);
-      return data.documentID;
-    });
-  }
-
   /** subscribe to ledger events
    * @param {function} callback - your callback function
    * @return {Promise} listener object
@@ -503,23 +513,8 @@ class BlockchainService {
 
         console.log('> INCOMING EVENT: [' + msp + '] <' + event.eventName + '> --> ' + eventDataRaw);
 
-        // resolve documentID from storageLocation if given
-        if (eventData.data.storageKey != '') {
-          self.getDocumentID(network, contract, eventData.data.storageKey).then( (documentID) => {
-            // append documentID to event and notify listeners:
-            eventData.data['documentID'] = documentID;
-          }).catch( (err) => {
-            console.log('ERROR: ' + err);
-            // append documentID to event and notify listeners:
-            eventData.data['documentID'] = 'could_not_resolve_storage_key';
-          }).finally( () => {
-            // finally send event
-            callback(eventData.eventName, eventData);
-          });
-        } else {
-          // not storageKey in data, publish data as it is
-          callback(eventData.eventName, eventData);
-        }
+        // publish evenData
+        callback(eventData.eventName, eventData);
       };
 
       return contract.addContractListener(listener);

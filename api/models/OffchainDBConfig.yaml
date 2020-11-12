@@ -1,0 +1,10 @@
+title: OffchainDBConfig
+type: object
+properties:
+  URI:
+    type: string
+    description: URL of the offchain db (couchdb)
+    format: uri
+    example: 'http://user:password@localhost:5984/'
+required:
+  - URI

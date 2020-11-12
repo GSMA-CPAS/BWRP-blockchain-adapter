@@ -4,24 +4,24 @@ All URIs are relative to *http://localhost*
 
 Method | HTTP request | Description
 ------------- | ------------- | -------------
-[**getOffchainDBAdapterConfig**](ConfigApi.md#getOffchainDBAdapterConfig) | **GET** /config/offchain-db-adapter | 
-[**setOffchainDBAdapterConfig**](ConfigApi.md#setOffchainDBAdapterConfig) | **PUT** /config/offchain-db-adapter | 
+[**getOffchainDBConfig**](ConfigApi.md#getOffchainDBConfig) | **GET** /config/offchain-db | 
+[**setOffchainDBConfig**](ConfigApi.md#setOffchainDBConfig) | **PUT** /config/offchain-db | 
 
 
-<a name="getOffchainDBAdapterConfig"></a>
-# **getOffchainDBAdapterConfig**
-> OffchainDBAdapterConfig getOffchainDBAdapterConfig()
+<a name="getOffchainDBConfig"></a>
+# **getOffchainDBConfig**
+> OffchainDBConfig getOffchainDBConfig()
 
 
 
-    Read back the configuration of the offchain-db-adapter
+    Read back the configuration of the offchain-db
 
 ### Parameters
 This endpoint does not need any parameter.
 
 ### Return type
 
-[**OffchainDBAdapterConfig**](../Models/OffchainDBAdapterConfig.md)
+[**OffchainDBConfig**](../Models/OffchainDBConfig.md)
 
 ### Authorization
 
@@ -32,19 +32,19 @@ No authorization required
 - **Content-Type**: Not defined
 - **Accept**: application/json
 
-<a name="setOffchainDBAdapterConfig"></a>
-# **setOffchainDBAdapterConfig**
-> String setOffchainDBAdapterConfig(body)
+<a name="setOffchainDBConfig"></a>
+# **setOffchainDBConfig**
+> String setOffchainDBConfig(body)
 
 
 
-    Update the configuration of the offchain-db-adapter
+    Update the configuration of the offchain-db
 
 ### Parameters
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **body** | [**OffchainDBAdapterConfig**](../Models/OffchainDBAdapterConfig.md)| A configuration for the offchain-db-adapter |
+ **body** | [**OffchainDBConfig**](../Models/OffchainDBConfig.md)| A configuration for the offchain-db |
 
 ### Return type
 

@@ -1,10 +1,9 @@
-# InlineObject
+# OffchainDBConfig
 ## Properties
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**eventName** | [**String**](string.md) | The Event name | [default to null]
-**callbackUrl** | [**URI**](URI.md) | The location where data will be sent | [default to null]
+**URI** | [**URI**](URI.md) | URL of the offchain db (couchdb) | [default to null]
 
 [[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)
 

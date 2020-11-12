@@ -19,4 +19,5 @@ echo "> generating server api stubs"
 java -jar .bin/${OPENAPI_JAR} generate  -i openapi.yaml  -g nodejs-express-server -o ../server
 
 echo "> generating markdown"
+rm -r doc
 java -jar .bin/${OPENAPI_JAR} generate  -i openapi.yaml  -g markdown -o doc
