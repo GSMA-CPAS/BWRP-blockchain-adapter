@@ -4,6 +4,7 @@ const crypto = require('crypto');
 
 const {Gateway, Wallets} = require('fabric-network');
 const SingleMSPQueryHandler = require('./query_handler');
+const {ErrorCode} = require('../utils/errorcode');
 
 const sleep = require('util').promisify(setTimeout);
 
@@ -100,9 +101,19 @@ class BlockchainService {
           .then( (_) => {
             return tx.getTransactionId();
           })
-          .catch( (error) => {
-            // forward error to main app
-            return Promise.reject(error);
+          .catch( (txError) => {
+            // FIXME: this returns a list of errors, one for each peer!
+            //        for now return the first error
+            for (const item of txError.responses) {
+              // console.log(item.response);
+              if (item.response.status != 200) {
+                console.log('ERROR: peer ' + item.peer + ' reported: ' + item.response);
+                return Promise.reject(ErrorCode.fromChaincodeError(item.response, 'SetOffchainDBConfig('+msp+',' + url+') failed'));
+              }
+            }
+            // if this does not trigger (this should never happen?!)
+            console.log(txError);
+            return Promise.reject(new ErrorCode('ERROR_INTERNAL', 'SetOffchainDBConfig('+msp+',' + url+') failed'));
           });
     });
   }
@@ -129,6 +140,8 @@ class BlockchainService {
 
         console.log('> got offchain db config ' + result);
         return result.toString(); ;
+      }).catch( (errorJSON) => {
+        return Promise.reject(ErrorCode.fromChaincodeError(errorJSON, 'GetOffchainDBConfig() failed'));
       });
     });
   }
@@ -158,6 +171,8 @@ class BlockchainService {
       console.log('> ' + onMSP + ' stored data with #' + hash);
 
       return hash;
+    }).catch( (errorJSON) => {
+      return Promise.reject(ErrorCode.fromChaincodeError(errorJSON, 'StorePrivateDocument('+partnerMSP+',' + documentID+', ...) failed'));
     });
   }
 
@@ -165,18 +180,21 @@ class BlockchainService {
    * @param {Contract} contract - a fabric contract object
    * @param {string} storageKey - the storagekey
    * @param {string} documentHash - a document hash
+   * @param {string} documentID - the documentID
    * @return {Promise}
   */
-  storeDocumentHash(contract, storageKey, documentHash) {
+  storeDocumentHash(contract, storageKey, documentHash, documentID) {
     // send transaction
     const tx = contract.createTransaction('StoreDocumentHash');
     console.log('> will store signature at key ' + storageKey);
 
     return tx.submit(...[storageKey, documentHash]).then( (_) => {
-      return tx.getTransactionId();
-    }).catch( (error) => {
-      // forward error to main app
-      return Promise.reject(error);
+      const result = {};
+      result.documentID = documentID;
+      result.txID = tx.getTransactionId();
+      return result;
+    }).catch( (errorJSON) => {
+      return Promise.reject(ErrorCode.fromChaincodeError(errorJSON, 'StoreDocumentHash('+storageKey+',' + documentHash+') failed'));
     });
   }
 
@@ -204,22 +222,21 @@ class BlockchainService {
         return self.storeDocument(network, contract, fromMSP, partnerMSP, documentID, documentBase64).then( (hash) => {
           // check hash
           if (expectedHash != hash) {
-            return Promise.reject(new Error(fromMSP + ' stored invalid hash: ' + hash + ' != ' + expectedHash));
+            console.log('ERROR: '+fromMSP + ' stored invalid hash: ' + hash + ' != ' + expectedHash);
+            return Promise.reject(ErrorCode.createErrorCode('ERROR_INTERNAL', fromMSP + ' stored invalid hash'));
           }
 
           // EVALUATE store document on partnerMSP (remote)
           return self.storeDocument(network, contract, partnerMSP, partnerMSP, documentID, documentBase64).then( () => {
             // check hash
             if (expectedHash != hash) {
-              return Promise.reject(new Error(partnerMSP + ' stored invalid hash: ' + hash + ' != ' + expectedHash));
+              console.log('ERROR: '+partnerMSP + ' stored invalid hash: ' + hash + ' != ' + expectedHash);
+              return Promise.reject(ErrorCode.createErrorCode('ERROR_INTERNAL', partnerMSP + ' stored invalid hash'));
             }
 
             // calculate storage key
             return self.createStorageKey(network, contract, fromMSP, documentID).then( (storageKey) => {
-              return self.storeDocumentHash(contract, storageKey, hash).then( (_) => {
-                // finally return document id
-                return documentID;
-              });
+              return self.storeDocumentHash(contract, storageKey, hash, documentId);
             });
           });
         });
@@ -249,6 +266,8 @@ class BlockchainService {
       console.log('> got storage key ' + storageKey + ' for MSP ' + partnerMSP);
 
       return storageKey;
+    }).catch( (errorJSON) => {
+      return Promise.reject(ErrorCode.fromChaincodeError(errorJSON, 'CreateStorageKey(' + partnerMSP + ', ' + documentID + ') failed'));
     });
   }
 
@@ -272,6 +291,8 @@ class BlockchainService {
       console.log('> got documentID ' + documentID);
 
       return documentID;
+    }).catch( (errorJSON) => {
+      return Promise.reject(ErrorCode.fromChaincodeError(errorJSON, 'CreateDocumentID() failed'));
     });
   }
 
@@ -288,9 +309,8 @@ class BlockchainService {
 
     return tx.submit(...[storageKey, signature]).then( (_) => {
       return tx.getTransactionId();
-    }).catch( (error) => {
-      // forward error to main app
-      return Promise.reject(error);
+    }).catch( (errorJSON) => {
+      return Promise.reject(ErrorCode.fromChaincodeError(errorJSON, 'StoreSignature(' + storageKey + ', ...) failed'));
     });
   }
 
@@ -355,6 +375,8 @@ class BlockchainService {
       }
 
       return signatures;
+    }).catch( (errorJSON) => {
+      return Promise.reject(ErrorCode.fromChaincodeError(errorJSON, 'GetSignatures(' + msp + ', ' + storageKey + ') failed'));
     });
   }
 
@@ -410,9 +432,13 @@ class BlockchainService {
         }
 
         return document.toString();
+      }).catch( (errorJSON) => {
+        console.log(errorJSON);
+        return Promise.reject(ErrorCode.fromChaincodeError(errorJSON, 'FetchPrivateDocument(' + documentID + ') failed'));
       });
     });
   }
+
 
   /** delete a private document for a given documentID
    * @param {string} documentID - a document id
@@ -438,6 +464,8 @@ class BlockchainService {
         console.log('> reply: DeletePrivateDocument(#' + documentID + ')');
 
         return;
+      }).catch( (errorJSON) => {
+        return Promise.reject(ErrorCode.fromChaincodeError(errorJSON, 'DeletePrivateDocument(' + documentID + ') failed'));
       });
     });
   }
@@ -471,6 +499,8 @@ class BlockchainService {
         }
 
         return documentIDs.toString();
+      }).catch( (errorJSON) => {
+        return Promise.reject(ErrorCode.fromChaincodeError(errorJSON, 'FetchPrivateDocumentIDs() failed'));
       });
     });
   }
@@ -490,7 +520,12 @@ class BlockchainService {
   */
   getDiscoveryMSP(mspID) {
     return this.network.then( (network) => {
-      return network.getChannel().getMsp(mspID);
+      const results = network.getChannel().getMsp(mspID);
+      if (results != undefined) {
+        return results;
+      } else {
+        return Promise.reject(ErrorCode.createErrorCode('ERROR_INTERNAL', 'MSP ' + mspid + ' not found.'));
+      }
     });
   }
 

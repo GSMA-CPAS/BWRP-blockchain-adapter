@@ -18,5 +18,5 @@ properties:
     type: string
     description: The timestamp when the document was stored in the local database.
   id:
-    type: integer
+    type: string
     description: The document ID

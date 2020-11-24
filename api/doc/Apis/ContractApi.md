@@ -37,7 +37,7 @@ No authorization required
 ### HTTP request headers
 
 - **Content-Type**: Not defined
-- **Accept**: Not defined
+- **Accept**: application/json
 
 <a name="fetchPrivateDocument"></a>
 # **fetchPrivateDocument**
@@ -72,7 +72,7 @@ No authorization required
 
 
 
-    show last n private documents
+    show all private documents that are in the transient storage
 
 ### Parameters
 This endpoint does not need any parameter.
@@ -116,11 +116,11 @@ No authorization required
 ### HTTP request headers
 
 - **Content-Type**: Not defined
-- **Accept**: text/plain
+- **Accept**: text/plain, application/json
 
 <a name="uploadPrivateDocument"></a>
 # **uploadPrivateDocument**
-> String uploadPrivateDocument(body)
+> PrivateDocumentAdded uploadPrivateDocument(body)
 
 
 
@@ -134,7 +134,7 @@ Name | Type | Description  | Notes
 
 ### Return type
 
-[**String**](../Models/string.md)
+[**PrivateDocumentAdded**](../Models/PrivateDocumentAdded.md)
 
 ### Authorization
 
@@ -143,7 +143,7 @@ No authorization required
 ### HTTP request headers
 
 - **Content-Type**: application/json
-- **Accept**: text/plain
+- **Accept**: application/json
 
 <a name="uploadSignature"></a>
 # **uploadSignature**
@@ -171,5 +171,5 @@ No authorization required
 ### HTTP request headers
 
 - **Content-Type**: application/json
-- **Accept**: text/plain
+- **Accept**: text/plain, application/json
 

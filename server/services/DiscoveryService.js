@@ -13,14 +13,9 @@ const getDiscoveryMSP = ({mspid}) => new Promise(
 
       blockchainConnection.getDiscoveryMSP(mspid)
           .then( (results) => {
-            if (results != undefined) {
-              resolve(Service.successResponse(JSON.stringify(results), 200));
-            } else {
-              reject(Service.rejectResponse({'message': `MSP '${mspid}' not found.`}, 500));
-            }
+            resolve(Service.successResponse(JSON.stringify(results), 200));
           }).catch((error) => {
-            console.log('ERROR: ' + error);
-            reject(Service.rejectResponse({'message': error.toString()}, 500));
+            reject(Service.rejectResponse({'code': error.code, 'message': error.message}, 500));
           }).finally( () => {
             blockchainConnection.disconnect();
           });
@@ -38,8 +33,7 @@ const getDiscoveryMSPs = () => new Promise(
           .then( (results) => {
             resolve(Service.successResponse(JSON.stringify(results), 200));
           }).catch((error) => {
-            console.log('ERROR: ' + error);
-            reject(Service.rejectResponse({'message': error.toString()}, 500));
+            reject(Service.rejectResponse({'code': error.code, 'message': error.message}, 500));
           }).finally( () => {
             blockchainConnection.disconnect();
           });

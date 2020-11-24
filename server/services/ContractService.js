@@ -13,8 +13,7 @@ const fetchPrivateDocument = ({id}) => new Promise(
           .then( (document) => {
             resolve(Service.successResponse(document, 200));
           }).catch((error) => {
-            console.log('ERROR: ' + error);
-            reject(Service.rejectResponse({'message': error.toString()}, 500));
+            reject(Service.rejectResponse({'code': error.code, 'message': error.message}, 500));
           }).finally( () => {
             blockchainConnection.disconnect();
           });
@@ -35,8 +34,7 @@ const deletePrivateDocument = ({id}) => new Promise(
           .then( () => {
             resolve(Service.successResponse('', 200));
           }).catch((error) => {
-            console.log('ERROR: ' + error);
-            reject(Service.rejectResponse({'message': error.toString()}, 500));
+            reject(Service.rejectResponse({'code': error.code, 'message': error.message}, 500));
           }).finally( () => {
             blockchainConnection.disconnect();
           });
@@ -54,8 +52,7 @@ const fetchPrivateDocumentIDs = () => new Promise(
           .then( (documents) => {
             resolve(Service.successResponse(documents, 200));
           }).catch((error) => {
-            console.log('ERROR: ' + error);
-            reject(Service.rejectResponse({'message': error.toString()}, 500));
+            reject(Service.rejectResponse({'code': error.code, 'message': error.message}, 500));
           }).finally( () => {
             blockchainConnection.disconnect();
           });
@@ -75,8 +72,7 @@ const fetchSignatures = ({id, msp}) => new Promise(
           .then( (signatures) => {
             resolve(Service.successResponse(signatures, 200));
           }).catch((error) => {
-            console.log('ERROR: ' + error);
-            reject(Service.rejectResponse( {'message': error.toString()}, 500));
+            reject(Service.rejectResponse({'code': error.code, 'message': error.message}, 500));
           }).finally( () => {
             blockchainConnection.disconnect();
           });
@@ -98,8 +94,7 @@ const uploadPrivateDocument = ({body}) => new Promise(
             console.log('> both parties stored data with ID ' + documentID);
             resolve(Service.successResponse(resJSON, 200));
           }).catch((error) => {
-            console.log('ERROR: ' + error);
-            reject(Service.rejectResponse({'message': error.toString()}, 500));
+            reject(Service.rejectResponse({'code': error.code, 'message': error.message}, 500));
           }).finally( () => {
             blockchainConnection.disconnect();
           });
@@ -131,8 +126,7 @@ const uploadSignature = ({id, body}) => new Promise(
             resolve(Service.successResponse(resJSON, 200))
             ;
           }).catch((error) => {
-            console.log('ERROR: ' + error);
-            reject(Service.rejectResponse({'message': error.toString()}, 500));
+            reject(Service.rejectResponse({'code': error.code, 'message': error.message}, 500));
           }).finally( () => {
             blockchainConnection.disconnect();
           });
