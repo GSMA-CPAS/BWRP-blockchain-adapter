@@ -13,8 +13,16 @@ function Webhook() {
   // track subscriptions
   this._subscriptions = _loadSubscriptions(_db);
 
-  this.addSubscription('STORE:SIGNATURE', 'http://localhost:8086/test');
-  this.addSubscription('STORE:DOCUMENTHASH', 'http://localhost:8086/test');
+  // if not initialized properly, add event names:
+  if (!this._subscriptions.hasOwnProperty('STORE:SIGNATURE')) {
+    this._subscriptions['STORE:SIGNATURE'] = {};
+  }
+  if (!this._subscriptions.hasOwnProperty('STORE:DOCUMENTHASH')) {
+    this._subscriptions['STORE:DOCUMENTHASH'] = {};
+  }
+
+  // this.addSubscription('STORE:SIGNATURE', 'http://localhost:8086/test');
+  // this.addSubscription('STORE:DOCUMENTHASH', 'http://localhost:8086/test');
 }
 
 // add a new subscripton to our list
@@ -23,7 +31,7 @@ Webhook.prototype.addSubscription = function(eventName, callbackURL) {
   if (typeof callbackURL !== 'string') throw new TypeError('callbackURL must be a string');
 
   if (!this._subscriptions.hasOwnProperty(eventName)) {
-    reject(new Error('unknown eventName ' + eventName + ' specified'));
+    throw new Error('unknown eventName ' + eventName + ' specified');
     return;
   }
 
@@ -128,11 +136,6 @@ function _loadSubscriptions(filename) {
   } catch (error) {
     if (error.hasOwnProperty('code') && (error.code === 'ENOENT')) {
       const subscriptions = {};
-
-      // init empty lists
-      subscriptions['STORE:SIGNATURE'] = {};
-      subscriptions['STORE:DOCUMENTHASH'] = {};
-
       debug('file does not exist. empty subscription initialized');
       return subscriptions;
     } else {
