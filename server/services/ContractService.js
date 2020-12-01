@@ -88,11 +88,9 @@ const uploadPrivateDocument = ({body}) => new Promise(
       const blockchainConnection = new BlockchainService(process.env.BSA_CCP);
 
       blockchainConnection.addDocument(body['toMSP'], body['data'])
-          .then( (documentID) => {
-            const resJSON = {};
-            resJSON['documentID'] = documentID;
-            console.log('> both parties stored data with ID ' + documentID);
-            resolve(Service.successResponse(resJSON, 200));
+          .then( (responseJSON) => {
+            console.log('> both parties stored data with ID ' + responseJSON.documentID);
+            resolve(Service.successResponse(responseJSON, 200));
           }).catch((error) => {
             reject(Service.rejectResponse({'code': error.code, 'message': error.message}, 500));
           }).finally( () => {
