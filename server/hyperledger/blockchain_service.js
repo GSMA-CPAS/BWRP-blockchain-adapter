@@ -236,7 +236,7 @@ class BlockchainService {
 
             // calculate storage key
             return self.createStorageKey(network, contract, fromMSP, documentID).then( (storageKey) => {
-              return self.storeDocumentHash(contract, storageKey, hash, documentId);
+              return self.storeDocumentHash(contract, storageKey, hash, documentID);
             });
           });
         });
