@@ -1,0 +1,12 @@
+title: PrivateDocumentAdded
+type: object
+properties:
+  documentID:
+    description: The documentID of the document that was added
+    type: string
+  txID:
+    description: The hyperledger TX ID of the successfull add
+    type: string
+required:
+  - documentID
+  - txID

@@ -15,8 +15,7 @@ const setOffchainDBConfig = ({body}) => new Promise(
         console.log('> stored data with txID ' + txID);
         resolve(Service.successResponse(resJSON, 200));
       }).catch((error) => {
-        console.log('ERROR: ' + error);
-        reject(Service.rejectResponse({'message': error.toString()}, 500));
+        reject(Service.rejectResponse({'code': error.code, 'message': error.message}, 500));
       }).finally( () => {
         blockchainConnection.disconnect();
       });
@@ -35,8 +34,7 @@ const getOffchainDBConfig = () => new Promise(
         resJSON['URI'] = uri;
         resolve(Service.successResponse(resJSON, 200));
       }).catch((error) => {
-        console.log('ERROR: ' + error);
-        reject(Service.rejectResponse({'message': error.toString()}, 500));
+        reject(Service.rejectResponse({'code': error.code, 'message': error.message}, 500));
       }).finally( () => {
         blockchainConnection.disconnect();
       });

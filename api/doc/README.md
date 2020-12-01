@@ -11,7 +11,7 @@ Class | Method | HTTP request | Description
 *ConfigApi* | [**setOffchainDBConfig**](Apis/ConfigApi.md#setoffchaindbconfig) | **PUT** /config/offchain-db | Update the configuration of the offchain-db
 *ContractApi* | [**deletePrivateDocument**](Apis/ContractApi.md#deleteprivatedocument) | **DELETE** /private-documents/{id} | Delete a private document from the database, identified by its id
 *ContractApi* | [**fetchPrivateDocument**](Apis/ContractApi.md#fetchprivatedocument) | **GET** /private-documents/{id} | Fetch a private document from the database, identified by its id
-*ContractApi* | [**fetchPrivateDocumentIDs**](Apis/ContractApi.md#fetchprivatedocumentids) | **GET** /private-documents | show last n private documents
+*ContractApi* | [**fetchPrivateDocumentIDs**](Apis/ContractApi.md#fetchprivatedocumentids) | **GET** /private-documents | show all private documents that are in the transient storage
 *ContractApi* | [**fetchSignatures**](Apis/ContractApi.md#fetchsignatures) | **GET** /signatures/{id}/{msp} | Fetch all signatures for a given msp and a given document id from the ledger
 *ContractApi* | [**uploadPrivateDocument**](Apis/ContractApi.md#uploadprivatedocument) | **POST** /private-documents | Upload a private document, shared between our own organization and a partner MSP
 *ContractApi* | [**uploadSignature**](Apis/ContractApi.md#uploadsignature) | **PUT** /signatures/{id} | store a signature for the document identified by id on the ledger
@@ -27,8 +27,10 @@ Class | Method | HTTP request | Description
 ## Documentation for Models
 
  - [DocumentSignature](./Models/DocumentSignature.md)
+ - [ErrorCode](./Models/ErrorCode.md)
  - [OffchainDBConfig](./Models/OffchainDBConfig.md)
  - [PrivateDocument](./Models/PrivateDocument.md)
+ - [PrivateDocumentAdded](./Models/PrivateDocumentAdded.md)
  - [PrivateDocumentResponse](./Models/PrivateDocumentResponse.md)
  - [SubscriptionPayload](./Models/SubscriptionPayload.md)
  - [SubscriptionRequest](./Models/SubscriptionRequest.md)

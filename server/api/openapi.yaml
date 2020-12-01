@@ -5,7 +5,7 @@ info:
     name: Simon Schulz
   description: This is the REST api specification for the blockchain-adapter
   title: Blockchain-Adapter
-  version: 0.0.6
+  version: 0.0.7
 servers:
 - url: /
 tags:
@@ -85,7 +85,7 @@ paths:
       x-eov-operation-handler: controllers/StatusController
   /private-documents:
     get:
-      description: show last n private documents
+      description: show all private documents that are in the transient storage
       operationId: fetchPrivateDocumentIDs
       responses:
         "200":
@@ -93,7 +93,8 @@ paths:
             application/json:
               schema:
                 type: string
-          description: Successful operation, returns stored documentIDs
+          description: Successful operation, returns stored documentIDs _FIXME_ use
+            proper content type _FIXME_
         "500":
           content: {}
           description: Internal Error
@@ -114,16 +115,16 @@ paths:
       responses:
         "200":
           content:
-            text/plain:
+            application/json:
               schema:
-                type: string
-                x-content-type: text/plain
-          description: Successful operation, returns ID of stored document
-        "400":
-          content: {}
-          description: Bad Request
+                $ref: '#/components/schemas/PrivateDocumentAdded'
+          description: Successful operation, returns the documentID and the txID of
+            the stored document
         "500":
-          content: {}
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorCode'
           description: Internal Error
       tags:
       - contract
@@ -148,7 +149,10 @@ paths:
           content: {}
           description: Successful deletion
         "500":
-          content: {}
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorCode'
           description: Internal Error
       tags:
       - contract
@@ -173,7 +177,10 @@ paths:
                 $ref: '#/components/schemas/PrivateDocumentResponse'
           description: Successful operation, returns document
         "500":
-          content: {}
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorCode'
           description: Internal Error
       tags:
       - contract
@@ -297,8 +304,11 @@ paths:
                 type: string
           description: Successful operation, returns transaction hash
         "500":
-          content: {}
-          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorCode'
+          description: Internal Error
       tags:
       - contract
       x-codegen-request-body-name: body
@@ -334,8 +344,11 @@ paths:
                 x-content-type: text/plain
           description: Successful operation, returns json of signatures
         "500":
-          content: {}
-          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorCode'
+          description: Internal Error
       tags:
       - contract
       x-eov-operation-handler: controllers/ContractController
@@ -351,7 +364,10 @@ paths:
                 $ref: '#/components/schemas/OffchainDBConfig'
           description: The current configuration for the offchain-db
         "500":
-          content: {}
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorCode'
           description: Internal Error
       tags:
       - config
@@ -375,7 +391,10 @@ paths:
                 x-content-type: text/plain
           description: Successful operation, returns transaction hash
         "500":
-          content: {}
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorCode'
           description: Internal Error
       tags:
       - config
@@ -399,13 +418,54 @@ components:
       - toMSP
       title: PrivateDocument
       type: object
+    PrivateDocumentAdded:
+      example:
+        txID: txID
+        documentID: documentID
+      properties:
+        documentID:
+          description: The documentID of the document that was added
+          type: string
+        txID:
+          description: The hyperledger TX ID of the successfull add
+          type: string
+      required:
+      - documentID
+      - txID
+      title: PrivateDocumentAdded
+      type: object
+    ErrorCode:
+      properties:
+        code:
+          description: The error code. See chaincode/hybrid/errorcodes/errors.go for
+            a list
+          enum:
+          - ERROR_NON_LOCAL_ACCESS_DENIED
+          - ERROR_OFFCHAIN_DB_CONFIG
+          - ERROR_INTERNAL
+          - ERROR_DOCUMENT_ID_EXISTS
+          - ERROR_DOCUMENT_ID_INVALID
+          - ERROR_TARGET_MSP_INVALID
+          - ERROR_CERT_INVALID
+          - ERROR_SIGNATURE_INVALID
+          - ERROR_BAD_JSON
+          - ERROR_HASH_MISMATCH
+          type: string
+        message:
+          description: The description of the error
+          type: string
+      required:
+      - code
+      - message
+      title: ErrorCode
+      type: object
     PrivateDocumentResponse:
       allOf:
       - $ref: '#/components/schemas/PrivateDocument'
       example:
         fromMSP: fromMSP
         dataHash: dataHash
-        id: 0
+        id: id
         timestamp: timestamp
       properties:
         fromMSP:
@@ -419,7 +479,7 @@ components:
           type: string
         id:
           description: The document ID
-          type: integer
+          type: string
       required:
       - dataHash
       - fromMSP
