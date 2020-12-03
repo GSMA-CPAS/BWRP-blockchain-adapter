@@ -555,6 +555,25 @@ class BlockchainService {
       return contract.addContractListener(listener);
     });
   };
+
+
+  /** get the local msp name
+   * @return {Promise} name of local msp
+  */
+  getBlockchainStatus() {
+    const self = this;
+    return this.network.then( (_) => {
+      // wait for network to be connected so that we are sure the config was read
+      const result = {};
+      result.localMSP = self.connectionProfile.organizations[self.connectionProfile.client.organization].mspid;
+      result.channel = self.connectionProfile.config.channelName;
+      result.contractID = self.connectionProfile.config.contractID;
+      return result;
+    }).catch( (error) => {
+      console.log(error);
+      return Promise.reject(new ErrorCode('ERROR_INTERNAL', 'getBlockchainStatus() failed'));
+    });
+  }
 }
 
 module.exports = {BlockchainService};
