@@ -557,8 +557,8 @@ class BlockchainService {
   };
 
 
-  /** get the local msp name
-   * @return {Promise} name of local msp
+  /** get some hyperledger status
+   * @return {Promise} struct with hyperledger status data (channel, contract, and localMSP)
   */
   getBlockchainStatus() {
     const self = this;
