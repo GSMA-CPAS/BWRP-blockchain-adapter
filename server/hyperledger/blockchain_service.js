@@ -108,7 +108,7 @@ class BlockchainService {
               // console.log(item.response);
               if (item.response.status != 200) {
                 console.log('ERROR: peer ' + item.peer + ' reported: ' + item.response);
-                return Promise.reject(ErrorCode.fromChaincodeError(item.response, 'SetOffchainDBConfig('+msp+',' + url+') failed'));
+                return Promise.reject(ErrorCode.fromError(item.response, 'SetOffchainDBConfig('+msp+',' + url+') failed'));
               }
             }
             // if this does not trigger (this should never happen?!)
@@ -140,8 +140,8 @@ class BlockchainService {
 
         console.log('> got offchain db config ' + result);
         return result.toString(); ;
-      }).catch( (errorJSON) => {
-        return Promise.reject(ErrorCode.fromChaincodeError(errorJSON, 'GetOffchainDBConfig() failed'));
+      }).catch( (error) => {
+        return Promise.reject(ErrorCode.fromError(error, 'GetOffchainDBConfig() failed'));
       });
     });
   }
@@ -171,8 +171,8 @@ class BlockchainService {
       console.log('> ' + onMSP + ' stored data with #' + hash);
 
       return hash;
-    }).catch( (errorJSON) => {
-      return Promise.reject(ErrorCode.fromChaincodeError(errorJSON, 'StorePrivateDocument('+partnerMSP+',' + documentID+', ...) failed'));
+    }).catch( (error) => {
+      return Promise.reject(ErrorCode.fromError(error, 'StorePrivateDocument('+partnerMSP+',' + documentID+', ...) failed'));
     });
   }
 
@@ -193,8 +193,8 @@ class BlockchainService {
       result.documentID = documentID;
       result.txID = tx.getTransactionId();
       return result;
-    }).catch( (errorJSON) => {
-      return Promise.reject(ErrorCode.fromChaincodeError(errorJSON, 'StoreDocumentHash('+storageKey+',' + documentHash+') failed'));
+    }).catch( (error) => {
+      return Promise.reject(ErrorCode.fromError(error, 'StoreDocumentHash('+storageKey+',' + documentHash+') failed'));
     });
   }
 
@@ -266,8 +266,8 @@ class BlockchainService {
       console.log('> got storage key ' + storageKey + ' for MSP ' + partnerMSP);
 
       return storageKey;
-    }).catch( (errorJSON) => {
-      return Promise.reject(ErrorCode.fromChaincodeError(errorJSON, 'CreateStorageKey(' + partnerMSP + ', ' + documentID + ') failed'));
+    }).catch( (error) => {
+      return Promise.reject(ErrorCode.fromError(error, 'CreateStorageKey(' + partnerMSP + ', ' + documentID + ') failed'));
     });
   }
 
@@ -291,8 +291,8 @@ class BlockchainService {
       console.log('> got documentID ' + documentID);
 
       return documentID;
-    }).catch( (errorJSON) => {
-      return Promise.reject(ErrorCode.fromChaincodeError(errorJSON, 'CreateDocumentID() failed'));
+    }).catch( (error) => {
+      return Promise.reject(ErrorCode.fromError(error, 'CreateDocumentID() failed'));
     });
   }
 
@@ -309,8 +309,8 @@ class BlockchainService {
 
     return tx.submit(...[storageKey, signature]).then( (_) => {
       return tx.getTransactionId();
-    }).catch( (errorJSON) => {
-      return Promise.reject(ErrorCode.fromChaincodeError(errorJSON, 'StoreSignature(' + storageKey + ', ...) failed'));
+    }).catch( (error) => {
+      return Promise.reject(ErrorCode.fromError(error, 'StoreSignature(' + storageKey + ', ...) failed'));
     });
   }
 
@@ -375,8 +375,8 @@ class BlockchainService {
       }
 
       return signatures;
-    }).catch( (errorJSON) => {
-      return Promise.reject(ErrorCode.fromChaincodeError(errorJSON, 'GetSignatures(' + msp + ', ' + storageKey + ') failed'));
+    }).catch( (error) => {
+      return Promise.reject(ErrorCode.fromError(error, 'GetSignatures(' + msp + ', ' + storageKey + ') failed'));
     });
   }
 
@@ -432,9 +432,9 @@ class BlockchainService {
         }
 
         return document.toString();
-      }).catch( (errorJSON) => {
-        console.log(errorJSON);
-        return Promise.reject(ErrorCode.fromChaincodeError(errorJSON, 'FetchPrivateDocument(' + documentID + ') failed'));
+      }).catch( (error) => {
+        console.log(error);
+        return Promise.reject(ErrorCode.fromError(error, 'FetchPrivateDocument(' + documentID + ') failed'));
       });
     });
   }
@@ -464,8 +464,8 @@ class BlockchainService {
         console.log('> reply: DeletePrivateDocument(#' + documentID + ')');
 
         return;
-      }).catch( (errorJSON) => {
-        return Promise.reject(ErrorCode.fromChaincodeError(errorJSON, 'DeletePrivateDocument(' + documentID + ') failed'));
+      }).catch( (error) => {
+        return Promise.reject(ErrorCode.fromError(error, 'DeletePrivateDocument(' + documentID + ') failed'));
       });
     });
   }
@@ -499,8 +499,8 @@ class BlockchainService {
         }
 
         return documentIDs.toString();
-      }).catch( (errorJSON) => {
-        return Promise.reject(ErrorCode.fromChaincodeError(errorJSON, 'FetchPrivateDocumentIDs() failed'));
+      }).catch( (error) => {
+        return Promise.reject(ErrorCode.fromError(error, 'FetchPrivateDocumentIDs() failed'));
       });
     });
   }

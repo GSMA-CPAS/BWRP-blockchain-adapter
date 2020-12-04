@@ -5,8 +5,7 @@
  */
 
 // based on https://raw.githubusercontent.com/hyperledger/fabric-sdk-node/master/test/ts-scenario/config/handlers/sample-query-handler.ts
-
-const util = require('util');
+const {ErrorCode} = require('../utils/errorcode');
 
 /** Query handler implementation
  */
@@ -35,23 +34,25 @@ class SingleMSPQueryHandler {
   async evaluate(query) {
     console.log('> evaluate will be executed on peers <' + this.peers + '>');
 
-    const errorMessages = [];
-
     for (const peer of this.peers) {
       const results = await query.evaluate([peer]);
       const result = results[peer.name];
       if (result instanceof Error) {
-        errorMessages.push(result.toString());
+        // for now return the very first error
+        console.log(result.toString());
+        throw new ErrorCode('ERROR_INTERNAL', result.toString());
       } else {
         if (result.isEndorsed) {
           return result.payload;
+        } else {
+          // for now return the very first error
+          console.log('ERROR: ' + peer.name + ': ' + result.message + '\n');
+          throw new ErrorCode('ERROR_INTERNAL', result.message);
         }
-        throw new Error(result.message);
       }
     }
 
-    const message = util.format('Query failed. Errors: %j', errorMessages);
-    throw new Error(message);
+    throw new ErrorCode('ERROR_INTERNAL', 'got no evalute results from peers');
   }
 }
 
