@@ -131,6 +131,29 @@ const uploadSignature = ({id, body}) => new Promise(
     },
 );
 
+/** Validate a given document with it's signature, identified by its id
+ *    * @param {string} document - The document
+ *       * @param {string} signature - The signature
+ *          * @param {string} certList - The Certificate array list
+ *             * @return {status}
+ *               */
+
+const validateSignature = ({doc, sig, certList}) => new Promise(
+    async (resolve, reject) => {
+      const blockchainConnection = new BlockchainService(process.env.BSA_CCP);
+
+      blockchainConnection.validateSignature(doc, sig, certList)
+          .then( (status) => {
+            resolve(Service.successResponse(status, 200));
+          }).catch((error) => {
+            console.log('ERROR: ' + error);
+            reject(Service.rejectResponse({'message': error.toString()}, 500));
+          }).finally( () => {
+            blockchainConnection.disconnect();
+          });
+    },
+);
+
 module.exports = {
   fetchPrivateDocument,
   deletePrivateDocument,
@@ -138,4 +161,5 @@ module.exports = {
   fetchSignatures,
   uploadPrivateDocument,
   uploadSignature,
+  validateSignature,
 };

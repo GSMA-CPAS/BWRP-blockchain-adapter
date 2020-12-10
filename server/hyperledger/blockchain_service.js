@@ -505,6 +505,23 @@ class BlockchainService {
     });
   }
 
+  /** validate signature of a given document with given certificate list
+ *    * @param {string} document - a document
+ *       * @param (string) signature - document signature
+ *          * @param (string) certList - Certificate array list
+ *             * @return {Status}
+ *               */
+  validateSignature(doc, sig, certList) {
+    const self = this;
+
+    return this.network.then( (network) => {
+      // fetch contract
+      const contract = network.getContract(self.connectionProfile.config.contractID);
+
+      console.log('> validating signature for document <' + doc + '>');
+    });
+  }
+
   /** get discovery results as msp list
    * @return {Promise}
   */
