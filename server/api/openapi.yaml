@@ -185,35 +185,16 @@ paths:
       tags:
       - contract
       x-eov-operation-handler: controllers/ContractController
-  /validate-signature/{doc}/{sig}/{certList}:
-    get:
+  /validate-signature:
+    post:
       description: Validates a private document signature and it's authentication
       operationId: validateSignature
-      parameters:
-      - description: The document
-        explode: false
-        in: path
-        name: doc
+      requestBody:
         required: true
-        schema:
-          type: string
-        style: simple
-      - description: Document signature
-        explode: false
-        in: path
-        name: sig
-        required: true
-        schema:
-          type: string
-        style: simple
-      - description: Certificate list array string
-        explode: false
-        in: path
-        name: certList
-        required: true
-        schema:
-          type: string
-        style: simple
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ValidateSignature'
       responses:
         "200":
           content:
