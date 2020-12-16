@@ -352,6 +352,51 @@ paths:
       tags:
       - contract
       x-eov-operation-handler: controllers/ContractController
+  /signatures/{id}/{msp}/verify:
+    post:
+      description: Fetch all signatures for a given msp and a given document id from
+        the ledger and verify the content against a given document
+      operationId: verifySignatures
+      parameters:
+      - description: The document ID
+        explode: false
+        in: path
+        name: id
+        required: true
+        schema:
+          type: string
+        style: simple
+      - description: A MSP name
+        explode: false
+        in: path
+        name: msp
+        required: true
+        schema:
+          type: string
+        style: simple
+      requestBody:
+        content:
+          text/plain:
+            schema:
+              type: string
+        description: A document to be used to verify the signatures
+      responses:
+        "200":
+          content:
+            text/plain:
+              schema:
+                type: string
+                x-content-type: text/plain
+          description: Successful operation, returns json of verified signatures
+        "500":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorCode'
+          description: Internal Error
+      tags:
+      - contract
+      x-eov-operation-handler: controllers/ContractController
   /config/offchain-db:
     get:
       description: Read back the configuration of the offchain-db
@@ -445,6 +490,7 @@ components:
           - ERROR_INTERNAL
           - ERROR_DOCUMENT_ID_EXISTS
           - ERROR_DOCUMENT_ID_INVALID
+          - ERROR_DOCUMENT_ID_UNKNOWN
           - ERROR_TARGET_MSP_INVALID
           - ERROR_CERT_INVALID
           - ERROR_SIGNATURE_INVALID

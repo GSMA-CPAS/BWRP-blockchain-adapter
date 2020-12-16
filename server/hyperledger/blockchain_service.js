@@ -380,6 +380,32 @@ class BlockchainService {
     });
   }
 
+
+  /** verify all signatures for given msp and documentID
+   * @param {Network} network - a fabric network object
+   * @param {Contract} contract - a fabric contract object
+   * @param {string} msp - a msp
+   * @param {string} documentID - a documentID
+   * @param {string} document - a document
+   * @return {Promise}
+  */
+  verifySignatures(network, contract, msp, documentID, document) {
+  // enable filter to execute query on our MSP
+    const onMSP = this.connectionProfile.organizations[this.connectionProfile.client.organization].mspid;
+    network.queryHandler.setFilter(onMSP);
+
+    return contract.evaluateTransaction('VerifySignatures', ...[msp, documentID, document]).then( (results) => {
+    // reset filter
+      network.queryHandler.setFilter('');
+
+      console.log('> reply: VerifySignatures(' + msp + ', ' + documentID +', <data>) = ' + results);
+
+      return results;
+    }).catch( (error) => {
+      return Promise.reject(ErrorCode.fromError(error, 'VerifySignatures(' + msp + ', ' + documentID +', <data>) failed'));
+    });
+  }
+
   /** get signature for a given documentID
    * @param {string} msp - a msp
    * @param {string} documentID - a document id

@@ -121,8 +121,29 @@ const uploadSignature = ({id, body}) => new Promise(
             const resJSON = {};
             resJSON['txID'] = txID;
             console.log('> stored signature with txID ' + txID);
-            resolve(Service.successResponse(resJSON, 200))
-            ;
+            resolve(Service.successResponse(resJSON, 200));
+          }).catch((error) => {
+            reject(Service.rejectResponse({'code': error.code, 'message': error.message}, 500));
+          }).finally( () => {
+            blockchainConnection.disconnect();
+          });
+    },
+);
+
+/** Store a signature for the document identified by id on the ledger
+   * @param {string} id - The document ID
+   * @param {string} msp - String A MSP name
+   * @param {Document} body - A document to be used to verify the signatures
+   * @return {string}
+  */
+const verifySignatures = ({id, msp, body}) => new Promise(
+    async (resolve, reject) => {
+      const blockchainConnection = new BlockchainService(process.env.BSA_CCP);
+
+      blockchainConnection.verifySignatures(msp, id, body)
+          .then( (response) => {
+            console.log('> stored signature with txID ' + txID);
+            resolve(Service.successResponse(response, 200));
           }).catch((error) => {
             reject(Service.rejectResponse({'code': error.code, 'message': error.message}, 500));
           }).finally( () => {
@@ -138,4 +159,5 @@ module.exports = {
   fetchSignatures,
   uploadPrivateDocument,
   uploadSignature,
+  verifySignatures,
 };

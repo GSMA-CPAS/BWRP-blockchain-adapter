@@ -312,6 +312,45 @@ paths:
             application/json:
               schema:
                 $ref: models/ErrorCode.yaml
+  /signatures/{id}/{msp}/verify:
+    post:
+      description: Fetch all signatures for a given msp and a given document id from the ledger and verify the content against a given document
+      tags:
+        - contract
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+          description: The document ID
+        - in: path
+          name: msp
+          required: true
+          schema:
+            type: string
+          description: A MSP name
+      requestBody:
+        description: A document to be used to verify the signatures
+        content:
+          text/plain:
+              schema:
+                type: string
+      operationId: verifySignatures
+      responses:
+        '200':
+          description: Successful operation, returns json of verified signatures
+          content:
+            text/plain:
+              schema:
+                type: string
+                x-content-type: text/plain
+        '500':
+          description: Internal Error
+          content:
+            application/json:
+              schema:
+                $ref: models/ErrorCode.yaml
   /config/offchain-db:
     put:
       description: Update the configuration of the offchain-db
