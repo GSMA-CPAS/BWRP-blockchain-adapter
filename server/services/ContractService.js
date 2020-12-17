@@ -142,7 +142,6 @@ const verifySignatures = ({id, msp, body}) => new Promise(
 
       blockchainConnection.verifySignatures(msp, id, body)
           .then( (response) => {
-            console.log('> stored signature with txID ' + txID);
             resolve(Service.successResponse(response, 200));
           }).catch((error) => {
             reject(Service.rejectResponse({'code': error.code, 'message': error.message}, 500));

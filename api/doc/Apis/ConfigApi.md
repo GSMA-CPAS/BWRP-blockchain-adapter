@@ -4,7 +4,8 @@ All URIs are relative to *http://localhost*
 
 Method | HTTP request | Description
 ------------- | ------------- | -------------
-[**getOffchainDBConfig**](ConfigApi.md#getOffchainDBConfig) | **GET** /config/offchain-db | 
+[**getOffchainDBConfig**](ConfigApi.md#getOffchainDBConfig) | **GET** /config/certificates/root | 
+[**setCertificateRoot**](ConfigApi.md#setCertificateRoot) | **PUT** /config/certificates/root | 
 [**setOffchainDBConfig**](ConfigApi.md#setOffchainDBConfig) | **PUT** /config/offchain-db | 
 
 
@@ -31,6 +32,33 @@ No authorization required
 
 - **Content-Type**: Not defined
 - **Accept**: application/json
+
+<a name="setCertificateRoot"></a>
+# **setCertificateRoot**
+> String setCertificateRoot(string)
+
+
+
+    Upload a root certificate
+
+### Parameters
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **string** | [**List**](../Models/string.md)| Set the signature root certificate. |
+
+### Return type
+
+[**String**](../Models/string.md)
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+- **Content-Type**: application/json
+- **Accept**: text/plain, application/json
 
 <a name="setOffchainDBConfig"></a>
 # **setOffchainDBConfig**

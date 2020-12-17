@@ -12,6 +12,10 @@ const getOffchainDBConfig = async (request, response) => {
   await Controller.handleRequest(request, response, service.getOffchainDBConfig);
 };
 
+const setCertificateRoot = async (request, response) => {
+  await Controller.handleRequest(request, response, service.setCertificateRoot);
+};
+
 const setOffchainDBConfig = async (request, response) => {
   await Controller.handleRequest(request, response, service.setOffchainDBConfig);
 };
@@ -19,5 +23,6 @@ const setOffchainDBConfig = async (request, response) => {
 
 module.exports = {
   getOffchainDBConfig,
+  setCertificateRoot,
   setOffchainDBConfig,
 };

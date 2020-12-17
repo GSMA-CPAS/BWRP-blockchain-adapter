@@ -1,11 +1,11 @@
-openapi: 3.0.1
+openapi: 3.0.3
 info:
   contact:
     email: Simon.Schulz01@telekom.de
     name: Simon Schulz
   description: This is the REST api specification for the blockchain-adapter
   title: Blockchain-Adapter
-  version: 0.0.7
+  version: 0.0.8
 servers:
 - url: /
 tags:
@@ -353,7 +353,7 @@ paths:
       - contract
       x-eov-operation-handler: controllers/ContractController
   /signatures/{id}/{msp}/verify:
-    post:
+    put:
       description: Fetch all signatures for a given msp and a given document id from
         the ledger and verify the content against a given document
       operationId: verifySignatures
@@ -376,10 +376,16 @@ paths:
         style: simple
       requestBody:
         content:
-          text/plain:
+          application/json:
             schema:
-              type: string
+              items:
+                description: BUGBUG openapi dies not like string bodies?! Use json
+                  array for now
+                example: '["data..."]'
+                type: string
+              type: array
         description: A document to be used to verify the signatures
+        required: true
       responses:
         "200":
           content:
@@ -398,25 +404,6 @@ paths:
       - contract
       x-eov-operation-handler: controllers/ContractController
   /config/offchain-db:
-    get:
-      description: Read back the configuration of the offchain-db
-      operationId: getOffchainDBConfig
-      responses:
-        "200":
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/OffchainDBConfig'
-          description: The current configuration for the offchain-db
-        "500":
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorCode'
-          description: Internal Error
-      tags:
-      - config
-      x-eov-operation-handler: controllers/ConfigController
     put:
       description: Update the configuration of the offchain-db
       operationId: setOffchainDBConfig
@@ -444,6 +431,58 @@ paths:
       tags:
       - config
       x-codegen-request-body-name: body
+      x-eov-operation-handler: controllers/ConfigController
+  /config/certificates/root:
+    get:
+      description: Read back the configuration of the offchain-db
+      operationId: getOffchainDBConfig
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OffchainDBConfig'
+          description: The current configuration for the offchain-db
+        "500":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorCode'
+          description: Internal Error
+      tags:
+      - config
+      x-eov-operation-handler: controllers/ConfigController
+    put:
+      description: Upload a root certificate
+      operationId: setCertificateRoot
+      requestBody:
+        content:
+          application/json:
+            schema:
+              items:
+                description: BUGBUG openapi dies not like string bodies?! Use json
+                  array for now
+                example: '["-----BEGIN CERTIFICATE-----..."]'
+                type: string
+              type: array
+        description: Set the signature root certificate.
+        required: true
+      responses:
+        "200":
+          content:
+            text/plain:
+              schema:
+                type: string
+                x-content-type: text/plain
+          description: Successful operation
+        "500":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorCode'
+          description: Internal Error
+      tags:
+      - config
       x-eov-operation-handler: controllers/ConfigController
 components:
   schemas:
