@@ -1,5 +1,5 @@
 #!/bin/bash
-set -e -o errexit -x
+set -e -o errexit 
 export no_proxy="localhost,$no_proxy"
 
 # allow env override
@@ -44,7 +44,7 @@ echo "###################################################"
 echo "> storing document on both parties by calling the function on DTAG with the partner id TMUS"
 RES=$(request "POST" '{ "toMSP" : "TMUS", "data" : "'$DOCUMENT64'" }'  http://$BSA_DTAG/private-documents)
 echo $RES
-DOCUMENT_ID=$(echo "$RES" | jq -r .documentID)
+REFERENCE_ID=$(echo "$RES" | jq -r .referenceID)
 
 echo "###################################################"
 echo "> dtag signs contract"
@@ -57,7 +57,7 @@ openssl x509 -pubkey -in $CRT > $PUB_DTAG
 # do the signing
 SIGNATURE=$(echo -ne $DOCUMENT | openssl dgst -sha256 -sign $KEY | openssl base64 | tr -d '\n')
 # call blockchain adapter
-request "PUT" '{"algorithm": "secp384r1", "certificate" : "'"${CERT}"'", "signature" : "'$SIGNATURE'" }'  http://$BSA_DTAG/signatures/$DOCUMENT_ID
+request "PUT" '{"algorithm": "secp384r1", "certificate" : "'"${CERT}"'", "signature" : "'$SIGNATURE'" }'  http://$BSA_DTAG/signatures/$REFERENCE_ID
 
 echo "###################################################"
 echo "> tmus signs contract"
@@ -70,11 +70,11 @@ openssl x509 -pubkey -in $CRT > $PUB_TMUS
 # do the signing
 SIGNATURE=$(echo -ne $DOCUMENT | openssl dgst -sha256 -sign $KEY | openssl base64  | tr -d '\n')
 # call the blockchain adapter
-request "PUT" '{"algorithm": "secp384r1", "certificate" : "'"${CERT}"'", "signature" : "'$SIGNATURE'" }'  http://$BSA_TMUS/signatures/$DOCUMENT_ID
+request "PUT" '{"algorithm": "secp384r1", "certificate" : "'"${CERT}"'", "signature" : "'$SIGNATURE'" }'  http://$BSA_TMUS/signatures/$REFERENCE_ID
 
 echo "###################################################"
 echo "> fetching contract from dtag"
-RES=$(request "GET" "" http://$BSA_DTAG/private-documents/$DOCUMENT_ID)
+RES=$(request "GET" "" http://$BSA_DTAG/private-documents/$REFERENCE_ID)
 echo $RES
 FETCHED_DOC64=$(echo "$RES" | jq -r .data)
 FETCHED_TS=$(echo "$RES" | jq -r .timeStamp)
@@ -104,3 +104,9 @@ echo "> verifying signature"
 echo -ne $DOCUMENT > $DOC
 echo $TMUS_SIGNATURE | openssl base64 -d | openssl dgst -sha256 -verify $PUB_TMUS -signature /dev/stdin $DOC
 
+
+
+echo "###################################################"
+echo "> removing document from transient db on DTAG"
+RES=$(request "DELETE" ''  http://$BSA_DTAG/private-documents/$REFERENCE_ID)
+echo $RES

@@ -5,7 +5,7 @@ info:
     name: Simon Schulz
   description: This is the REST api specification for the blockchain-adapter
   title: Blockchain-Adapter
-  version: 0.0.7
+  version: 0.0.8
 servers:
 - url: /
 tags:
@@ -86,15 +86,17 @@ paths:
   /private-documents:
     get:
       description: show all private documents that are in the transient storage
-      operationId: fetchPrivateDocumentIDs
+      operationId: fetchPrivateDocuments
       responses:
         "200":
           content:
             application/json:
               schema:
-                type: string
-          description: Successful operation, returns stored documentIDs _FIXME_ use
-            proper content type _FIXME_
+                items:
+                  type: string
+                type: array
+          description: Successful operation, returns an array of referenceIDs of the
+            stored documents
         "500":
           content: {}
           description: Internal Error
@@ -118,8 +120,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/PrivateDocumentAdded'
-          description: Successful operation, returns the documentID and the txID of
-            the stored document
+          description: Successful operation, returns the referenceID and the txID
+            of the stored document
         "500":
           content:
             application/json:
@@ -130,16 +132,16 @@ paths:
       - contract
       x-codegen-request-body-name: body
       x-eov-operation-handler: controllers/ContractController
-  /private-documents/{id}:
+  /private-documents/{referenceID}:
     delete:
       description: Delete a private document from the database, identified by its
-        id
+        referenceID
       operationId: deletePrivateDocument
       parameters:
-      - description: The document ID
+      - description: The referenceID for the document to delete
         explode: false
         in: path
-        name: id
+        name: referenceID
         required: true
         schema:
           type: string
@@ -158,13 +160,13 @@ paths:
       - contract
       x-eov-operation-handler: controllers/ContractController
     get:
-      description: Fetch a private document from the database, identified by its id
+      description: Fetch a private document from the database, identified by its referenceID
       operationId: fetchPrivateDocument
       parameters:
-      - description: The document ID
+      - description: The referenceID of the document
         explode: false
         in: path
-        name: id
+        name: referenceID
         required: true
         schema:
           type: string
@@ -276,15 +278,16 @@ paths:
       tags:
       - webhook
       x-eov-operation-handler: controllers/WebhookController
-  /signatures/{id}:
+  /signatures/{referenceID}:
     put:
-      description: store a signature for the document identified by id on the ledger
+      description: store a signature for the document identified by its referenceID
+        on the ledger
       operationId: uploadSignature
       parameters:
-      - description: The document ID
+      - description: The referenceID of the document
         explode: false
         in: path
-        name: id
+        name: referenceID
         required: true
         schema:
           type: string
@@ -313,16 +316,16 @@ paths:
       - contract
       x-codegen-request-body-name: body
       x-eov-operation-handler: controllers/ContractController
-  /signatures/{id}/{msp}:
+  /signatures/{referenceID}/{msp}:
     get:
-      description: Fetch all signatures for a given msp and a given document id from
+      description: Fetch all signatures for a given msp and a given referenceID from
         the ledger
       operationId: fetchSignatures
       parameters:
-      - description: The document ID
+      - description: The referenceID of the document
         explode: false
         in: path
-        name: id
+        name: referenceID
         required: true
         schema:
           type: string
@@ -421,16 +424,16 @@ components:
     PrivateDocumentAdded:
       example:
         txID: txID
-        documentID: documentID
+        referenceID: referenceID
       properties:
-        documentID:
-          description: The documentID of the document that was added
+        referenceID:
+          description: The referenceID of the document that was added
           type: string
         txID:
           description: The hyperledger TX ID of the successfull add
           type: string
       required:
-      - documentID
+      - referenceID
       - txID
       title: PrivateDocumentAdded
       type: object
@@ -445,6 +448,7 @@ components:
           - ERROR_INTERNAL
           - ERROR_DOCUMENT_ID_EXISTS
           - ERROR_DOCUMENT_ID_INVALID
+          - ERROR_DOCUMENT_ID_UNKNOWN
           - ERROR_TARGET_MSP_INVALID
           - ERROR_CERT_INVALID
           - ERROR_SIGNATURE_INVALID
@@ -465,7 +469,7 @@ components:
       example:
         fromMSP: fromMSP
         dataHash: dataHash
-        id: id
+        referenceID: referenceID
         timestamp: timestamp
       properties:
         fromMSP:
@@ -477,13 +481,13 @@ components:
         timestamp:
           description: The timestamp when the document was stored in the local database.
           type: string
-        id:
-          description: The document ID
+        referenceID:
+          description: The referenceID of the document
           type: string
       required:
       - dataHash
       - fromMSP
-      - id
+      - referenceID
       - timestamp
       title: PrivateDocumentResponse
       type: object

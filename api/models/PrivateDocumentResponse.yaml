@@ -4,7 +4,7 @@ required:
   - fromMSP
   - dataHash
   - timestamp
-  - id
+  - referenceID
 allOf:
   - $ref: 'PrivateDocument.yaml'
 properties:
@@ -17,6 +17,6 @@ properties:
   timestamp: 
     type: string
     description: The timestamp when the document was stored in the local database.
-  id:
+  referenceID:
     type: string
-    description: The document ID
+    description: The referenceID of the document

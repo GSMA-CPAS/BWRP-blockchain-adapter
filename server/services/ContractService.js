@@ -1,15 +1,15 @@
 const Service = require('./Service');
 const {BlockchainService} = require('../hyperledger/blockchain_service');
 
-/** Fetch a private document from the database, identified by its id
-   * @param {string} id - The document ID
+/** Fetch a private document from the database, identified by its referenceID
+   * @param {string} referenceID - The referenceID of the document
    * @return {PrivateDocumentResponse}
   */
-const fetchPrivateDocument = ({id}) => new Promise(
+const fetchPrivateDocument = ({referenceID}) => new Promise(
     async (resolve, reject) => {
       const blockchainConnection = new BlockchainService(process.env.BSA_CCP);
 
-      blockchainConnection.fetchPrivateDocument(id)
+      blockchainConnection.fetchPrivateDocument(referenceID)
           .then( (document) => {
             resolve(Service.successResponse(document, 200));
           }).catch((error) => {
@@ -21,16 +21,16 @@ const fetchPrivateDocument = ({id}) => new Promise(
 );
 
 /**
-* Delete a private document from the database, identified by its id
+* Delete a private document from the database, identified by its referenceID
 *
-* @param {string} id - The document ID
+* @param {string} referenceID - The referenceID of the document
 * @return {string} - no response value expected for this operation
 * */
-const deletePrivateDocument = ({id}) => new Promise(
+const deletePrivateDocument = ({referenceID}) => new Promise(
     async (resolve, reject) => {
       const blockchainConnection = new BlockchainService(process.env.BSA_CCP);
 
-      blockchainConnection.deletePrivateDocument(id)
+      blockchainConnection.deletePrivateDocument(referenceID)
           .then( () => {
             resolve(Service.successResponse('', 200));
           }).catch((error) => {
@@ -41,14 +41,14 @@ const deletePrivateDocument = ({id}) => new Promise(
     },
 );
 
-/** show last n private documents
+/** show a list of referenceIDs of the private documents
    * @return {String[]}
   */
-const fetchPrivateDocumentIDs = () => new Promise(
+const fetchPrivateDocuments = () => new Promise(
     async (resolve, reject) => {
       const blockchainConnection = new BlockchainService(process.env.BSA_CCP);
 
-      blockchainConnection.fetchPrivateDocumentIDs()
+      blockchainConnection.fetchPrivateDocuments()
           .then( (documents) => {
             resolve(Service.successResponse(documents, 200));
           }).catch((error) => {
@@ -59,16 +59,16 @@ const fetchPrivateDocumentIDs = () => new Promise(
     },
 );
 
-/** Fetch all signatures for a given msp and a given document id from the ledger
-   * @param {string} id - The document ID
+/** Fetch all signatures for a given msp and a given document from the ledger
+   * @param {string} referenceID - The referenceID of a document
    * @param {string} msp - A MSP name
    * @return {string}
   */
-const fetchSignatures = ({id, msp}) => new Promise(
+const fetchSignatures = ({referenceID, msp}) => new Promise(
     async (resolve, reject) => {
       const blockchainConnection = new BlockchainService(process.env.BSA_CCP);
 
-      blockchainConnection.fetchSignatures(msp, id)
+      blockchainConnection.fetchSignatures(msp, referenceID)
           .then( (signatures) => {
             resolve(Service.successResponse(signatures, 200));
           }).catch((error) => {
@@ -89,7 +89,7 @@ const uploadPrivateDocument = ({body}) => new Promise(
 
       blockchainConnection.addDocument(body['toMSP'], body['data'])
           .then( (responseJSON) => {
-            console.log('> both parties stored data with ID ' + responseJSON.documentID);
+            console.log('> both parties stored data with referenceID ' + responseJSON.referenceID);
             resolve(Service.successResponse(responseJSON, 200));
           }).catch((error) => {
             reject(Service.rejectResponse({'code': error.code, 'message': error.message}, 500));
@@ -100,11 +100,11 @@ const uploadPrivateDocument = ({body}) => new Promise(
 );
 
 /** Store a signature for the document identified by id on the ledger
-   * @param {string} id - The document ID
+   * @param {string} referenceID - The referenceID of the document
    * @param {DocumentSignature} body - a document signature that should be uploaded
    * @return {string}
   */
-const uploadSignature = ({id, body}) => new Promise(
+const uploadSignature = ({referenceID, body}) => new Promise(
     async (resolve, reject) => {
       const blockchainConnection = new BlockchainService(process.env.BSA_CCP);
 
@@ -116,7 +116,7 @@ const uploadSignature = ({id, body}) => new Promise(
       };
       const signatureJSON = JSON.stringify(signature);
 
-      blockchainConnection.signDocument(id, signatureJSON)
+      blockchainConnection.signDocument(referenceID, signatureJSON)
           .then( (txID) => {
             const resJSON = {};
             resJSON['txID'] = txID;
@@ -134,7 +134,7 @@ const uploadSignature = ({id, body}) => new Promise(
 module.exports = {
   fetchPrivateDocument,
   deletePrivateDocument,
-  fetchPrivateDocumentIDs,
+  fetchPrivateDocuments,
   fetchSignatures,
   uploadPrivateDocument,
   uploadSignature,
