@@ -2,7 +2,7 @@ openapi: 3.0.1
 info:
   title: Blockchain-Adapter
   description: This is the REST api specification for the blockchain-adapter
-  version: 0.0.7
+  version: 0.0.8
   contact:
     name: Simon Schulz
     email: Simon.Schulz01@telekom.de
@@ -91,7 +91,7 @@ paths:
         required: true
       responses:
         '200':  
-          description: Successful operation, returns the documentID and the txID of the stored document
+          description: Successful operation, returns the referenceID and the txID of the stored document
           content:
             application/json:
               schema:
@@ -107,29 +107,31 @@ paths:
       description: show all private documents that are in the transient storage
       tags:
         - contract
-      operationId: fetchPrivateDocumentIDs
+      operationId: fetchPrivateDocuments
       responses:
         '200':  
-          description: Successful operation, returns stored documentIDs _FIXME_ use proper content type _FIXME_
+          description: Successful operation, returns an array of referenceIDs of the stored documents
           content:
             application/json:
               schema:
-                type: string
+                type: array
+                items:
+                  type: string
         '500':
           description: Internal Error
           content: {}
-  /private-documents/{id}:
+  /private-documents/{referenceID}:
     get:
-      description: Fetch a private document from the database, identified by its id
+      description: Fetch a private document from the database, identified by its referenceID
       tags:
         - contract
       parameters:
         - in: path
-          name: id
+          name: referenceID
           required: true
           schema:
             type: string
-          description: The document ID
+          description: The referenceID of the document
       operationId: fetchPrivateDocument
       responses:
         '200':
@@ -145,16 +147,16 @@ paths:
               schema:
                 $ref: models/ErrorCode.yaml
     delete:
-      description: Delete a private document from the database, identified by its id
+      description: Delete a private document from the database, identified by its referenceID
       tags:
         - contract
       parameters:
         - in: path
-          name: id
+          name: referenceID
           required: true
           schema:
             type: string
-          description: The document ID
+          description: The referenceID for the document to delete
       operationId: deletePrivateDocument
       responses:
         '200':
@@ -245,19 +247,19 @@ paths:
         '500':
           description: Internal Server Error
           content: {}
-  /signatures/{id}:
+  /signatures/{referenceID}:
     put:
-      description: 'store a signature for the document identified by id on the ledger'
+      description: 'store a signature for the document identified by its referenceID on the ledger'
       tags:
         - contract
       operationId: uploadSignature
       parameters:
         - in: path
-          name: id
+          name: referenceID
           required: true
           schema:
             type: string
-          description: The document ID
+          description: The referenceID of the document
       responses:
         '200':
           description: Successful operation, returns transaction hash
@@ -279,18 +281,18 @@ paths:
               $ref: models/DocumentSignature.yaml
         required: true
       x-codegen-request-body-name: body
-  /signatures/{id}/{msp}:
+  /signatures/{referenceID}/{msp}:
     get:
-      description: Fetch all signatures for a given msp and a given document id from the ledger
+      description: Fetch all signatures for a given msp and a given referenceID from the ledger
       tags:
         - contract
       parameters:
         - in: path
-          name: id
+          name: referenceID
           required: true
           schema:
             type: string
-          description: The document ID
+          description: The referenceID of the document
         - in: path
           name: msp
           required: true

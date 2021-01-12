@@ -14,7 +14,7 @@
   },
   "author": "Sebastian Meyer zu Borgsen",
   "dependencies": {
-    "@openapitools/openapi-generator-cli": "^1.0.18-4.3.1",
+    "@openapitools/openapi-generator-cli": "^1.0.18-5.0.0-beta2",
     "atob": "^2.1.2",
     "blockchain-adapter-api": "file:./build/openapi",
     "btoa": "^1.2.1",

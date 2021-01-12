@@ -143,31 +143,31 @@ const launchClient = async () => {
     privateDocument.toMSP = 'TMUS';
     privateDocument.data = DOCUMENT64;
 
-    const documentID = await DTAG.contract.uploadPrivateDocument(privateDocument).then( (res) => {
-      const id = res.response.body.documentID;
-      console.log('> done. stored with ID ' + id);
+    const referenceID = await DTAG.contract.uploadPrivateDocument(privateDocument).then( (res) => {
+      const id = res.response.body.referenceID;
+      console.log('> done. stored with referenceID ' + id);
       return id;
     });
 
     console.log('> dtag signs contract');
     let documentSignature = await signContract('user@dtag', DOCUMENT64);
-    await DTAG.contract.uploadSignature(documentID, documentSignature).then( (res) => {
+    await DTAG.contract.uploadSignature(referenceID, documentSignature).then( (res) => {
       console.log('> done. txid ' + res.response.body.txID);
     });
 
     console.log('> tmus signs contract');
     documentSignature = await signContract('user@tmus', DOCUMENT64);
-    await TMUS.contract.uploadSignature(documentID, documentSignature).then( (res) => {
+    await TMUS.contract.uploadSignature(referenceID, documentSignature).then( (res) => {
       console.log('> done. txid ' + res.response.body.txID);
     });
 
     console.log('> fetching document from dtag');
-    const resDTAG = await DTAG.contract.fetchPrivateDocument(documentID);
+    const resDTAG = await DTAG.contract.fetchPrivateDocument(referenceID);
     const doc = resDTAG.body;
     console.log('> ' + doc.timestamp + ': ' + doc.fromMSP + ' -> ' + doc.toMSP + ', document data b64 = ' + doc.dataHash);
 
     console.log('> fetching tmus signatures');
-    const resTMUS = await DTAG.contract.fetchSignatures(documentID, 'TMUS');
+    const resTMUS = await DTAG.contract.fetchSignatures(referenceID, 'TMUS');
     const sig = resTMUS.body;
 
     _.each(sig, function(entry, key) {

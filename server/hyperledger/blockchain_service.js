@@ -151,17 +151,17 @@ class BlockchainService {
    * @param {Contract} contract - a fabric contract object
    * @param {string} onMSP - MSP where to execute this call
    * @param {string} partnerMSP - the partnerMSP
-   * @param {string} documentID - a documentID
+   * @param {string} referenceID - a referenceID of a document
    * @param {string} documentBase64 - a bas64 encoded document
    * @return {Promise}
   */
-  storeDocument(network, contract, onMSP, partnerMSP, documentID, documentBase64) {
-    console.log('> storing document with id ' + documentID);
+  storeDocument(network, contract, onMSP, partnerMSP, referenceID, documentBase64) {
+    console.log('> storing document with id ' + referenceID);
 
     // enable filter
     network.queryHandler.setFilter(onMSP);
 
-    return contract.evaluateTransaction('StorePrivateDocument', ...[partnerMSP, documentID, documentBase64]).then( (result) => {
+    return contract.evaluateTransaction('StorePrivateDocument', ...[partnerMSP, referenceID, documentBase64]).then( (result) => {
       // reset filter
       network.queryHandler.setFilter('');
 
@@ -172,7 +172,7 @@ class BlockchainService {
 
       return hash;
     }).catch( (error) => {
-      return Promise.reject(ErrorCode.fromError(error, 'StorePrivateDocument('+partnerMSP+',' + documentID+', ...) failed'));
+      return Promise.reject(ErrorCode.fromError(error, 'StorePrivateDocument('+partnerMSP+',' + referenceID+', ...) failed'));
     });
   }
 
@@ -180,17 +180,17 @@ class BlockchainService {
    * @param {Contract} contract - a fabric contract object
    * @param {string} storageKey - the storagekey
    * @param {string} documentHash - a document hash
-   * @param {string} documentID - the documentID
+   * @param {string} referenceID - the referenceID of the document
    * @return {Promise}
   */
-  storeDocumentHash(contract, storageKey, documentHash, documentID) {
+  storeDocumentHash(contract, storageKey, documentHash, referenceID) {
     // send transaction
     const tx = contract.createTransaction('StoreDocumentHash');
     console.log('> will store signature at key ' + storageKey);
 
     return tx.submit(...[storageKey, documentHash]).then( (_) => {
       const result = {};
-      result.documentID = documentID;
+      result.referenceID = referenceID;
       result.txID = tx.getTransactionId();
       return result;
     }).catch( (error) => {
@@ -216,10 +216,10 @@ class BlockchainService {
       // fetch our MSP name
       const fromMSP = self.connectionProfile.organizations[self.connectionProfile.client.organization].mspid;
 
-      // fetch document ID
-      return self.createDocumentID(network, contract).then( (documentID) => {
+      // fetch referenceID
+      return self.createReferenceID(network, contract).then( (referenceID) => {
         // EVALUATE store document on fromMSP (local)
-        return self.storeDocument(network, contract, fromMSP, partnerMSP, documentID, documentBase64).then( (hash) => {
+        return self.storeDocument(network, contract, fromMSP, partnerMSP, referenceID, documentBase64).then( (hash) => {
           // check hash
           if (expectedHash != hash) {
             console.log('ERROR: '+fromMSP + ' stored invalid hash: ' + hash + ' != ' + expectedHash);
@@ -227,7 +227,7 @@ class BlockchainService {
           }
 
           // EVALUATE store document on partnerMSP (remote)
-          return self.storeDocument(network, contract, partnerMSP, partnerMSP, documentID, documentBase64).then( () => {
+          return self.storeDocument(network, contract, partnerMSP, partnerMSP, referenceID, documentBase64).then( () => {
             // check hash
             if (expectedHash != hash) {
               console.log('ERROR: '+partnerMSP + ' stored invalid hash: ' + hash + ' != ' + expectedHash);
@@ -235,8 +235,8 @@ class BlockchainService {
             }
 
             // calculate storage key
-            return self.createStorageKey(network, contract, fromMSP, documentID).then( (storageKey) => {
-              return self.storeDocumentHash(contract, storageKey, hash, documentID);
+            return self.createStorageKey(network, contract, fromMSP, referenceID).then( (storageKey) => {
+              return self.storeDocumentHash(contract, storageKey, hash, referenceID);
             });
           });
         });
@@ -244,21 +244,21 @@ class BlockchainService {
     });
   }
 
-  /** createStorageKey for a documentID
+  /** createStorageKey for a referenceID
    * @param {Network} network - a fabric network object
    * @param {Contract} contract - a fabric contract object
    * @param {string} partnerMSP - the partnerMSP
-   * @param {string} documentID - a documentID
+   * @param {string} referenceID - a referenceID of a document
    * @return {Promise}
   */
-  createStorageKey(network, contract, partnerMSP, documentID) {
+  createStorageKey(network, contract, partnerMSP, referenceID) {
     // fetch our MSP name
     const localMSP = this.connectionProfile.organizations[this.connectionProfile.client.organization].mspid;
 
     // enable filter
     network.queryHandler.setFilter(localMSP);
 
-    return contract.evaluateTransaction('CreateStorageKey', ...[partnerMSP, documentID]).then( (result) => {
+    return contract.evaluateTransaction('CreateStorageKey', ...[partnerMSP, referenceID]).then( (result) => {
       // reset filter
       network.queryHandler.setFilter('');
 
@@ -267,32 +267,32 @@ class BlockchainService {
 
       return storageKey;
     }).catch( (error) => {
-      return Promise.reject(ErrorCode.fromError(error, 'CreateStorageKey(' + partnerMSP + ', ' + documentID + ') failed'));
+      return Promise.reject(ErrorCode.fromError(error, 'CreateStorageKey(' + partnerMSP + ', ' + referenceID + ') failed'));
     });
   }
 
-  /** create a unique documentID
+  /** create a unique referenceID
    * @param {Network} network - a fabric network object
    * @param {Contract} contract - a fabric contract object
    * @return {Promise}
   */
-  createDocumentID(network, contract) {
+  createReferenceID(network, contract) {
     // fetch our MSP name
     const localMSP = this.connectionProfile.organizations[this.connectionProfile.client.organization].mspid;
 
     // enable filter
     network.queryHandler.setFilter(localMSP);
 
-    return contract.evaluateTransaction('CreateDocumentID', ...[]).then( (result) => {
+    return contract.evaluateTransaction('CreateReferenceID', ...[]).then( (result) => {
       // reset filter
       network.queryHandler.setFilter('');
 
-      const documentID = result.toString();
-      console.log('> got documentID ' + documentID);
+      const referenceID = result.toString();
+      console.log('> got referenceID ' + referenceID);
 
-      return documentID;
+      return referenceID;
     }).catch( (error) => {
-      return Promise.reject(ErrorCode.fromError(error, 'CreateDocumentID() failed'));
+      return Promise.reject(ErrorCode.fromError(error, 'CreateReferenceID() failed'));
     });
   }
 
@@ -315,13 +315,13 @@ class BlockchainService {
   }
 
   /** sign a document
-   * @param {string} documentID - a document id
+   * @param {string} referenceID - a document referenceID
    * @param {string} signatureJSON - a signature object
    * @return {Promise}
   */
-  signDocument(documentID, signatureJSON) {
+  signDocument(referenceID, signatureJSON) {
     const self = this;
-    console.log('> signDocument(' + documentID + ', ...)');
+    console.log('> signDocument(' + referenceID + ', ...)');
 
     return this.network.then( (network) => {
       // fetch contract
@@ -331,7 +331,7 @@ class BlockchainService {
       const localMSP = self.connectionProfile.organizations[self.connectionProfile.client.organization].mspid;
 
       // calculate storage key
-      return self.createStorageKey(network, contract, localMSP, documentID).then( (storageKey) => {
+      return self.createStorageKey(network, contract, localMSP, referenceID).then( (storageKey) => {
         return self.storeSignature(contract, storageKey, signatureJSON);
       });
     });
@@ -380,50 +380,50 @@ class BlockchainService {
     });
   }
 
-  /** get signature for a given documentID
+  /** get signature for a given referenceID
    * @param {string} msp - a msp
-   * @param {string} documentID - a document id
+   * @param {string} referenceID - a referenceID of a document
    * @return {Promise}
   */
-  fetchSignatures(msp, documentID) {
+  fetchSignatures(msp, referenceID) {
     const self = this;
 
     return this.network.then( (network) => {
       // fetch contract
       const contract = network.getContract(self.connectionProfile.config.contractID);
 
-      console.log('> fetching signatures for <' + msp + '> and document id ' + documentID);
+      console.log('> fetching signatures for <' + msp + '> and referenceID ' + referenceID);
 
       // calculate storage key for our own signatures:
-      return self.createStorageKey(network, contract, msp, documentID).then( (storageKey) => {
+      return self.createStorageKey(network, contract, msp, referenceID).then( (storageKey) => {
         console.log('> accessing data using storage key ' + storageKey);
         return self.getSignatures(network, contract, msp, storageKey);
       });
     });
   }
 
-  /** get a private document for a given documentID
-   * @param {string} documentID - a document id
+  /** get a private document for a given referenceID
+   * @param {string} referenceID - a referenceID of a document
    * @return {Promise}
   */
-  fetchPrivateDocument(documentID) {
+  fetchPrivateDocument(referenceID) {
     const self = this;
 
     return this.network.then( (network) => {
       // fetch contract
       const contract = network.getContract(self.connectionProfile.config.contractID);
 
-      console.log('> fetching document for id ' + documentID);
+      console.log('> fetching document for referenceID ' + referenceID);
 
       // enable filter to execute query on our MSP
       const onMSP = this.connectionProfile.organizations[this.connectionProfile.client.organization].mspid;
       network.queryHandler.setFilter(onMSP);
 
-      return contract.evaluateTransaction('FetchPrivateDocument', ...[documentID]).then( (document) => {
+      return contract.evaluateTransaction('FetchPrivateDocument', ...[referenceID]).then( (document) => {
         // reset filter
         network.queryHandler.setFilter('');
 
-        console.log('> reply: FetchPrivateDocument(#' + documentID + ') = ' + document);
+        console.log('> reply: FetchPrivateDocument(#' + referenceID + ') = ' + document);
 
         // check for error
         if (document == '{}') {
@@ -434,46 +434,46 @@ class BlockchainService {
         return document.toString();
       }).catch( (error) => {
         console.log(error);
-        return Promise.reject(ErrorCode.fromError(error, 'FetchPrivateDocument(' + documentID + ') failed'));
+        return Promise.reject(ErrorCode.fromError(error, 'FetchPrivateDocument(' + referenceID + ') failed'));
       });
     });
   }
 
 
-  /** delete a private document for a given documentID
-   * @param {string} documentID - a document id
+  /** delete a private document for a given referenceID
+   * @param {string} referenceID - a referenceID of a document
    * @return {void}
   */
-  deletePrivateDocument(documentID) {
+  deletePrivateDocument(referenceID) {
     const self = this;
 
     return this.network.then( (network) => {
       // fetch contract
       const contract = network.getContract(self.connectionProfile.config.contractID);
 
-      console.log('> deleting document for id ' + documentID);
+      console.log('> deleting document for referenceID ' + referenceID);
 
       // enable filter to execute query on our MSP
       const onMSP = this.connectionProfile.organizations[this.connectionProfile.client.organization].mspid;
       network.queryHandler.setFilter(onMSP);
 
-      return contract.evaluateTransaction('DeletePrivateDocument', ...[documentID]).then( () => {
+      return contract.evaluateTransaction('DeletePrivateDocument', ...[referenceID]).then( () => {
         // reset filter
         network.queryHandler.setFilter('');
 
-        console.log('> reply: DeletePrivateDocument(#' + documentID + ')');
+        console.log('> reply: DeletePrivateDocument(#' + referenceID + ')');
 
         return;
       }).catch( (error) => {
-        return Promise.reject(ErrorCode.fromError(error, 'DeletePrivateDocument(' + documentID + ') failed'));
+        return Promise.reject(ErrorCode.fromError(error, 'DeletePrivateDocument(' + referenceID + ') failed'));
       });
     });
   }
 
-  /** get private documents
+  /** get private documents referenceIDs
    * @return {Promise}
   */
-  fetchPrivateDocumentIDs() {
+  fetchPrivateDocumentReferenceIDs() {
     const self = this;
 
     return this.network.then( (network) => {
@@ -486,21 +486,21 @@ class BlockchainService {
       const onMSP = this.connectionProfile.organizations[this.connectionProfile.client.organization].mspid;
       network.queryHandler.setFilter(onMSP);
 
-      return contract.evaluateTransaction('FetchPrivateDocumentIDs', ...[]).then( (documentIDs) => {
+      return contract.evaluateTransaction('FetchPrivateDocumentReferenceIDs', ...[]).then( (referenceIDs) => {
         // reset filter
         network.queryHandler.setFilter('');
 
-        console.log(documentIDs.toString());
+        console.log(referenceIDs.toString());
 
         // check for error
-        if (documentIDs == '{}') {
+        if (referenceIDs == '{}') {
           console.log('> got no results');
           return {};
         }
 
-        return documentIDs.toString();
+        return referenceIDs.toString();
       }).catch( (error) => {
-        return Promise.reject(ErrorCode.fromError(error, 'FetchPrivateDocumentIDs() failed'));
+        return Promise.reject(ErrorCode.fromError(error, 'FetchPrivateDocumentReferenceIDs() failed'));
       });
     });
   }
