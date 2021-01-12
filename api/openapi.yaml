@@ -384,6 +384,24 @@ paths:
               schema:
                 $ref: models/ErrorCode.yaml
       x-codegen-request-body-name: body
+    get:
+      description: Read back the configuration of the offchain-db
+      tags:
+        - config
+      operationId: getOffchainDBConfig
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: models/OffchainDBConfig.yaml
+          description: The current configuration for the offchain-db
+        '500':
+          description: Internal Error
+          content:
+            application/json:
+              schema:
+                $ref: models/ErrorCode.yaml
   /config/certificates/root:
     put:
       description: Upload a root certificate
@@ -398,7 +416,7 @@ paths:
               type: array
               items:
                 type: string
-                description: BUGBUG openapi dies not like string bodies?! Use json array for now
+                description: BUGBUG openapi does not like string bodies?! Use json array for now
                 example: ["-----BEGIN CERTIFICATE-----..."]
         
         required: true
@@ -410,24 +428,6 @@ paths:
               schema:
                 type: string
                 x-content-type: text/plain
-        '500':
-          description: Internal Error
-          content:
-            application/json:
-              schema:
-                $ref: models/ErrorCode.yaml
-    get:
-      description: Read back the configuration of the offchain-db
-      tags:
-        - config
-      operationId: getOffchainDBConfig
-      responses:
-        '200':
-          content:
-            application/json:
-              schema:
-                $ref: models/OffchainDBConfig.yaml
-          description: The current configuration for the offchain-db
         '500':
           description: Internal Error
           content:

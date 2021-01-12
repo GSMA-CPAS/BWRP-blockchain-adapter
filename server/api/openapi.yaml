@@ -404,6 +404,25 @@ paths:
       - contract
       x-eov-operation-handler: controllers/ContractController
   /config/offchain-db:
+    get:
+      description: Read back the configuration of the offchain-db
+      operationId: getOffchainDBConfig
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OffchainDBConfig'
+          description: The current configuration for the offchain-db
+        "500":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorCode'
+          description: Internal Error
+      tags:
+      - config
+      x-eov-operation-handler: controllers/ConfigController
     put:
       description: Update the configuration of the offchain-db
       operationId: setOffchainDBConfig
@@ -433,25 +452,6 @@ paths:
       x-codegen-request-body-name: body
       x-eov-operation-handler: controllers/ConfigController
   /config/certificates/root:
-    get:
-      description: Read back the configuration of the offchain-db
-      operationId: getOffchainDBConfig
-      responses:
-        "200":
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/OffchainDBConfig'
-          description: The current configuration for the offchain-db
-        "500":
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorCode'
-          description: Internal Error
-      tags:
-      - config
-      x-eov-operation-handler: controllers/ConfigController
     put:
       description: Upload a root certificate
       operationId: setCertificateRoot

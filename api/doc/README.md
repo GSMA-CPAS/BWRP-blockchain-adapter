@@ -7,7 +7,7 @@ All URIs are relative to *http://localhost*
 
 Class | Method | HTTP request | Description
 ------------ | ------------- | ------------- | -------------
-*ConfigApi* | [**getOffchainDBConfig**](Apis/ConfigApi.md#getoffchaindbconfig) | **GET** /config/certificates/root | Read back the configuration of the offchain-db
+*ConfigApi* | [**getOffchainDBConfig**](Apis/ConfigApi.md#getoffchaindbconfig) | **GET** /config/offchain-db | Read back the configuration of the offchain-db
 *ConfigApi* | [**setCertificateRoot**](Apis/ConfigApi.md#setcertificateroot) | **PUT** /config/certificates/root | Upload a root certificate
 *ConfigApi* | [**setOffchainDBConfig**](Apis/ConfigApi.md#setoffchaindbconfig) | **PUT** /config/offchain-db | Update the configuration of the offchain-db
 *ContractApi* | [**deletePrivateDocument**](Apis/ContractApi.md#deleteprivatedocument) | **DELETE** /private-documents/{id} | Delete a private document from the database, identified by its id

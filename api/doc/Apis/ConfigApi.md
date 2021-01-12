@@ -4,7 +4,7 @@ All URIs are relative to *http://localhost*
 
 Method | HTTP request | Description
 ------------- | ------------- | -------------
-[**getOffchainDBConfig**](ConfigApi.md#getOffchainDBConfig) | **GET** /config/certificates/root | 
+[**getOffchainDBConfig**](ConfigApi.md#getOffchainDBConfig) | **GET** /config/offchain-db | 
 [**setCertificateRoot**](ConfigApi.md#setCertificateRoot) | **PUT** /config/certificates/root | 
 [**setOffchainDBConfig**](ConfigApi.md#setOffchainDBConfig) | **PUT** /config/offchain-db | 
 
