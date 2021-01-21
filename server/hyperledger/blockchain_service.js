@@ -545,7 +545,7 @@ class BlockchainService {
         const eventDataRaw = event.payload.toString();
         const eventData = JSON.parse(eventDataRaw);
         const msp = event.getTransactionEvent().transactionData.actions[0].header.creator.mspid;
-        
+
         // enhance event data with the txID
         eventData.txID = event.getTransactionEvent().transactionId;
 
