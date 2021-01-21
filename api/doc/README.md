@@ -11,7 +11,7 @@ Class | Method | HTTP request | Description
 *ConfigApi* | [**setOffchainDBConfig**](Apis/ConfigApi.md#setoffchaindbconfig) | **PUT** /config/offchain-db | Update the configuration of the offchain-db
 *ContractApi* | [**deletePrivateDocument**](Apis/ContractApi.md#deleteprivatedocument) | **DELETE** /private-documents/{referenceID} | Delete a private document from the database, identified by its referenceID
 *ContractApi* | [**fetchPrivateDocument**](Apis/ContractApi.md#fetchprivatedocument) | **GET** /private-documents/{referenceID} | Fetch a private document from the database, identified by its referenceID
-*ContractApi* | [**fetchPrivateDocuments**](Apis/ContractApi.md#fetchprivatedocuments) | **GET** /private-documents | show all private documents that are in the transient storage
+*ContractApi* | [**fetchPrivateDocumentReferenceIDs**](Apis/ContractApi.md#fetchprivatedocumentreferenceids) | **GET** /private-documents | show all private documents that are in the transient storage
 *ContractApi* | [**fetchSignatures**](Apis/ContractApi.md#fetchsignatures) | **GET** /signatures/{referenceID}/{msp} | Fetch all signatures for a given msp and a given referenceID from the ledger
 *ContractApi* | [**uploadPrivateDocument**](Apis/ContractApi.md#uploadprivatedocument) | **POST** /private-documents | Upload a private document, shared between our own organization and a partner MSP
 *ContractApi* | [**uploadSignature**](Apis/ContractApi.md#uploadsignature) | **PUT** /signatures/{referenceID} | store a signature for the document identified by its referenceID on the ledger

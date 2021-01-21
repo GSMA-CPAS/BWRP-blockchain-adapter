@@ -107,7 +107,7 @@ paths:
       description: show all private documents that are in the transient storage
       tags:
         - contract
-      operationId: fetchPrivateDocuments
+      operationId: fetchPrivateDocumentReferenceIDs
       responses:
         '200':  
           description: Successful operation, returns an array of referenceIDs of the stored documents

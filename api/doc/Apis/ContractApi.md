@@ -6,7 +6,7 @@ Method | HTTP request | Description
 ------------- | ------------- | -------------
 [**deletePrivateDocument**](ContractApi.md#deletePrivateDocument) | **DELETE** /private-documents/{referenceID} | 
 [**fetchPrivateDocument**](ContractApi.md#fetchPrivateDocument) | **GET** /private-documents/{referenceID} | 
-[**fetchPrivateDocuments**](ContractApi.md#fetchPrivateDocuments) | **GET** /private-documents | 
+[**fetchPrivateDocumentReferenceIDs**](ContractApi.md#fetchPrivateDocumentReferenceIDs) | **GET** /private-documents | 
 [**fetchSignatures**](ContractApi.md#fetchSignatures) | **GET** /signatures/{referenceID}/{msp} | 
 [**uploadPrivateDocument**](ContractApi.md#uploadPrivateDocument) | **POST** /private-documents | 
 [**uploadSignature**](ContractApi.md#uploadSignature) | **PUT** /signatures/{referenceID} | 
@@ -66,9 +66,9 @@ No authorization required
 - **Content-Type**: Not defined
 - **Accept**: application/json
 
-<a name="fetchPrivateDocuments"></a>
-# **fetchPrivateDocuments**
-> List fetchPrivateDocuments()
+<a name="fetchPrivateDocumentReferenceIDs"></a>
+# **fetchPrivateDocumentReferenceIDs**
+> List fetchPrivateDocumentReferenceIDs()
 
 
 
