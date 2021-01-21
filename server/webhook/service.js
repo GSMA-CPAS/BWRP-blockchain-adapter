@@ -94,7 +94,7 @@ Webhook.prototype.sendNotification = function(eventName, uuid, url, eventData) {
     debug('['+uuid+'] notification sent.');
 
     // verify response
-    if (response.statusCode == 202) {
+    if ((response.statusCode == 200) || (response.statusCode == 202)) {
       // client sent an ACK, fine
       debug('['+uuid+'] received ACK');
     } else if (response.statusCode == 204) {
