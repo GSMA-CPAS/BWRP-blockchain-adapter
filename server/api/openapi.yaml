@@ -86,7 +86,7 @@ paths:
   /private-documents:
     get:
       description: show all private documents that are in the transient storage
-      operationId: fetchPrivateDocuments
+      operationId: fetchPrivateDocumentReferenceIDs
       responses:
         "200":
           content:

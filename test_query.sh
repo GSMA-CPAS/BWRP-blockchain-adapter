@@ -110,3 +110,9 @@ echo "###################################################"
 echo "> removing document from transient db on DTAG"
 RES=$(request "DELETE" ''  http://$BSA_DTAG/private-documents/$REFERENCE_ID)
 echo $RES
+
+
+echo "###################################################"
+echo "> fetching list pf referenceIDs from DTAG"
+RES=$(request "GET" ''  http://$BSA_DTAG/private-documents/)
+echo $RES
