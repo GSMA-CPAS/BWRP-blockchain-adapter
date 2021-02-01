@@ -1,0 +1,390 @@
+{
+	"info": {
+		"_postman_id": "c1dbe3b1-9fe8-4a93-bbd8-98b4168e7da7",
+		"name": "Blockchain Adapter",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Create Private Doc",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Body matches string\", function () {",
+							"    pm.expect(pm.response.text()).to.include(\"documentID\");",
+							"});",
+							"",
+							"pm.test(\"Body matches string\", function () {",
+							"    pm.expect(pm.response.text()).to.include(\"txID\");",
+							"});",
+							"",
+							"pm.test(\"documentID response check\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.documentID).to.lengthOf(64);",
+							"});",
+							"pm.test(\"txID response check\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.txID).to.lengthOf(64);",
+							"});",
+							"pm.test(\"Response time is less than 5s\", function () {",
+							"    pm.expect(pm.response.responseTime).to.be.below(5000);",
+							"});",
+							"pm.test(\"Successful POST request\", function () {",
+							"    pm.expect(pm.response.code).to.be.oneOf([201, 202]);",
+							"});",
+							"var schema = {",
+							"    \"documetnID\": {",
+							"        \"type\": \"string\"",
+							"    },",
+							"    \"txID\": {",
+							"        \"type\": \"string\"",
+							"    }",
+							"};",
+							"",
+							"pm.test('Response Structure is valid', function () {",
+							"    pm.expect(tv4.validate(pm.response, schema)).to.be.true;",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{   \"toMSP\" : \"TMUS\",\n    \"data\" : \"{\\\"name\\\": \\\"Tilak Vardhan\\\",\\\"age\\\": 27,\\\"cars\\\": {\\\"car1\\\": \\\"Ford\\\",\\\"car2\\\": \\\"BMW\\\",\\\"car3\\\": \\\"Fiat\\\"}}\"}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://{{ip}}:{{port}}/private-documents",
+					"protocol": "http",
+					"host": [
+						"{{ip}}"
+					],
+					"port": "{{port}}",
+					"path": [
+						"private-documents"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Fetch SpecificPrivate Data",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"pm.test(\"fromMSP present\", function () {",
+							"    pm.expect(pm.response.text()).to.include(\"fromMSP\");",
+							"});",
+							"pm.test(\"toMSP present\", function () {",
+							"    pm.expect(pm.response.text()).to.include(\"toMSP\");",
+							"});",
+							"pm.test(\"data present\", function () {",
+							"    pm.expect(pm.response.text()).to.include(\"data\");",
+							"});",
+							"pm.test(\"dataHash present\", function () {",
+							"    pm.expect(pm.response.text()).to.include(\"dataHash\");",
+							"});",
+							"pm.test(\"timeStamp present\", function () {",
+							"    pm.expect(pm.response.text()).to.include(\"timeStamp\");",
+							"});",
+							"pm.test(\"id present\", function () {",
+							"    pm.expect(pm.response.text()).to.include(\"id\");",
+							"});",
+							"pm.test(\"fromMSP lenght\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.fromMSP).to.length.greaterThan(0);",
+							"});",
+							"pm.test(\"toMSP lenght\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.toMSP).to.length.greaterThan(0);",
+							"});",
+							"pm.test(\"data lenght\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.data).to.length.greaterThan(0);",
+							"});",
+							"pm.test(\"timeStamp lenght\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.timeStamp).to.length.greaterThan(0);",
+							"});",
+							"pm.test(\"dataHash lenght\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.dataHash).to.lengthOf(64);",
+							"});",
+							"pm.test(\"id lenght\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.id).to.lengthOf(64);",
+							"});",
+							"pm.test(\"Content-Type is present\", function () {",
+							"    pm.response.to.have.header(\"Content-Type\");",
+							"});",
+							"pm.test(\"Response time is less than 3s\", function () {",
+							"    pm.expect(pm.response.responseTime).to.be.below(3000);",
+							"});",
+							"pm.test(\"Status code name has string\", function () {",
+							"    pm.response.to.have.status(\"OK\");",
+							"});",
+							"var schema = {",
+							"   \"fromMSP\": {",
+							"      \"type\": \"string\"",
+							"    },",
+							"    \"toMSP\": {",
+							"      \"type\": \"string\"",
+							"    },",
+							"    \"data\": {",
+							"      \"type\": \"string\"",
+							"    },",
+							"    \"dataHash\": {",
+							"      \"type\": \"string\"",
+							"    },",
+							"    \"timeStamp\": {",
+							"      \"type\": \"string\"",
+							"    },",
+							"    \"id\": {",
+							"      \"type\": \"string\"",
+							"    }",
+							"};",
+							"pm.test('Schema is valid', function () {",
+							"    pm.expect(tv4.validate(pm.response, schema)).to.be.true;",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://{{ip}}:{{port}}/private-documents/d536bd0e139be83fed76af72531518936d360d25c84c86eb5d4d7e533a6761bc",
+					"protocol": "http",
+					"host": [
+						"{{ip}}"
+					],
+					"port": "{{port}}",
+					"path": [
+						"private-documents",
+						"d536bd0e139be83fed76af72531518936d360d25c84c86eb5d4d7e533a6761bc"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Fetch All Private Data",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://{{ip}}:{{port}}/private-documents",
+					"protocol": "http",
+					"host": [
+						"{{ip}}"
+					],
+					"port": "{{port}}",
+					"path": [
+						"private-documents"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Delete Specific Private Doc",
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "http://{{ip}}:{{port}}/private-documents/79729e6e8fe186f3bb8d1bce994c21a2fe79eac3ef6afb3495d98d1631c4f722",
+					"protocol": "http",
+					"host": [
+						"{{ip}}"
+					],
+					"port": "{{port}}",
+					"path": [
+						"private-documents",
+						"79729e6e8fe186f3bb8d1bce994c21a2fe79eac3ef6afb3495d98d1631c4f722"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Add Signatures to Document",
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{   \"name\" : \"Tilak Vardhan\",\n    \"description\" : \"test description\",\n    \"algorithm\" : \"sha256\",\n    \"certificate\" : \"LIURGFI3UW4G8734RGI2U3RH2G34RH92348RYH92\",\n    \"signature\" : \"test sign 5\"}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://{{ip}}:{{port}}/signatures/c0a0014b2cb0157cb801e33c988f34f3f1ca774e4f6279a8a5c214906f15d4f0",
+					"protocol": "http",
+					"host": [
+						"{{ip}}"
+					],
+					"port": "{{port}}",
+					"path": [
+						"signatures",
+						"c0a0014b2cb0157cb801e33c988f34f3f1ca774e4f6279a8a5c214906f15d4f0"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Fetch all signatures of an MSP",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://{{ip}}:{{port}}/signatures/c0a0014b2cb0157cb801e33c988f34f3f1ca774e4f6279a8a5c214906f15d4f0/DTAG",
+					"protocol": "http",
+					"host": [
+						"{{ip}}"
+					],
+					"port": "{{port}}",
+					"path": [
+						"signatures",
+						"c0a0014b2cb0157cb801e33c988f34f3f1ca774e4f6279a8a5c214906f15d4f0",
+						"DTAG"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get Offchain DB",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"URI\": \"http://admin:admin@couchdb-offchain-dtag:5984\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://{{ip}}:{{port}}/config/offchain-db",
+					"protocol": "http",
+					"host": [
+						"{{ip}}"
+					],
+					"port": "{{port}}",
+					"path": [
+						"config",
+						"offchain-db"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Set Offchain DB",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.environment.get(\"variable_key\");",
+							"pm.sendRequest(\"https://postman-echo.com/get\", function (err, response) {",
+							"    console.log(response.json());",
+							"});",
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"pm.test(\"Value\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.value).to.eql(100);",
+							"});",
+							"pm.test(\"Response time is less than 2500ms\", function () {",
+							"    pm.expect(pm.response.responseTime).to.be.below(2500);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"URI\": \"http://admin:admin@couchdb-offchain-dtag:5984\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://{{ip}}:{{port}}/config/offchain-db",
+					"protocol": "http",
+					"host": [
+						"{{ip}}"
+					],
+					"port": "{{port}}",
+					"path": [
+						"config",
+						"offchain-db"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Validate Signature",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"docId\": \"ZGF0YTEyMzQ=\",\n\t\"sign\": \"3046022100a9032e0bad13e9abd64ba685e976f7e67f1b4db2f7ad1e61482b2fc82e9c3bc8022100fd7a0cd39e0ba40ea70b6e91b4d1192641bb1c8cc36cfbeb2742628f4a0283f5\",\n\t\"certList\": \"[\\\"-----BEGIN CERTIFICATE-----\\nMIICkTCCAjegAwIBAgIQeJ7Faqe6r0GuHbw9KMVrKTAKBggqhkjOPQQDAjCBmTEQ\\nMA4GA1UEBhMHR2VybWFueTENMAsGA1UECBMEQm9ubjENMAsGA1UEBxMEQm9ubjEi\\nMCAGA1UECRMZRnJpZWRyaWNoLUViZXJ0LUFsbGVlIDE0MDEOMAwGA1UEERMFNTMx\\nMTMxFzAVBgNVBAoTDmR0YWcubm9tYWQuY29tMRowGAYDVQQDExFjYS5kdGFnLm5v\\nbWFkLmNvbTAeFw0xODExMjgxMTUxMDBaFw0yODExMjUxMTUxMDBaMIGZMRAwDgYD\\nVQQGEwdHZXJtYW55MQ0wCwYDVQQIEwRCb25uMQ0wCwYDVQQHEwRCb25uMSIwIAYD\\nVQQJExlGcmllZHJpY2gtRWJlcnQtQWxsZWUgMTQwMQ4wDAYDVQQREwU1MzExMzEX\\nMBUGA1UEChMOZHRhZy5ub21hZC5jb20xGjAYBgNVBAMTEWNhLmR0YWcubm9tYWQu\\nY29tMFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAE/u+XC8eMFf2Te5bEQEkf8axT\\nbbCtJFH6f0CNCWn9rSIMfSnJiV78uCcDW1plzP+h4sUf+fM8rKGujXRbwuUAvqNf\\nMF0wDgYDVR0PAQH/BAQDAgGmMA8GA1UdJQQIMAYGBFUdJQAwDwYDVR0TAQH/BAUw\\nAwEB/zApBgNVHQ4EIgQgjg3NXW4c1tQgeElXumyFSJZRGpaP/Na3uU1P4QtYIf8w\\nCgYIKoZIzj0EAwIDSAAwRQIhAI6HwH4sbpY3++rcVNX9IOSo95IFCLWYzVzXa8Ij\\n61gsAiAjoRWuGOUJ0B34GT/2l3ei55KN1Ew0T9kB2zuToorcRA==\\n-----END CERTIFICATE-----\\\", \\\"-----BEGIN CERTIFICATE-----\\nMIICmzCCAkGgAwIBAgIUO5j45+pv3Pg3MUu4CZzKPxCw0ZEwCgYIKoZIzj0EAwIw\\ngZkxEDAOBgNVBAYTB0dlcm1hbnkxDTALBgNVBAgTBEJvbm4xDTALBgNVBAcTBEJv\\nbm4xIjAgBgNVBAkTGUZyaWVkcmljaC1FYmVydC1BbGxlZSAxNDAxDjAMBgNVBBET\\nBTUzMTEzMRcwFQYDVQQKEw5kdGFnLm5vbWFkLmNvbTEaMBgGA1UEAxMRY2EuZHRh\\nZy5ub21hZC5jb20wHhcNMjAxMTA0MDk0MjAwWhcNMjExMTA0MDk0NzAwWjAgMQ8w\\nDQYDVQQLEwZjbGllbnQxDTALBgNVBAMTBGhhbnMwWTATBgcqhkjOPQIBBggqhkjO\\nPQMBBwNCAASoh3rVPKT1fB1T0bmTXvXqypVPXIZSN3nWhLq+aEVi7R1LpfJeTQ/w\\n3Bcs2672398m7QMzrizxsEwbgX+LvCL5o4HeMIHbMA4GA1UdDwEB/wQEAwIHgDAM\\nBgNVHRMBAf8EAjAAMB0GA1UdDgQWBBQzvnLW6SaPUugcDwS4s5AN6VogKDArBgNV\\nHSMEJDAigCCODc1dbhzW1CB4SVe6bIVIllEalo/81re5TU/hC1gh/zBvBggqAwQF\\nBgcIAQRjeyJhdHRycyI6eyJDYW5TaWduRG9jdW1lbnQiOiJ5ZXMiLCJoZi5BZmZp\\nbGlhdGlvbiI6IiIsImhmLkVucm9sbG1lbnRJRCI6ImhhbnMiLCJoZi5UeXBlIjoi\\nY2xpZW50In19MAoGCCqGSM49BAMCA0gAMEUCIQDBoEhAlHRwPmbQbS6mhfboiqW6\\n9rU4NSDXj6Ek2cRk+gIgUUi55ku7EeEUMZEIQTC0vd+E7g0YO7TCRrVQws5wpfk=\\n-----END CERTIFICATE-----\\\"]\"\n}"
+				},
+				"url": {
+					"raw": "http://{{ip}}:{{port}}/validate-signature",
+					"protocol": "http",
+					"host": [
+						"{{ip}}"
+					],
+					"port": "{{port}}",
+					"path": [
+						"validate-signature"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
