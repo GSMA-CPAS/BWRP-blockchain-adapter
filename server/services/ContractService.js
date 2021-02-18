@@ -130,7 +130,7 @@ const uploadSignature = ({referenceID, body}) => new Promise(
     },
 );
 
-/** verify the on chain signatures for a given document identified by its referenceID 
+/** verify the on chain signatures for a given document identified by its referenceID
    * @param {string} referenceID - The referenceID
    * @param {string} creator - The msp that initially created the document
    * @param {string} signer - The msp that signed

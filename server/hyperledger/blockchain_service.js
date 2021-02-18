@@ -160,7 +160,7 @@ class BlockchainService {
 
       // configure certificate
       console.log('> will configure "'+type+'" certificate');
-      //console.log(cert);
+      // console.log(cert);
 
       // send transaction
       const tx = contract.createTransaction('SetCertificate');
@@ -259,7 +259,6 @@ class BlockchainService {
 
             // calculate reference payload Link:
             return self.createReferencePayloadLink(network, contract, referenceID, payloadHash).then( (link) => {
-              console.log(link)
               // publish the link on the ledger
               return self.publishReferencePayloadLink(contract, link.key, link.value).then( (txId) => {
                 // return the full document data here
@@ -347,7 +346,7 @@ class BlockchainService {
       network.queryHandler.setFilter('');
 
       const result = JSON.parse(resultJSON);
-      
+
       return {
         key: result[0],
         value: result[1],
