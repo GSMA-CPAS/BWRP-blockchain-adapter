@@ -146,6 +146,33 @@ class BlockchainService {
     });
   }
 
+  /** set a cert of the type <type>
+  * @param {string} type - the cert type (e.g. "root")
+  * @param {string} cert - the root cert
+  * @return {Promise}
+  */
+  setCertificate(type, cert) {
+    const self = this;
+
+    return this.network.then( (network) => {
+    // fetch contract
+      const contract = network.getContract(self.connectionProfile.config.contractID);
+
+      // configure certificate
+      console.log('> will configure "'+type+'" certificate');
+      //console.log(cert);
+
+      // send transaction
+      const tx = contract.createTransaction('SetCertificate');
+
+      return tx.submit(...[type, cert]).then( (_) => {
+        return '';
+      }).catch( (error) => {
+        return Promise.reject(ErrorCode.fromError(error, 'SetCertificate('+type+',' +cert+') failed'));
+      });
+    });
+  }
+
   /** store a document
    * @param {Network} network - a fabric network object
    * @param {Contract} contract - a fabric contract object
@@ -414,7 +441,39 @@ class BlockchainService {
     });
   }
 
-  /** get signature for a given referenceID
+  /** verify all signatures for given msp and documentID
+   * @param {Network} network - a fabric network object
+   * @param {Contract} contract - a fabric contract object
+   * @param {string} msp - a msp
+   * @param {string} documentID - a documentID
+   * @param {string} document - a document
+   * @return {Promise}
+  */
+  verifySignatures(msp, documentID, document) {
+    const self = this;
+
+    return this.network.then( (network) => {
+      // fetch contract
+      const contract = network.getContract(self.connectionProfile.config.contractID);
+
+      // enable filter to execute query on our MSP
+      const onMSP = this.connectionProfile.organizations[this.connectionProfile.client.organization].mspid;
+      network.queryHandler.setFilter(onMSP);
+
+      return contract.evaluateTransaction('VerifySignatures', ...[msp, documentID, document]).then( (results) => {
+        // reset filter
+        network.queryHandler.setFilter('');
+
+        console.log('> reply: VerifySignatures(' + msp + ', ' + documentID +', <data>) = \n' + JSON.stringify(JSON.parse(results.toString()), null, 4));
+
+        return results.toString();
+      }).catch( (error) => {
+        return Promise.reject(ErrorCode.fromError(error, 'VerifySignatures(' + msp + ', ' + documentID +', <data>) failed'));
+      });
+    });
+  }
+
+  /** get signature for a given documentID
    * @param {string} msp - a msp
    * @param {string} referenceID - a referenceID of a document
    * @return {Promise}

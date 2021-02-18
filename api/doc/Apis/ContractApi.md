@@ -10,6 +10,7 @@ Method | HTTP request | Description
 [**fetchSignatures**](ContractApi.md#fetchSignatures) | **GET** /signatures/{referenceID}/{msp} | 
 [**uploadPrivateDocument**](ContractApi.md#uploadPrivateDocument) | **POST** /private-documents | 
 [**uploadSignature**](ContractApi.md#uploadSignature) | **PUT** /signatures/{referenceID} | 
+[**verifySignatures**](ContractApi.md#verifySignatures) | **PUT** /signatures/{id}/{msp}/verify | 
 
 
 <a name="deletePrivateDocument"></a>
@@ -159,6 +160,35 @@ Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
  **referenceID** | **String**| The referenceID of the document | [default to null]
  **body** | [**DocumentSignature**](../Models/DocumentSignature.md)| a document signature that should be uploaded |
+
+### Return type
+
+[**String**](../Models/string.md)
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+- **Content-Type**: application/json
+- **Accept**: text/plain, application/json
+
+<a name="verifySignatures"></a>
+# **verifySignatures**
+> String verifySignatures(id, msp, string)
+
+
+
+    Fetch all signatures for a given msp and a given document id from the ledger and verify the content against a given document
+
+### Parameters
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **id** | **String**| The document ID | [default to null]
+ **msp** | **String**| A MSP name | [default to null]
+ **string** | [**List**](../Models/string.md)| A document to be used to verify the signatures |
 
 ### Return type
 

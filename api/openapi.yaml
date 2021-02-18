@@ -1,4 +1,4 @@
-openapi: 3.0.1
+openapi: 3.0.3
 info:
   title: Blockchain-Adapter
   description: This is the REST api specification for the blockchain-adapter
@@ -314,6 +314,50 @@ paths:
             application/json:
               schema:
                 $ref: models/ErrorCode.yaml
+  /signatures/{id}/{msp}/verify:
+    put:
+      description: Fetch all signatures for a given msp and a given document id from the ledger and verify the content against a given document
+      tags:
+        - contract
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+          description: The document ID
+        - in: path
+          name: msp
+          required: true
+          schema:
+            type: string
+          description: A MSP name
+      requestBody:
+        description: A document to be used to verify the signatures
+        required: true
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                type: string
+                description: BUGBUG openapi dies not like string bodies?! Use json array for now
+                example: ["data..."]
+      operationId: verifySignatures
+      responses:
+        '200':
+          description: Successful operation, returns json of verified signatures
+          content:
+            text/plain:
+              schema:
+                type: string
+                x-content-type: text/plain
+        '500':
+          description: Internal Error
+          content:
+            application/json:
+              schema:
+                $ref: models/ErrorCode.yaml
   /config/offchain-db:
     put:
       description: Update the configuration of the offchain-db
@@ -354,6 +398,38 @@ paths:
               schema:
                 $ref: models/OffchainDBConfig.yaml
           description: The current configuration for the offchain-db
+        '500':
+          description: Internal Error
+          content:
+            application/json:
+              schema:
+                $ref: models/ErrorCode.yaml
+  /config/certificates/root:
+    put:
+      description: Upload a root certificate
+      tags:
+        - config
+      operationId: setCertificateRoot
+      requestBody:
+        description: Set the signature root certificate.
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                type: string
+                description: BUGBUG openapi does not like string bodies?! Use json array for now
+                example: ["-----BEGIN CERTIFICATE-----..."]
+        
+        required: true
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            text/plain:
+              schema:
+                type: string
+                x-content-type: text/plain
         '500':
           description: Internal Error
           content:

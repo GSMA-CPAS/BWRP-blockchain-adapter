@@ -1,4 +1,4 @@
-openapi: 3.0.1
+openapi: 3.0.3
 info:
   contact:
     email: Simon.Schulz01@telekom.de
@@ -355,6 +355,57 @@ paths:
       tags:
       - contract
       x-eov-operation-handler: controllers/ContractController
+  /signatures/{id}/{msp}/verify:
+    put:
+      description: Fetch all signatures for a given msp and a given document id from
+        the ledger and verify the content against a given document
+      operationId: verifySignatures
+      parameters:
+      - description: The document ID
+        explode: false
+        in: path
+        name: id
+        required: true
+        schema:
+          type: string
+        style: simple
+      - description: A MSP name
+        explode: false
+        in: path
+        name: msp
+        required: true
+        schema:
+          type: string
+        style: simple
+      requestBody:
+        content:
+          application/json:
+            schema:
+              items:
+                description: BUGBUG openapi dies not like string bodies?! Use json
+                  array for now
+                example: '["data..."]'
+                type: string
+              type: array
+        description: A document to be used to verify the signatures
+        required: true
+      responses:
+        "200":
+          content:
+            text/plain:
+              schema:
+                type: string
+                x-content-type: text/plain
+          description: Successful operation, returns json of verified signatures
+        "500":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorCode'
+          description: Internal Error
+      tags:
+      - contract
+      x-eov-operation-handler: controllers/ContractController
   /config/offchain-db:
     get:
       description: Read back the configuration of the offchain-db
@@ -402,6 +453,39 @@ paths:
       tags:
       - config
       x-codegen-request-body-name: body
+      x-eov-operation-handler: controllers/ConfigController
+  /config/certificates/root:
+    put:
+      description: Upload a root certificate
+      operationId: setCertificateRoot
+      requestBody:
+        content:
+          application/json:
+            schema:
+              items:
+                description: BUGBUG openapi does not like string bodies?! Use json
+                  array for now
+                example: '["-----BEGIN CERTIFICATE-----..."]'
+                type: string
+              type: array
+        description: Set the signature root certificate.
+        required: true
+      responses:
+        "200":
+          content:
+            text/plain:
+              schema:
+                type: string
+                x-content-type: text/plain
+          description: Successful operation
+        "500":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorCode'
+          description: Internal Error
+      tags:
+      - config
       x-eov-operation-handler: controllers/ConfigController
 components:
   schemas:

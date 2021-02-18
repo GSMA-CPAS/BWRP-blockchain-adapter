@@ -25,16 +25,11 @@ function payload() {
     hash $(concat "$1" "$2" "$3")
 }
 
-# pass creatorMSP, referenceid
+# pass referenceid documenthash
 function payloadlink(){
     hash $(concat "$1" "$2")
 }
 
-PAYLOADLINK=$(payloadlink "DTAG" $REFERENCE_ID)
-SIGNATURE_PAYLOAD=$(payload "DTAG" $REFERENCE_ID $PAYLOADLINK)
-echo $SIGNATURE_PAYLOAD
-
-exit 1
 
 # allow env override
 [ -z "$BSA_DTAG" ] && BSA_DTAG="localhost:8081"
@@ -68,81 +63,103 @@ function request {
     echo $RET | grep -i "error" > /dev/null && echo $RET > /dev/stderr && exit 1 || : 
 }
 
-#TODO: print the following help only if it was not configured already
-echo "###################################################"
-echo "> prepare offchain db config with the following call for both orgs if not done already during setup:"
-echo 'curl -s -X PUT http://localhost:8081/config/offchain-db -d "{\"URI\": \"http://${OFFCHAIN_COUCHDB_USER}:${OFFCHAIN_COUCHDB_PASSWORD}@couchdb-offchain-dtag:5984\"}" -H "Content-Type: application/json"'
+function createRoot {
+    ORG=$1
+    echo -ne "[ default ]\nbasicConstraints = critical,CA:true\nkeyUsage = critical,keyCertSign\n" > $DIR/ca.$ORG.ext
+    attr_hex=$(echo -n '{"attrs":{"CanSignDocument":"yes"}}' | xxd -ps -c 200 | tr -d '\n')
+    echo -ne "[default]\n1.2.3.4.5.6.7.8.1=DER:$attr_hex\n" > $DIR/user.$ORG.ext
 
+    # create ca 
+    openssl req -new -newkey ec -pkeyopt ec_paramgen_curve:secp384r1 -nodes -out $DIR/root.$ORG.csr -keyout $DIR/root.$ORG.key  -subj "/CN=ROOT@$ORG/C=DE/ST=NRW/L=Bielefeld/O=$ORG/OU=${ORG}OU" 
+    openssl x509 -signkey $DIR/root.$ORG.key -days 365 -req -in $DIR/root.$ORG.csr -out $DIR/root.$ORG.pem  --extfile $DIR/ca.$ORG.ext
+    openssl x509 -in $DIR/root.$ORG.pem > $DIR/root.$ORG.crt
+}
+
+function createUserCert {
+    ORG=$1
+    
+    # create signing request
+    openssl req -newkey ec -pkeyopt ec_paramgen_curve:secp384r1 -nodes -keyout $DIR/user.$ORG.key -out $DIR/user.$ORG.csr  -subj "/CN=user@$ORG/C=DE/ST=NRW/L=Bielefeld/O=$ORG/OU=${ORG}OU"
+
+    # use ca to sign it
+    openssl x509 -CA $DIR/root.$ORG.crt -CAkey $DIR/root.$ORG.key -CAcreateserial -req -in  $DIR/user.$ORG.csr -out $DIR/user.$ORG.pem -extfile $DIR/user.$ORG.ext -days 365
+    openssl x509 -in $DIR/user.$ORG.pem > $DIR/user.$ORG.crt
+
+    # replace newlines
+    cat $DIR/user.$ORG.crt | awk 1 ORS='\\n' > $DIR/user.$ORG.crt_newline
+}
+
+echo "###################################################"
+echo "> creating root and user certs"
+echo "###################################################"
+createRoot DTAG
+createUserCert DTAG
+createRoot TMUS
+createUserCert TMUS
+
+echo "###################################################"
+echo "> storing root cert on DTAG"
+request PUT "[\"$(cat $DIR/root.DTAG.pem | awk 1 ORS='\\n' )\"]" http://$BSA_DTAG/config/certificates/root
+echo "> storing root cert on TMUS"
+request PUT "[\"$(cat $DIR/root.TMUS.pem | awk 1 ORS='\\n' )\"]" http://$BSA_TMUS/config/certificates/root
 
 echo "###################################################"
 echo "> storing document on both parties by calling the function on DTAG with the partner id TMUS"
 RES=$(request "POST" '{ "toMSP" : "TMUS", "data" : "'$DOCUMENT64'" }'  http://$BSA_DTAG/private-documents)
 echo $RES
 REFERENCE_ID=$(echo "$RES" | jq -r .referenceID)
+PAYLOADLINK=$(payloadlink $REFERENCE_ID":"$DOCUMENTSHA256)
 
 echo "###################################################"
 echo "> dtag signs contract"
-# generate key and crt
-openssl req -x509 -newkey ec -pkeyopt ec_paramgen_curve:secp384r1 -nodes -keyout $KEY -out $CRT -subj "/CN=${SIGNER_DTAG}/C=DE/ST=NRW/L=Bielefeld/O=ORG/OU=ORGOU" -addext keyUsage=digitalSignature
-# create pem formatted with \n
-CERT=$(cat $CRT | awk 1 ORS='\\n')
-# extract public key
-openssl x509 -pubkey -in $CRT > $PUB_DTAG
-# create the signature payload:
-# payloadlink = hash(concat(creatorMSP, referenceId))
-PAYLOADLINK=$(echo -ne "DTAG:$REFERENCE_ID" | openssl dgst -sha256 -r | cut -d " " -f1)
-SIGNATUREPAYLOAD=$(echo -ne "DTAG:$REFERENCE_ID:$PAYLOADLINK" | openssl dgst -sha256 -r | cut -d " " -f1)
 # do the signing
-
-
-SIGNATURE=$(echo -ne $SIGNATUREPAYLOAD | openssl dgst -sha256 -sign $KEY | openssl base64 | tr -d '\n')
+CERT=$(cat $DIR/user.DTAG.crt_newline)
+SIGNATUREPAYLOAD=$(echo -ne "DTAG:$REFERENCE_ID:$PAYLOADLINK" | openssl dgst -sha256 -r | cut -d " " -f1)
+SIGNATURE=$(echo -ne $SIGNATUREPAYLOAD | openssl dgst -sha256 -sign $DIR/user.DTAG.key | openssl base64 | tr -d '\n')
 # call blockchain adapter
-request "PUT" '{"algorithm": "secp384r1", "certificate" : "'"${CERT}"'", "signature" : "'$SIGNATURE'" }'  http://$BSA_DTAG/signatures/$REFERENCE_ID
+RES=$(request "PUT" '{"algorithm": "secp384r1", "certificate" : "'"${CERT}"'", "signature" : "'$SIGNATURE'" }'  http://$BSA_DTAG/signatures/$DOCUMENT_ID)
+TXID_DTAG=$(echo $RES | jq -r .txID)
+echo "> stored signature with txid $TXID_DTAG"
 
 echo "###################################################"
 echo "> tmus signs contract"
-# generate key and crt 
-openssl req -x509 -newkey ec -pkeyopt ec_paramgen_curve:secp384r1 -nodes -keyout $KEY -out $CRT -subj "/CN=${SIGNER_TMUS}/C=DE/ST=NRW/L=Bielefeld/O=ORG/OU=ORGOU" -addext keyUsage=digitalSignature
-# create pem formatted with \n
-CERT=$(cat $CRT | awk 1 ORS='\\n')
-# extract public key
-openssl x509 -pubkey -in $CRT > $PUB_TMUS
 # do the signing
-SIGNATURE=$(echo -ne $DOCUMENT | openssl dgst -sha256 -sign $KEY | openssl base64  | tr -d '\n')
-# call the blockchain adapter
-request "PUT" '{"algorithm": "secp384r1", "certificate" : "'"${CERT}"'", "signature" : "'$SIGNATURE'" }'  http://$BSA_TMUS/signatures/$REFERENCE_ID
+CERT=$(cat $DIR/user.DTAG.crt_newline)
+
+SIGNATUREPAYLOAD=$(echo -ne "TMUS:$REFERENCE_ID:$PAYLOADLINK" | openssl dgst -sha256 -r | cut -d " " -f1)
+SIGNATURE=$(echo -ne $SIGNATUREPAYLOAD | openssl dgst -sha256 -sign $DIR/user.TMUS.key | openssl base64 | tr -d '\n')
+
+# call blockchain adapter
+RES=$(request "PUT" '{"algorithm": "secp384r1", "certificate" : "'"${CERT}"'", "signature" : "'$SIGNATURE'" }'  http://$BSA_TMUS/signatures/$DOCUMENT_ID)
+TXID_TMUS=$(echo $RES | jq -r .txID)
+echo "> stored signature with txid $TXID_TMUS"
 
 echo "###################################################"
-echo "> fetching contract from dtag"
-RES=$(request "GET" "" http://$BSA_DTAG/private-documents/$REFERENCE_ID)
-echo $RES
-FETCHED_DOC64=$(echo "$RES" | jq -r .data)
-FETCHED_TS=$(echo "$RES" | jq -r .timeStamp)
-FETCHED_FROM=$(echo "$RES" | jq -r .fromMSP)
-FETCHED_TO=$(echo "$RES" | jq -r .toMSP)
-FETCHED_ID=$(echo "$RES" | jq -r .id)
-echo "> $FETCHED_TS: id<$FETCHED_ID> $FETCHED_FROM -> $FETCHED_TO, document data b64 = '$FETCHED_DOC64'"
+echo "> verify dtag signature on-chain"
+RES=$(request PUT "[\"$DOCUMENT\"]" http://$BSA_DTAG/signatures/$DOCUMENT_ID/DTAG/verify)
+echo $RES | jq 
+VALID=$(echo $RES | jq -r .$TXID_DTAG.valid)
+if [ $VALID == "true" ]; then
+    echo "SIGNATURE VALID!"
+else
+    echo "FAILED"
+    exit 1
+fi
 
 echo "###################################################"
-echo "> fetching dtag signatures"
-SIGNATURES=$(request "GET" "" http://$BSA_DTAG/signatures/$FETCHED_ID/DTAG)
-DTAG_SIGNATURE=$(echo $SIGNATURES | jq -r .[].signature)
-echo "> got DTAG signature $DTAG_SIGNATURE"
+echo "> verify tmus signature on-chain"
+RES=$(request PUT "[\"$DOCUMENT\"]" http://$BSA_DTAG/signatures/$DOCUMENT_ID/TMUS/verify)
+echo $RES | jq 
+VALID=$(echo $RES | jq -r .$TXID_TMUS.valid)
+if [ $VALID == "true" ]; then
+    echo "SIGNATURE VALID!"
+else
+    echo "FAILED"
+    exit 1
+fi
 
-echo "> verifying signature"
-FETCHED_DOC=$(echo $FETCHED_DOC64 | openssl base64 -d)
-echo -n $FETCHED_DOC > $DOC
-echo $DTAG_SIGNATURE | openssl base64 -d | openssl dgst -sha256 -verify $PUB_DTAG -signature /dev/stdin $DOC
+exit 0
 
-echo "###################################################"
-echo "> fetching tmus signatures"
-SIGNATURES=$(request "GET" "" http://$BSA_DTAG/signatures/$FETCHED_ID/TMUS)
-TMUS_SIGNATURE=$(echo $SIGNATURES | jq -r .[].signature)
-echo "> got TMUS signature $TMUS_SIGNATURE"
-
-echo "> verifying signature"
-echo -ne $DOCUMENT > $DOC
-echo $TMUS_SIGNATURE | openssl base64 -d | openssl dgst -sha256 -verify $PUB_TMUS -signature /dev/stdin $DOC
 
 
 
