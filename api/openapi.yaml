@@ -281,9 +281,9 @@ paths:
               $ref: models/DocumentSignature.yaml
         required: true
       x-codegen-request-body-name: body
-  /signatures/{referenceID}/{msp}:
+  /signatures/{referenceID}/{signer}:
     get:
-      description: Fetch all signatures for a given msp and a given referenceID from the ledger
+      description: Fetch all signatures for a given referenceID and a signer from the ledger
       tags:
         - contract
       parameters:
@@ -294,11 +294,11 @@ paths:
             type: string
           description: The referenceID of the document
         - in: path
-          name: msp
+          name: signer
           required: true
           schema:
             type: string
-          description: A MSP name
+          description: The signers MSP name
       operationId: fetchSignatures
       responses:
         '200':
@@ -314,35 +314,30 @@ paths:
             application/json:
               schema:
                 $ref: models/ErrorCode.yaml
-  /signatures/{id}/{msp}/verify:
-    put:
-      description: Fetch all signatures for a given msp and a given document id from the ledger and verify the content against a given document
+  /signatures/{referenceID}/verify/{creator}/{signer}:
+    get:
+      description: Fetch all signatures for a given reference id, creator and signer from the ledger and verify the content against the on chain referencepayload link
       tags:
         - contract
       parameters:
         - in: path
-          name: id
+          name: referenceID
           required: true
           schema:
             type: string
-          description: The document ID
+          description: The referenceID
         - in: path
-          name: msp
+          name: creator
           required: true
           schema:
             type: string
-          description: A MSP name
-      requestBody:
-        description: A document to be used to verify the signatures
-        required: true
-        content:
-          application/json:
-            schema:
-              type: array
-              items:
-                type: string
-                description: BUGBUG openapi dies not like string bodies?! Use json array for now
-                example: ["data..."]
+          description: The initial creator of the contract that was signed. This also verifies the origin on chain.
+        - in: path
+          name: signer
+          required: true
+          schema:
+            type: string
+          description: The signer 
       operationId: verifySignatures
       responses:
         '200':

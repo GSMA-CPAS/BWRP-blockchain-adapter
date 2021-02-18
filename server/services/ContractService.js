@@ -130,17 +130,17 @@ const uploadSignature = ({referenceID, body}) => new Promise(
     },
 );
 
-/** Store a signature for the document identified by id on the ledger
-   * @param {string} id - The document ID
-   * @param {string} msp - String A MSP name
-   * @param {Document} body - A document to be used to verify the signatures
+/** verify the on chain signatures for a given document identified by its referenceID 
+   * @param {string} referenceID - The referenceID
+   * @param {string} creator - The msp that initially created the document
+   * @param {string} signer - The msp that signed
    * @return {string}
   */
-const verifySignatures = ({id, msp, body}) => new Promise(
+const verifySignatures = ({referenceID, creator, signer}) => new Promise(
     async (resolve, reject) => {
       const blockchainConnection = new BlockchainService(process.env.BSA_CCP);
 
-      blockchainConnection.verifySignatures(msp, id, body)
+      blockchainConnection.verifySignatures(referenceID, creator, signer)
           .then( (response) => {
             resolve(Service.successResponse(response, 200));
           }).catch((error) => {

@@ -13,21 +13,26 @@ function concat(){
             res="$res:$var"
         fi
     done
-    echo $res
+    echo "$res"
 }
 
 function hash(){
-    echo "$1" | openssl dgst -sha256 -r | cut -d " " -f1
+    echo -ne "$1" | openssl dgst -sha256 -r | cut -d " " -f1
 }
 
 #pass msp, referenceid, payloadlink
 function payload() {
-    hash $(concat "$1" "$2" "$3")
+    local MSP=$1
+    local REFERENCE_ID=$2
+    local PAYLOADLINK=$3
+    hash $(concat "$MSP" "$REFERENCE_ID" "$PAYLOADLINK")
 }
 
 # pass referenceid documenthash
 function payloadlink(){
-    hash $(concat "$1" "$2")
+    local REFERENCE_ID=$1
+    local PAYLOADHASH=$2
+    hash $(concat "$REFERENCE_ID" "$PAYLOADHASH")
 }
 
 
@@ -108,37 +113,39 @@ echo "> storing document on both parties by calling the function on DTAG with th
 RES=$(request "POST" '{ "toMSP" : "TMUS", "data" : "'$DOCUMENT64'" }'  http://$BSA_DTAG/private-documents)
 echo $RES
 REFERENCE_ID=$(echo "$RES" | jq -r .referenceID)
-PAYLOADLINK=$(payloadlink $REFERENCE_ID":"$DOCUMENTSHA256)
+PAYLOADLINK=$(payloadlink $REFERENCE_ID $DOCUMENTSHA256)
 
 echo "###################################################"
 echo "> dtag signs contract"
 # do the signing
 CERT=$(cat $DIR/user.DTAG.crt_newline)
-SIGNATUREPAYLOAD=$(echo -ne "DTAG:$REFERENCE_ID:$PAYLOADLINK" | openssl dgst -sha256 -r | cut -d " " -f1)
+SIGNATUREPAYLOAD=$(payload "DTAG" "$REFERENCE_ID" "$PAYLOADLINK")
+echo -e "payload to sign <$SIGNATUREPAYLOAD>"
 SIGNATURE=$(echo -ne $SIGNATUREPAYLOAD | openssl dgst -sha256 -sign $DIR/user.DTAG.key | openssl base64 | tr -d '\n')
 # call blockchain adapter
-RES=$(request "PUT" '{"algorithm": "secp384r1", "certificate" : "'"${CERT}"'", "signature" : "'$SIGNATURE'" }'  http://$BSA_DTAG/signatures/$DOCUMENT_ID)
+RES=$(request "PUT" '{"algorithm": "secp384r1", "certificate" : "'"${CERT}"'", "signature" : "'$SIGNATURE'" }'  http://$BSA_DTAG/signatures/$REFERENCE_ID)
 TXID_DTAG=$(echo $RES | jq -r .txID)
 echo "> stored signature with txid $TXID_DTAG"
 
 echo "###################################################"
 echo "> tmus signs contract"
 # do the signing
-CERT=$(cat $DIR/user.DTAG.crt_newline)
+CERT=$(cat $DIR/user.TMUS.crt_newline)
 
-SIGNATUREPAYLOAD=$(echo -ne "TMUS:$REFERENCE_ID:$PAYLOADLINK" | openssl dgst -sha256 -r | cut -d " " -f1)
+SIGNATUREPAYLOAD=$(payload "TMUS" "$REFERENCE_ID" "$PAYLOADLINK")
+echo -e "payload to sign <$SIGNATUREPAYLOAD>"
 SIGNATURE=$(echo -ne $SIGNATUREPAYLOAD | openssl dgst -sha256 -sign $DIR/user.TMUS.key | openssl base64 | tr -d '\n')
 
 # call blockchain adapter
-RES=$(request "PUT" '{"algorithm": "secp384r1", "certificate" : "'"${CERT}"'", "signature" : "'$SIGNATURE'" }'  http://$BSA_TMUS/signatures/$DOCUMENT_ID)
+RES=$(request "PUT" '{"algorithm": "secp384r1", "certificate" : "'"${CERT}"'", "signature" : "'$SIGNATURE'" }'  http://$BSA_TMUS/signatures/$REFERENCE_ID)
 TXID_TMUS=$(echo $RES | jq -r .txID)
 echo "> stored signature with txid $TXID_TMUS"
 
 echo "###################################################"
 echo "> verify dtag signature on-chain"
-RES=$(request PUT "[\"$DOCUMENT\"]" http://$BSA_DTAG/signatures/$DOCUMENT_ID/DTAG/verify)
+RES=$(request "GET" '' http://$BSA_DTAG/signatures/$REFERENCE_ID/verify/DTAG/DTAG)
 echo $RES | jq 
-VALID=$(echo $RES | jq -r .$TXID_DTAG.valid)
+VALID=$(echo $RES | jq -r .\"$TXID_DTAG\".valid)
 if [ $VALID == "true" ]; then
     echo "SIGNATURE VALID!"
 else
@@ -148,9 +155,9 @@ fi
 
 echo "###################################################"
 echo "> verify tmus signature on-chain"
-RES=$(request PUT "[\"$DOCUMENT\"]" http://$BSA_DTAG/signatures/$DOCUMENT_ID/TMUS/verify)
+RES=$(request "GET" '' http://$BSA_DTAG/signatures/$REFERENCE_ID/verify/DTAG/TMUS)
 echo $RES | jq 
-VALID=$(echo $RES | jq -r .$TXID_TMUS.valid)
+VALID=$(echo $RES | jq -r .\"$TXID_TMUS\".valid)
 if [ $VALID == "true" ]; then
     echo "SIGNATURE VALID!"
 else

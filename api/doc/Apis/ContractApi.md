@@ -7,10 +7,10 @@ Method | HTTP request | Description
 [**deletePrivateDocument**](ContractApi.md#deletePrivateDocument) | **DELETE** /private-documents/{referenceID} | 
 [**fetchPrivateDocument**](ContractApi.md#fetchPrivateDocument) | **GET** /private-documents/{referenceID} | 
 [**fetchPrivateDocumentReferenceIDs**](ContractApi.md#fetchPrivateDocumentReferenceIDs) | **GET** /private-documents | 
-[**fetchSignatures**](ContractApi.md#fetchSignatures) | **GET** /signatures/{referenceID}/{msp} | 
+[**fetchSignatures**](ContractApi.md#fetchSignatures) | **GET** /signatures/{referenceID}/{signer} | 
 [**uploadPrivateDocument**](ContractApi.md#uploadPrivateDocument) | **POST** /private-documents | 
 [**uploadSignature**](ContractApi.md#uploadSignature) | **PUT** /signatures/{referenceID} | 
-[**verifySignatures**](ContractApi.md#verifySignatures) | **PUT** /signatures/{id}/{msp}/verify | 
+[**verifySignatures**](ContractApi.md#verifySignatures) | **GET** /signatures/{referenceID}/verify/{creator}/{signer} | 
 
 
 <a name="deletePrivateDocument"></a>
@@ -93,18 +93,18 @@ No authorization required
 
 <a name="fetchSignatures"></a>
 # **fetchSignatures**
-> String fetchSignatures(referenceID, msp)
+> String fetchSignatures(referenceID, signer)
 
 
 
-    Fetch all signatures for a given msp and a given referenceID from the ledger
+    Fetch all signatures for a given referenceID and a signer from the ledger
 
 ### Parameters
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
  **referenceID** | **String**| The referenceID of the document | [default to null]
- **msp** | **String**| A MSP name | [default to null]
+ **signer** | **String**| The signers MSP name | [default to null]
 
 ### Return type
 
@@ -176,19 +176,19 @@ No authorization required
 
 <a name="verifySignatures"></a>
 # **verifySignatures**
-> String verifySignatures(id, msp, string)
+> String verifySignatures(referenceID, creator, signer)
 
 
 
-    Fetch all signatures for a given msp and a given document id from the ledger and verify the content against a given document
+    Fetch all signatures for a given reference id, creator and signer from the ledger and verify the content against the on chain referencepayload link
 
 ### Parameters
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **id** | **String**| The document ID | [default to null]
- **msp** | **String**| A MSP name | [default to null]
- **string** | [**List**](../Models/string.md)| A document to be used to verify the signatures |
+ **referenceID** | **String**| The referenceID | [default to null]
+ **creator** | **String**| The initial creator of the contract that was signed. This also verifies the origin on chain. | [default to null]
+ **signer** | **String**| The signer | [default to null]
 
 ### Return type
 
@@ -200,6 +200,6 @@ No authorization required
 
 ### HTTP request headers
 
-- **Content-Type**: application/json
+- **Content-Type**: Not defined
 - **Accept**: text/plain, application/json
 
