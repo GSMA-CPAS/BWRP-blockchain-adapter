@@ -231,16 +231,16 @@ class BlockchainService {
             }
 
             // calculate reference payload Link:
-            return self.createReferencePayloadLink(network, contract, referenceID, payloadHash).then( (key, value) => {
+            return self.createReferencePayloadLink(network, contract, referenceID, payloadHash).then( (link) => {
+              console.log(link)
               // publish the link on the ledger
-              return self.publishReferencePayloadLink(contract, key, value).then( (txId) => {
+              return self.publishReferencePayloadLink(contract, link.key, link.value).then( (txId) => {
                 // return the full document data here
-                const result = {
+                return {
                   txId: txId,
-                  referenceId: referenceID,
+                  referenceID: referenceID,
                   todo: 'TODO: add full document here and move txId to the blockchain entry',
                 };
-                return result;
               });
             });
           });
@@ -319,13 +319,12 @@ class BlockchainService {
       // reset filter
       network.queryHandler.setFilter('');
 
-      console.log(resultJSON);
       const result = JSON.parse(resultJSON);
-
-      const key = result[0];
-      const value = result[1];
-
-      return (key, value);
+      
+      return {
+        key: result[0],
+        value: result[1],
+      };
     }).catch( (error) => {
       return Promise.reject(ErrorCode.fromError(error, 'CreateReferencePayloadLink() failed'));
     });

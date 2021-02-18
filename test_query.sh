@@ -2,6 +2,40 @@
 set -e -o errexit 
 export no_proxy="localhost,$no_proxy"
 
+
+
+function concat(){
+    local res=""
+    for var in "$@"; do
+        if [ -z $res ]; then
+            res=$var
+        else
+            res="$res:$var"
+        fi
+    done
+    echo $res
+}
+
+function hash(){
+    echo "$1" | openssl dgst -sha256 -r | cut -d " " -f1
+}
+
+#pass msp, referenceid, payloadlink
+function payload() {
+    hash $(concat "$1" "$2" "$3")
+}
+
+# pass creatorMSP, referenceid
+function payloadlink(){
+    hash $(concat "$1" "$2")
+}
+
+PAYLOADLINK=$(payloadlink "DTAG" $REFERENCE_ID)
+SIGNATURE_PAYLOAD=$(payload "DTAG" $REFERENCE_ID $PAYLOADLINK)
+echo $SIGNATURE_PAYLOAD
+
+exit 1
+
 # allow env override
 [ -z "$BSA_DTAG" ] && BSA_DTAG="localhost:8081"
 [ -z "$BSA_TMUS" ] && BSA_TMUS="localhost:8082"
@@ -54,8 +88,14 @@ openssl req -x509 -newkey ec -pkeyopt ec_paramgen_curve:secp384r1 -nodes -keyout
 CERT=$(cat $CRT | awk 1 ORS='\\n')
 # extract public key
 openssl x509 -pubkey -in $CRT > $PUB_DTAG
+# create the signature payload:
+# payloadlink = hash(concat(creatorMSP, referenceId))
+PAYLOADLINK=$(echo -ne "DTAG:$REFERENCE_ID" | openssl dgst -sha256 -r | cut -d " " -f1)
+SIGNATUREPAYLOAD=$(echo -ne "DTAG:$REFERENCE_ID:$PAYLOADLINK" | openssl dgst -sha256 -r | cut -d " " -f1)
 # do the signing
-SIGNATURE=$(echo -ne $DOCUMENT | openssl dgst -sha256 -sign $KEY | openssl base64 | tr -d '\n')
+
+
+SIGNATURE=$(echo -ne $SIGNATUREPAYLOAD | openssl dgst -sha256 -sign $KEY | openssl base64 | tr -d '\n')
 # call blockchain adapter
 request "PUT" '{"algorithm": "secp384r1", "certificate" : "'"${CERT}"'", "signature" : "'$SIGNATURE'" }'  http://$BSA_DTAG/signatures/$REFERENCE_ID
 

@@ -17,12 +17,12 @@ function Webhook() {
   if (!this._subscriptions.hasOwnProperty('STORE:SIGNATURE')) {
     this._subscriptions['STORE:SIGNATURE'] = {};
   }
-  if (!this._subscriptions.hasOwnProperty('STORE:DOCUMENTHASH')) {
-    this._subscriptions['STORE:DOCUMENTHASH'] = {};
+  if (!this._subscriptions.hasOwnProperty('STORE:PAYLOADLINK')) {
+    this._subscriptions['STORE:PAYLOADLINK'] = {};
   }
 
   // this.addSubscription('STORE:SIGNATURE', 'http://localhost:8086/test');
-  // this.addSubscription('STORE:DOCUMENTHASH', 'http://localhost:8086/test');
+  // this.addSubscription('STORE:PAYLOADLINK', 'http://localhost:8086/test');
 }
 
 // add a new subscripton to our list
