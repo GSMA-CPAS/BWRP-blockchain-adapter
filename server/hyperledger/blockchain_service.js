@@ -214,8 +214,12 @@ class BlockchainService {
     const tx = contract.createTransaction('PublishReferencePayloadLink');
     console.log('> will store reference payload link ' + key + ' -> ' + value);
 
-    return tx.submit(...[key, value]).then( (_) => {
-      return tx.getTransactionId();
+    return tx.submit(...[key, value]).then( (timestamp) => {
+      return {
+        type: 'hlf',
+        txId: tx.getTransactionId(),
+        timestamp: timestamp,
+      };
     }).catch( (error) => {
       return Promise.reject(ErrorCode.fromError(error, 'PublishReferencePayloadLink('+key+',' + value+') failed'));
     });
@@ -260,13 +264,9 @@ class BlockchainService {
             // calculate reference payload Link:
             return self.createReferencePayloadLink(network, contract, referenceID, payloadHash).then( (link) => {
               // publish the link on the ledger
-              return self.publishReferencePayloadLink(contract, link.key, link.value).then( (txId) => {
-                // return the full document data here
-                return {
-                  txId: txId,
-                  referenceID: referenceID,
-                  todo: 'TODO: add full document here and move txId to the blockchain entry',
-                };
+              return self.publishReferencePayloadLink(contract, link.key, link.value).then( (blockchainRef) => {
+                // now its safe to access the document!
+                return self.fetchPrivateDocument(referenceID);
               });
             });
           });
@@ -367,7 +367,8 @@ class BlockchainService {
     const tx = contract.createTransaction('StoreSignature');
     console.log('> will store signature at key ' + storageKey);
 
-    return tx.submit(...[storageKey, signature]).then( (_) => {
+    return tx.submit(...[storageKey, signature]).then( (timestamp) => {
+      console.log('> signature stored. timestamp ' + timestamp + ', txid + ' +tx.getTransactionId());
       return tx.getTransactionId();
     }).catch( (error) => {
       return Promise.reject(ErrorCode.fromError(error, 'StoreSignature(' + storageKey + ', ...) failed'));
@@ -519,7 +520,7 @@ class BlockchainService {
         // check for error
         if (document == '{}') {
           console.log('> got no results');
-          return {};
+          return Promise.reject(new ErrorCode('ERROR_REFERENCE_ID_UNKNOWN', 'failed to fetch document with referenceID ' + referenceID));
         }
 
         return document.toString();

@@ -5,7 +5,8 @@
   "main": "index.js",
   "scripts": {
     "start": "./tools/make_tags.sh; node index.js",
-    "lint": "eslint ."
+    "lint": "eslint .",
+    "lintfix": "eslint . --fix"
   },
   "keywords": [
     "openapi-generator",

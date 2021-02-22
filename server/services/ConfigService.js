@@ -1,6 +1,6 @@
 const Service = require('./Service');
 const {BlockchainService} = require('../hyperledger/blockchain_service');
-const {Certificate} = require('crypto');
+
 
 /** Update the configuration of the offchain-db-adapter
    * @param {OffchainDBConfig} body - A configuration for the offchain-db-adapter

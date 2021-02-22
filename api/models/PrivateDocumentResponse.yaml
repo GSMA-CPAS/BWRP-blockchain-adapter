@@ -2,8 +2,8 @@ title: PrivateDocumentResponse
 type: object
 required:
   - fromMSP
-  - dataHash
-  - timestamp
+  - payloadHash
+  - blockchainRef
   - referenceID
 allOf:
   - $ref: 'PrivateDocument.yaml'
@@ -11,12 +11,12 @@ properties:
   fromMSP:
     type: string
     description: The MSP that creates this document (optional on request)
-  dataHash:
+  payloadHash:
     type: string
     description: The hash over the document
-  timestamp: 
-    type: string
-    description: The timestamp when the document was stored in the local database.
+  blockchainRef: 
+    type: object
+    $ref: BlockchainRef.yaml
   referenceID:
+    description: The referenceID of the document that was added
     type: string
-    description: The referenceID of the document

@@ -5,7 +5,7 @@ info:
     name: Simon Schulz
   description: This is the REST api specification for the blockchain-adapter
   title: Blockchain-Adapter
-  version: 0.0.8
+  version: 0.1.1
 servers:
 - url: /
 tags:
@@ -119,7 +119,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/PrivateDocumentAdded'
+                $ref: '#/components/schemas/PrivateDocumentResponse'
           description: Successful operation, returns the referenceID and the txID
             of the stored document
         "500":
@@ -489,35 +489,49 @@ components:
   schemas:
     PrivateDocument:
       example:
-        data: data
+        payload: payload
         toMSP: toMSP
       properties:
         toMSP:
           description: The partner MSP that is also involved
           type: string
-        data:
-          description: A base64 encoded document
+        payload:
+          description: A base64 encoded payload
           type: string
       required:
-      - data
+      - payload
       - toMSP
       title: PrivateDocument
       type: object
-    PrivateDocumentAdded:
+    PrivateDocumentResponse:
+      allOf:
+      - $ref: '#/components/schemas/PrivateDocument'
       example:
-        txID: txID
+        fromMSP: fromMSP
+        payloadHash: payloadHash
+        blockchainRef:
+          txId: txId
+          type: type
+          timestamp: timestamp
         referenceID: referenceID
       properties:
+        fromMSP:
+          description: The MSP that creates this document (optional on request)
+          type: string
+        payloadHash:
+          description: The hash over the document
+          type: string
+        blockchainRef:
+          $ref: '#/components/schemas/BlockchainRef'
         referenceID:
           description: The referenceID of the document that was added
           type: string
-        txID:
-          description: The hyperledger TX ID of the successfull add
-          type: string
       required:
+      - blockchainRef
+      - fromMSP
+      - payloadHash
       - referenceID
-      - txID
-      title: PrivateDocumentAdded
+      title: PrivateDocumentResponse
       type: object
     ErrorCode:
       properties:
@@ -544,34 +558,6 @@ components:
       - code
       - message
       title: ErrorCode
-      type: object
-    PrivateDocumentResponse:
-      allOf:
-      - $ref: '#/components/schemas/PrivateDocument'
-      example:
-        fromMSP: fromMSP
-        dataHash: dataHash
-        referenceID: referenceID
-        timestamp: timestamp
-      properties:
-        fromMSP:
-          description: The MSP that creates this document (optional on request)
-          type: string
-        dataHash:
-          description: The hash over the document
-          type: string
-        timestamp:
-          description: The timestamp when the document was stored in the local database.
-          type: string
-        referenceID:
-          description: The referenceID of the document
-          type: string
-      required:
-      - dataHash
-      - fromMSP
-      - referenceID
-      - timestamp
-      title: PrivateDocumentResponse
       type: object
     SubscriptionRequest:
       example:
@@ -660,4 +646,25 @@ components:
       required:
       - URI
       title: OffchainDBConfig
+      type: object
+    BlockchainRef:
+      example:
+        txId: txId
+        type: type
+        timestamp: timestamp
+      properties:
+        type:
+          description: The tyoe of the blockchain, for now this is hlf
+          type: string
+        txId:
+          description: The transaction id as stored on the ledger
+          type: string
+        timestamp:
+          description: The timestamp when the document was committed RFC3339
+          type: string
+      required:
+      - timestamp
+      - txId
+      - type
+      title: BlockchainRef
       type: object

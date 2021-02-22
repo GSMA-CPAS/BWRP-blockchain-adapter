@@ -2,7 +2,7 @@ openapi: 3.0.3
 info:
   title: Blockchain-Adapter
   description: This is the REST api specification for the blockchain-adapter
-  version: 0.0.8
+  version: 0.1.1
   contact:
     name: Simon Schulz
     email: Simon.Schulz01@telekom.de
@@ -95,7 +95,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: models/PrivateDocumentAdded.yaml
+                $ref: models/PrivateDocumentResponse.yaml
         '500':
           description: Internal Error
           content:

@@ -121,7 +121,7 @@ No authorization required
 
 <a name="uploadPrivateDocument"></a>
 # **uploadPrivateDocument**
-> PrivateDocumentAdded uploadPrivateDocument(body)
+> PrivateDocumentResponse uploadPrivateDocument(body)
 
 
 
@@ -135,7 +135,7 @@ Name | Type | Description  | Notes
 
 ### Return type
 
-[**PrivateDocumentAdded**](../Models/PrivateDocumentAdded.md)
+[**PrivateDocumentResponse**](../Models/PrivateDocumentResponse.md)
 
 ### Authorization
 

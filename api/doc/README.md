@@ -28,11 +28,11 @@ Class | Method | HTTP request | Description
 <a name="documentation-for-models"></a>
 ## Documentation for Models
 
+ - [BlockchainRef](./Models/BlockchainRef.md)
  - [DocumentSignature](./Models/DocumentSignature.md)
  - [ErrorCode](./Models/ErrorCode.md)
  - [OffchainDBConfig](./Models/OffchainDBConfig.md)
  - [PrivateDocument](./Models/PrivateDocument.md)
- - [PrivateDocumentAdded](./Models/PrivateDocumentAdded.md)
  - [PrivateDocumentResponse](./Models/PrivateDocumentResponse.md)
  - [SubscriptionPayload](./Models/SubscriptionPayload.md)
  - [SubscriptionRequest](./Models/SubscriptionRequest.md)

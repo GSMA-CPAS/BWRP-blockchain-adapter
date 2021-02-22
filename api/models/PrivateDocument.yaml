@@ -4,9 +4,9 @@ properties:
   toMSP:
     type: string
     description: The partner MSP that is also involved
-  data:
+  payload:
     type: string
-    description: A base64 encoded document
+    description: A base64 encoded payload
 required:
   - toMSP
-  - data
+  - payload

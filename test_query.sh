@@ -110,7 +110,7 @@ request PUT "[\"$(cat $DIR/root.TMUS.pem | awk 1 ORS='\\n' )\"]" http://$BSA_TMU
 
 echo "###################################################"
 echo "> storing document on both parties by calling the function on DTAG with the partner id TMUS"
-RES=$(request "POST" '{ "toMSP" : "TMUS", "data" : "'$DOCUMENT64'" }'  http://$BSA_DTAG/private-documents)
+RES=$(request "POST" '{ "toMSP" : "TMUS", "payload" : "'$DOCUMENT64'", "data" : "'$DOCUMENT64'" }'  http://$BSA_DTAG/private-documents)
 echo $RES
 REFERENCE_ID=$(echo "$RES" | jq -r .referenceID)
 PAYLOADLINK=$(payloadlink $REFERENCE_ID $DOCUMENTSHA256)

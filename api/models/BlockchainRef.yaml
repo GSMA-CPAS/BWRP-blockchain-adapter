@@ -1,0 +1,16 @@
+title: BlockchainRef
+type: object
+required:
+  - type
+  - txId
+  - timestamp
+properties:
+  type:
+    type: string
+    description: The tyoe of the blockchain, for now this is hlf
+  txId:
+    type: string
+    description: The transaction id as stored on the ledger
+  timestamp:
+    type: string
+    description: The timestamp when the document was committed RFC3339
