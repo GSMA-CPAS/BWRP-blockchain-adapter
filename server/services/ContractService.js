@@ -87,7 +87,7 @@ const uploadPrivateDocument = ({body}) => new Promise(
     async (resolve, reject) => {
       const blockchainConnection = new BlockchainService(process.env.BSA_CCP);
 
-      blockchainConnection.addDocument(body['toMSP'], body['data'])
+      blockchainConnection.addDocument(body['toMSP'], body['payload'])
           .then( (responseJSON) => {
             console.log('> both parties stored data with referenceID ' + responseJSON.referenceID);
             resolve(Service.successResponse(responseJSON, 200));
