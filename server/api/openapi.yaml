@@ -568,7 +568,7 @@ components:
           description: The Event name
           enum:
           - STORE:SIGNATURE
-          - STORE:DOCUMENTHASH
+          - STORE:PAYLOADLINK
           type: string
         callbackUrl:
           description: The location where data will be sent
