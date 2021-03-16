@@ -316,9 +316,9 @@ paths:
       - contract
       x-codegen-request-body-name: body
       x-eov-operation-handler: controllers/ContractController
-  /signatures/{referenceID}/{signer}:
+  /signatures/{referenceID}/{signerMSP}:
     get:
-      description: Fetch all signatures for a given referenceID and a signer from
+      description: Fetch all signatures for a given referenceID and a signerMSP from
         the ledger
       operationId: fetchSignatures
       parameters:
@@ -333,7 +333,7 @@ paths:
       - description: The signers MSP name
         explode: false
         in: path
-        name: signer
+        name: signerMSP
         required: true
         schema:
           type: string

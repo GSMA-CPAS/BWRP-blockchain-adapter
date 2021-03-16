@@ -121,9 +121,9 @@ echo "> dtag signs contract"
 CERT=$(cat $DIR/user.DTAG.crt_newline)
 SIGNATUREPAYLOAD=$(payload "DTAG" "$REFERENCE_ID" "$PAYLOADLINK")
 echo -e "payload to sign <$SIGNATUREPAYLOAD>"
-SIGNATURE=$(echo -ne $SIGNATUREPAYLOAD | openssl dgst -sha256 -sign $DIR/user.DTAG.key | openssl base64 | tr -d '\n')
+SIGNATURE_DTAG=$(echo -ne $SIGNATUREPAYLOAD | openssl dgst -sha256 -sign $DIR/user.DTAG.key | openssl base64 | tr -d '\n')
 # call blockchain adapter
-RES=$(request "PUT" '{"algorithm": "secp384r1", "certificate" : "'"${CERT}"'", "signature" : "'$SIGNATURE'" }'  http://$BSA_DTAG/signatures/$REFERENCE_ID)
+RES=$(request "PUT" '{"algorithm": "secp384r1", "certificate" : "'"${CERT}"'", "signature" : "'$SIGNATURE_DTAG'" }'  http://$BSA_DTAG/signatures/$REFERENCE_ID)
 TXID_DTAG=$(echo $RES | jq -r .txID)
 echo "> stored signature with txid $TXID_DTAG"
 
@@ -134,12 +134,43 @@ CERT=$(cat $DIR/user.TMUS.crt_newline)
 
 SIGNATUREPAYLOAD=$(payload "TMUS" "$REFERENCE_ID" "$PAYLOADLINK")
 echo -e "payload to sign <$SIGNATUREPAYLOAD>"
-SIGNATURE=$(echo -ne $SIGNATUREPAYLOAD | openssl dgst -sha256 -sign $DIR/user.TMUS.key | openssl base64 | tr -d '\n')
+SIGNATURE_TMUS=$(echo -ne $SIGNATUREPAYLOAD | openssl dgst -sha256 -sign $DIR/user.TMUS.key | openssl base64 | tr -d '\n')
 
 # call blockchain adapter
-RES=$(request "PUT" '{"algorithm": "secp384r1", "certificate" : "'"${CERT}"'", "signature" : "'$SIGNATURE'" }'  http://$BSA_TMUS/signatures/$REFERENCE_ID)
+RES=$(request "PUT" '{"algorithm": "secp384r1", "certificate" : "'"${CERT}"'", "signature" : "'$SIGNATURE_TMUS'" }'  http://$BSA_TMUS/signatures/$REFERENCE_ID)
 TXID_TMUS=$(echo $RES | jq -r .txID)
 echo "> stored signature with txid $TXID_TMUS"
+
+
+
+echo "###################################################"
+echo "> test get all signatures call on dtag: signed by TMUS "
+RES=$(request "GET" '' http://$BSA_DTAG/signatures/$REFERENCE_ID/TMUS)
+echo $RES | jq 
+#echo $RES | jq .\"$TXID_TMUS\".signature
+RECEIVED=$(echo $RES | jq -r .\"$TXID_TMUS\".signature)
+if [ $RECEIVED == "$SIGNATURE_TMUS" ]; then
+    echo "SIGNATURE FOUND!"
+else
+    echo "FAILED, expected: $SIGNATURE_TMUS"
+    echo "received        : $RECEIVED"
+    exit 1
+fi
+
+echo "###################################################"
+echo "> test get all signatures call on dtag: signed by DTAG "
+RES=$(request "GET" '' http://$BSA_DTAG/signatures/$REFERENCE_ID/DTAG)
+echo $RES | jq 
+#echo $RES | jq .\"$TXID_DTAG\".signature
+RECEIVED=$(echo $RES | jq -r .\"$TXID_DTAG\".signature)
+if [ $RECEIVED == "$SIGNATURE_DTAG" ]; then
+    echo "SIGNATURE FOUND!"
+else
+    echo "FAILED, expected: $SIGNATURE_DTAG"
+    echo "received        : $RECEIVED"
+    exit 1
+fi
+
 
 echo "###################################################"
 echo "> verify dtag signature on-chain"

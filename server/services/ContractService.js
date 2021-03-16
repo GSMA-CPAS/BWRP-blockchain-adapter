@@ -59,16 +59,16 @@ const fetchPrivateDocumentReferenceIDs = () => new Promise(
     },
 );
 
-/** Fetch all signatures for a given msp and a given document from the ledger
+/** Fetch all signatures for a given signer msp and a given document from the ledger
    * @param {string} referenceID - The referenceID of a document
-   * @param {string} msp - A MSP name
+   * @param {string} signerMSP - the MSP of the signer
    * @return {string}
   */
-const fetchSignatures = ({referenceID, msp}) => new Promise(
+const fetchSignatures = ({referenceID, signerMSP}) => new Promise(
     async (resolve, reject) => {
       const blockchainConnection = new BlockchainService(process.env.BSA_CCP);
 
-      blockchainConnection.fetchSignatures(msp, referenceID)
+      blockchainConnection.fetchSignatures(signerMSP, referenceID)
           .then( (signatures) => {
             resolve(Service.successResponse(signatures, 200));
           }).catch((error) => {

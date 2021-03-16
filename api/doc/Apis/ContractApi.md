@@ -7,7 +7,7 @@ Method | HTTP request | Description
 [**deletePrivateDocument**](ContractApi.md#deletePrivateDocument) | **DELETE** /private-documents/{referenceID} | 
 [**fetchPrivateDocument**](ContractApi.md#fetchPrivateDocument) | **GET** /private-documents/{referenceID} | 
 [**fetchPrivateDocumentReferenceIDs**](ContractApi.md#fetchPrivateDocumentReferenceIDs) | **GET** /private-documents | 
-[**fetchSignatures**](ContractApi.md#fetchSignatures) | **GET** /signatures/{referenceID}/{signer} | 
+[**fetchSignatures**](ContractApi.md#fetchSignatures) | **GET** /signatures/{referenceID}/{signerMSP} | 
 [**uploadPrivateDocument**](ContractApi.md#uploadPrivateDocument) | **POST** /private-documents | 
 [**uploadSignature**](ContractApi.md#uploadSignature) | **PUT** /signatures/{referenceID} | 
 [**verifySignatures**](ContractApi.md#verifySignatures) | **GET** /signatures/{referenceID}/verify/{creator}/{signer} | 
@@ -93,18 +93,18 @@ No authorization required
 
 <a name="fetchSignatures"></a>
 # **fetchSignatures**
-> String fetchSignatures(referenceID, signer)
+> String fetchSignatures(referenceID, signerMSP)
 
 
 
-    Fetch all signatures for a given referenceID and a signer from the ledger
+    Fetch all signatures for a given referenceID and a signerMSP from the ledger
 
 ### Parameters
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
  **referenceID** | **String**| The referenceID of the document | [default to null]
- **signer** | **String**| The signers MSP name | [default to null]
+ **signerMSP** | **String**| The signers MSP name | [default to null]
 
 ### Return type
 

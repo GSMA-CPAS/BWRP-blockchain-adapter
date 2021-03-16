@@ -281,9 +281,9 @@ paths:
               $ref: models/DocumentSignature.yaml
         required: true
       x-codegen-request-body-name: body
-  /signatures/{referenceID}/{signer}:
+  /signatures/{referenceID}/{signerMSP}:
     get:
-      description: Fetch all signatures for a given referenceID and a signer from the ledger
+      description: Fetch all signatures for a given referenceID and a signerMSP from the ledger
       tags:
         - contract
       parameters:
@@ -294,7 +294,7 @@ paths:
             type: string
           description: The referenceID of the document
         - in: path
-          name: signer
+          name: signerMSP
           required: true
           schema:
             type: string
