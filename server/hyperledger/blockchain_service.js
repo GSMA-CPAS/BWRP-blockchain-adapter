@@ -146,22 +146,49 @@ class BlockchainService {
     });
   }
 
+  /** set a cert of the type <type>
+  * @param {string} type - the cert type (e.g. "root")
+  * @param {string} cert - the root cert
+  * @return {Promise}
+  */
+  setCertificate(type, cert) {
+    const self = this;
+
+    return this.network.then( (network) => {
+    // fetch contract
+      const contract = network.getContract(self.connectionProfile.config.contractID);
+
+      // configure certificate
+      console.log('> will configure "'+type+'" certificate');
+      // console.log(cert);
+
+      // send transaction
+      const tx = contract.createTransaction('SetCertificate');
+
+      return tx.submit(...[type, cert]).then( (_) => {
+        return '';
+      }).catch( (error) => {
+        return Promise.reject(ErrorCode.fromError(error, 'SetCertificate('+type+',' +cert+') failed'));
+      });
+    });
+  }
+
   /** store a document
    * @param {Network} network - a fabric network object
    * @param {Contract} contract - a fabric contract object
    * @param {string} onMSP - MSP where to execute this call
    * @param {string} partnerMSP - the partnerMSP
    * @param {string} referenceID - a referenceID of a document
-   * @param {string} documentBase64 - a bas64 encoded document
+   * @param {string} payload - a bas64 encoded document
    * @return {Promise}
   */
-  storeDocument(network, contract, onMSP, partnerMSP, referenceID, documentBase64) {
+  storePrivateDocument(network, contract, onMSP, partnerMSP, referenceID, payload) {
     console.log('> storing document with id ' + referenceID);
 
     // enable filter
     network.queryHandler.setFilter(onMSP);
 
-    return contract.evaluateTransaction('StorePrivateDocument', ...[partnerMSP, referenceID, documentBase64]).then( (result) => {
+    return contract.evaluateTransaction('StorePrivateDocument', ...[partnerMSP, referenceID, payload]).then( (result) => {
       // reset filter
       network.queryHandler.setFilter('');
 
@@ -176,34 +203,34 @@ class BlockchainService {
     });
   }
 
-  /** store a documentHash on the ledger
+  /** publish a reference payload link on the ledger
    * @param {Contract} contract - a fabric contract object
-   * @param {string} storageKey - the storagekey
-   * @param {string} documentHash - a document hash
-   * @param {string} referenceID - the referenceID of the document
+   * @param {string} key - the referencestorage link key
+   * @param {string} value - the referencestorage link value
    * @return {Promise}
   */
-  storeDocumentHash(contract, storageKey, documentHash, referenceID) {
+  publishReferencePayloadLink(contract, key, value) {
     // send transaction
-    const tx = contract.createTransaction('StoreDocumentHash');
-    console.log('> will store signature at key ' + storageKey);
+    const tx = contract.createTransaction('PublishReferencePayloadLink');
+    console.log('> will store reference payload link ' + key + ' -> ' + value);
 
-    return tx.submit(...[storageKey, documentHash]).then( (_) => {
-      const result = {};
-      result.referenceID = referenceID;
-      result.txID = tx.getTransactionId();
-      return result;
+    return tx.submit(...[key, value]).then( (timestamp) => {
+      return {
+        type: 'hlf',
+        txId: tx.getTransactionId(),
+        timestamp: timestamp,
+      };
     }).catch( (error) => {
-      return Promise.reject(ErrorCode.fromError(error, 'StoreDocumentHash('+storageKey+',' + documentHash+') failed'));
+      return Promise.reject(ErrorCode.fromError(error, 'PublishReferencePayloadLink('+key+',' + value+') failed'));
     });
   }
 
   /** add a document
    * @param {string} partnerMSP - the partnerMSP
-   * @param {string} documentBase64 - a bas64 encoded document
+   * @param {string} payload - a bas64 encoded payload (e.g. a document)
    * @return {Promise}
   */
-  addDocument(partnerMSP, documentBase64) {
+  addDocument(partnerMSP, payload) {
     const self = this;
 
     return this.network.then( (network) => {
@@ -211,7 +238,7 @@ class BlockchainService {
       const contract = network.getContract(self.connectionProfile.config.contractID);
 
       // calc expected hash
-      const expectedHash = crypto.createHash('sha256').update(documentBase64).digest('hex');
+      const payloadHash = crypto.createHash('sha256').update(payload).digest('hex');
 
       // fetch our MSP name
       const fromMSP = self.connectionProfile.organizations[self.connectionProfile.client.organization].mspid;
@@ -219,24 +246,28 @@ class BlockchainService {
       // fetch referenceID
       return self.createReferenceID(network, contract).then( (referenceID) => {
         // EVALUATE store document on fromMSP (local)
-        return self.storeDocument(network, contract, fromMSP, partnerMSP, referenceID, documentBase64).then( (hash) => {
+        return self.storePrivateDocument(network, contract, fromMSP, partnerMSP, referenceID, payload).then( (storedPayloadHash) => {
           // check hash
-          if (expectedHash != hash) {
-            console.log('ERROR: '+fromMSP + ' stored invalid hash: ' + hash + ' != ' + expectedHash);
+          if (storedPayloadHash != payloadHash) {
+            console.log('ERROR: '+fromMSP + ' stored invalid hash: ' + storedPayloadHash + ' != ' + payloadHash);
             return Promise.reject(ErrorCode.createErrorCode('ERROR_INTERNAL', fromMSP + ' stored invalid hash'));
           }
 
           // EVALUATE store document on partnerMSP (remote)
-          return self.storeDocument(network, contract, partnerMSP, partnerMSP, referenceID, documentBase64).then( () => {
+          return self.storePrivateDocument(network, contract, partnerMSP, partnerMSP, referenceID, payload).then( (storedPayloadHashPartner) => {
             // check hash
-            if (expectedHash != hash) {
-              console.log('ERROR: '+partnerMSP + ' stored invalid hash: ' + hash + ' != ' + expectedHash);
+            if (storedPayloadHashPartner != payloadHash) {
+              console.log('ERROR: '+partnerMSP + ' stored invalid hash: ' + storedPayloadHashPartner + ' != ' + payloadHash);
               return Promise.reject(ErrorCode.createErrorCode('ERROR_INTERNAL', partnerMSP + ' stored invalid hash'));
             }
 
-            // calculate storage key
-            return self.createStorageKey(network, contract, fromMSP, referenceID).then( (storageKey) => {
-              return self.storeDocumentHash(contract, storageKey, hash, referenceID);
+            // calculate reference payload Link:
+            return self.createReferencePayloadLink(network, contract, referenceID, payloadHash).then( (link) => {
+              // publish the link on the ledger
+              return self.publishReferencePayloadLink(contract, link.key, link.value).then( (blockchainRef) => {
+                // now its safe to access the document!
+                return self.fetchPrivateDocument(referenceID);
+              });
             });
           });
         });
@@ -296,6 +327,35 @@ class BlockchainService {
     });
   }
 
+  /** create a reference payload link
+   * @param {Network} network - a fabric network object
+   * @param {Contract} contract - a fabric contract object
+   * @param {referenceID} referenceID - a referenceId
+   * @param {payloadHash} payloadHash - the hash over the payload
+   * @return {Promise}
+  */
+  createReferencePayloadLink(network, contract, referenceID, payloadHash) {
+    // fetch our MSP name
+    const localMSP = this.connectionProfile.organizations[this.connectionProfile.client.organization].mspid;
+
+    // enable filter
+    network.queryHandler.setFilter(localMSP);
+
+    return contract.evaluateTransaction('CreateReferencePayloadLink', ...[referenceID, payloadHash]).then( (resultJSON) => {
+      // reset filter
+      network.queryHandler.setFilter('');
+
+      const result = JSON.parse(resultJSON);
+
+      return {
+        key: result[0],
+        value: result[1],
+      };
+    }).catch( (error) => {
+      return Promise.reject(ErrorCode.fromError(error, 'CreateReferencePayloadLink() failed'));
+    });
+  }
+
   /** store a signature on the ledger
    * @param {Contract} contract - a fabric contract object
    * @param {string} storageKey - a storage key
@@ -307,7 +367,8 @@ class BlockchainService {
     const tx = contract.createTransaction('StoreSignature');
     console.log('> will store signature at key ' + storageKey);
 
-    return tx.submit(...[storageKey, signature]).then( (_) => {
+    return tx.submit(...[storageKey, signature]).then( (timestamp) => {
+      console.log('> signature stored. timestamp ' + timestamp + ', txid + ' +tx.getTransactionId());
       return tx.getTransactionId();
     }).catch( (error) => {
       return Promise.reject(ErrorCode.fromError(error, 'StoreSignature(' + storageKey + ', ...) failed'));
@@ -380,6 +441,37 @@ class BlockchainService {
     });
   }
 
+  /** verify all signatures for given msp, referenceID, and payloadHash
+   * @param {string} referenceID - a referenceID
+   * @param {string} creatorMSP - the MSP that initially created the document
+   * @param {string} signerMSP - the MSP that signed
+   * @return {Promise}
+  */
+  verifySignatures(referenceID, creatorMSP, signerMSP) {
+    const self = this;
+
+    return this.network.then( (network) => {
+      // fetch contract
+      const contract = network.getContract(self.connectionProfile.config.contractID);
+
+      // enable filter to execute query on our MSP
+      const onMSP = this.connectionProfile.organizations[this.connectionProfile.client.organization].mspid;
+      network.queryHandler.setFilter(onMSP);
+
+      // creatorMSPID, targetMSPID, referenceID
+      return contract.evaluateTransaction('VerifySignatures', ...[referenceID, creatorMSP, signerMSP]).then( (results) => {
+        // reset filter
+        network.queryHandler.setFilter('');
+
+        console.log('> reply: VerifySignatures(' +referenceID+', '+ creatorMSP +', '+ signerMSP +') = \n' + JSON.stringify(JSON.parse(results.toString()), null, 4));
+
+        return results.toString();
+      }).catch( (error) => {
+        return Promise.reject(ErrorCode.fromError(error, 'VerifySignatures(' +referenceID+', '+ creatorMSP +', '+ signerMSP +') failed'));
+      });
+    });
+  }
+
   /** get signature for a given referenceID
    * @param {string} msp - a msp
    * @param {string} referenceID - a referenceID of a document
@@ -428,7 +520,7 @@ class BlockchainService {
         // check for error
         if (document == '{}') {
           console.log('> got no results');
-          return {};
+          return Promise.reject(new ErrorCode('ERROR_REFERENCE_ID_UNKNOWN', 'failed to fetch document with referenceID ' + referenceID));
         }
 
         return document.toString();

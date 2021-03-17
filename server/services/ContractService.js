@@ -59,16 +59,16 @@ const fetchPrivateDocumentReferenceIDs = () => new Promise(
     },
 );
 
-/** Fetch all signatures for a given msp and a given document from the ledger
+/** Fetch all signatures for a given signer msp and a given document from the ledger
    * @param {string} referenceID - The referenceID of a document
-   * @param {string} msp - A MSP name
+   * @param {string} signerMSP - the MSP of the signer
    * @return {string}
   */
-const fetchSignatures = ({referenceID, msp}) => new Promise(
+const fetchSignatures = ({referenceID, signerMSP}) => new Promise(
     async (resolve, reject) => {
       const blockchainConnection = new BlockchainService(process.env.BSA_CCP);
 
-      blockchainConnection.fetchSignatures(msp, referenceID)
+      blockchainConnection.fetchSignatures(signerMSP, referenceID)
           .then( (signatures) => {
             resolve(Service.successResponse(signatures, 200));
           }).catch((error) => {
@@ -87,7 +87,7 @@ const uploadPrivateDocument = ({body}) => new Promise(
     async (resolve, reject) => {
       const blockchainConnection = new BlockchainService(process.env.BSA_CCP);
 
-      blockchainConnection.addDocument(body['toMSP'], body['data'])
+      blockchainConnection.addDocument(body['toMSP'], body['payload'])
           .then( (responseJSON) => {
             console.log('> both parties stored data with referenceID ' + responseJSON.referenceID);
             resolve(Service.successResponse(responseJSON, 200));
@@ -121,8 +121,28 @@ const uploadSignature = ({referenceID, body}) => new Promise(
             const resJSON = {};
             resJSON['txID'] = txID;
             console.log('> stored signature with txID ' + txID);
-            resolve(Service.successResponse(resJSON, 200))
-            ;
+            resolve(Service.successResponse(resJSON, 200));
+          }).catch((error) => {
+            reject(Service.rejectResponse({'code': error.code, 'message': error.message}, 500));
+          }).finally( () => {
+            blockchainConnection.disconnect();
+          });
+    },
+);
+
+/** verify the on chain signatures for a given document identified by its referenceID
+   * @param {string} referenceID - The referenceID
+   * @param {string} creator - The msp that initially created the document
+   * @param {string} signer - The msp that signed
+   * @return {string}
+  */
+const verifySignatures = ({referenceID, creator, signer}) => new Promise(
+    async (resolve, reject) => {
+      const blockchainConnection = new BlockchainService(process.env.BSA_CCP);
+
+      blockchainConnection.verifySignatures(referenceID, creator, signer)
+          .then( (response) => {
+            resolve(Service.successResponse(response, 200));
           }).catch((error) => {
             reject(Service.rejectResponse({'code': error.code, 'message': error.message}, 500));
           }).finally( () => {
@@ -138,4 +158,5 @@ module.exports = {
   fetchSignatures,
   uploadPrivateDocument,
   uploadSignature,
+  verifySignatures,
 };

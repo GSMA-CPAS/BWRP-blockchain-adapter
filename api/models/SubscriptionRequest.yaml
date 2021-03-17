@@ -4,7 +4,7 @@ properties:
   eventName:
     description: The Event name
     type: string
-    enum: [STORE:SIGNATURE, STORE:DOCUMENTHASH]
+    enum: [STORE:SIGNATURE, STORE:PAYLOADLINK]
   callbackUrl:
     description: The location where data will be sent
     type: string

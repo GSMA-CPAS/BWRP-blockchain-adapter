@@ -1,11 +1,11 @@
-openapi: 3.0.1
+openapi: 3.0.3
 info:
   contact:
     email: Simon.Schulz01@telekom.de
     name: Simon Schulz
   description: This is the REST api specification for the blockchain-adapter
   title: Blockchain-Adapter
-  version: 0.0.8
+  version: 0.1.1
 servers:
 - url: /
 tags:
@@ -119,7 +119,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/PrivateDocumentAdded'
+                $ref: '#/components/schemas/PrivateDocumentResponse'
           description: Successful operation, returns the referenceID and the txID
             of the stored document
         "500":
@@ -316,9 +316,9 @@ paths:
       - contract
       x-codegen-request-body-name: body
       x-eov-operation-handler: controllers/ContractController
-  /signatures/{referenceID}/{msp}:
+  /signatures/{referenceID}/{signerMSP}:
     get:
-      description: Fetch all signatures for a given msp and a given referenceID from
+      description: Fetch all signatures for a given referenceID and a signerMSP from
         the ledger
       operationId: fetchSignatures
       parameters:
@@ -330,10 +330,10 @@ paths:
         schema:
           type: string
         style: simple
-      - description: A MSP name
+      - description: The signers MSP name
         explode: false
         in: path
-        name: msp
+        name: signerMSP
         required: true
         schema:
           type: string
@@ -346,6 +346,55 @@ paths:
                 type: string
                 x-content-type: text/plain
           description: Successful operation, returns json of signatures
+        "500":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorCode'
+          description: Internal Error
+      tags:
+      - contract
+      x-eov-operation-handler: controllers/ContractController
+  /signatures/{referenceID}/verify/{creator}/{signer}:
+    get:
+      description: Fetch all signatures for a given reference id, creator and signer
+        from the ledger and verify the content against the on chain referencepayload
+        link
+      operationId: verifySignatures
+      parameters:
+      - description: The referenceID
+        explode: false
+        in: path
+        name: referenceID
+        required: true
+        schema:
+          type: string
+        style: simple
+      - description: The initial creator of the contract that was signed. This also
+          verifies the origin on chain.
+        explode: false
+        in: path
+        name: creator
+        required: true
+        schema:
+          type: string
+        style: simple
+      - description: The signer
+        explode: false
+        in: path
+        name: signer
+        required: true
+        schema:
+          type: string
+        style: simple
+      responses:
+        "200":
+          content:
+            text/plain:
+              schema:
+                type: string
+                x-content-type: text/plain
+          description: Successful operation, returns json of verified signatures
         "500":
           content:
             application/json:
@@ -403,39 +452,86 @@ paths:
       - config
       x-codegen-request-body-name: body
       x-eov-operation-handler: controllers/ConfigController
+  /config/certificates/root:
+    put:
+      description: Upload a root certificate
+      operationId: setCertificateRoot
+      requestBody:
+        content:
+          application/json:
+            schema:
+              items:
+                description: BUGBUG openapi does not like string bodies?! Use json
+                  array for now
+                example: '["-----BEGIN CERTIFICATE-----..."]'
+                type: string
+              type: array
+        description: Set the signature root certificate.
+        required: true
+      responses:
+        "200":
+          content:
+            text/plain:
+              schema:
+                type: string
+                x-content-type: text/plain
+          description: Successful operation
+        "500":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorCode'
+          description: Internal Error
+      tags:
+      - config
+      x-eov-operation-handler: controllers/ConfigController
 components:
   schemas:
     PrivateDocument:
       example:
-        data: data
+        payload: payload
         toMSP: toMSP
       properties:
         toMSP:
           description: The partner MSP that is also involved
           type: string
-        data:
-          description: A base64 encoded document
+        payload:
+          description: A base64 encoded payload
           type: string
       required:
-      - data
+      - payload
       - toMSP
       title: PrivateDocument
       type: object
-    PrivateDocumentAdded:
+    PrivateDocumentResponse:
+      allOf:
+      - $ref: '#/components/schemas/PrivateDocument'
       example:
-        txID: txID
+        fromMSP: fromMSP
+        payloadHash: payloadHash
+        blockchainRef:
+          txId: txId
+          type: type
+          timestamp: timestamp
         referenceID: referenceID
       properties:
+        fromMSP:
+          description: The MSP that creates this document (optional on request)
+          type: string
+        payloadHash:
+          description: The hash over the document
+          type: string
+        blockchainRef:
+          $ref: '#/components/schemas/BlockchainRef'
         referenceID:
           description: The referenceID of the document that was added
           type: string
-        txID:
-          description: The hyperledger TX ID of the successfull add
-          type: string
       required:
+      - blockchainRef
+      - fromMSP
+      - payloadHash
       - referenceID
-      - txID
-      title: PrivateDocumentAdded
+      title: PrivateDocumentResponse
       type: object
     ErrorCode:
       properties:
@@ -463,34 +559,6 @@ components:
       - message
       title: ErrorCode
       type: object
-    PrivateDocumentResponse:
-      allOf:
-      - $ref: '#/components/schemas/PrivateDocument'
-      example:
-        fromMSP: fromMSP
-        dataHash: dataHash
-        referenceID: referenceID
-        timestamp: timestamp
-      properties:
-        fromMSP:
-          description: The MSP that creates this document (optional on request)
-          type: string
-        dataHash:
-          description: The hash over the document
-          type: string
-        timestamp:
-          description: The timestamp when the document was stored in the local database.
-          type: string
-        referenceID:
-          description: The referenceID of the document
-          type: string
-      required:
-      - dataHash
-      - fromMSP
-      - referenceID
-      - timestamp
-      title: PrivateDocumentResponse
-      type: object
     SubscriptionRequest:
       example:
         eventName: STORE:SIGNATURE
@@ -500,7 +568,7 @@ components:
           description: The Event name
           enum:
           - STORE:SIGNATURE
-          - STORE:DOCUMENTHASH
+          - STORE:PAYLOADLINK
           type: string
         callbackUrl:
           description: The location where data will be sent
@@ -578,4 +646,25 @@ components:
       required:
       - URI
       title: OffchainDBConfig
+      type: object
+    BlockchainRef:
+      example:
+        txId: txId
+        type: type
+        timestamp: timestamp
+      properties:
+        type:
+          description: The tyoe of the blockchain, for now this is hlf
+          type: string
+        txId:
+          description: The transaction id as stored on the ledger
+          type: string
+        timestamp:
+          description: The timestamp when the document was committed RFC3339
+          type: string
+      required:
+      - timestamp
+      - txId
+      - type
+      title: BlockchainRef
       type: object

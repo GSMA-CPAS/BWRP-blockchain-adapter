@@ -1,8 +1,8 @@
-openapi: 3.0.1
+openapi: 3.0.3
 info:
   title: Blockchain-Adapter
   description: This is the REST api specification for the blockchain-adapter
-  version: 0.0.8
+  version: 0.1.1
   contact:
     name: Simon Schulz
     email: Simon.Schulz01@telekom.de
@@ -95,7 +95,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: models/PrivateDocumentAdded.yaml
+                $ref: models/PrivateDocumentResponse.yaml
         '500':
           description: Internal Error
           content:
@@ -281,9 +281,9 @@ paths:
               $ref: models/DocumentSignature.yaml
         required: true
       x-codegen-request-body-name: body
-  /signatures/{referenceID}/{msp}:
+  /signatures/{referenceID}/{signerMSP}:
     get:
-      description: Fetch all signatures for a given msp and a given referenceID from the ledger
+      description: Fetch all signatures for a given referenceID and a signerMSP from the ledger
       tags:
         - contract
       parameters:
@@ -294,15 +294,54 @@ paths:
             type: string
           description: The referenceID of the document
         - in: path
-          name: msp
+          name: signerMSP
           required: true
           schema:
             type: string
-          description: A MSP name
+          description: The signers MSP name
       operationId: fetchSignatures
       responses:
         '200':
           description: Successful operation, returns json of signatures
+          content:
+            text/plain:
+              schema:
+                type: string
+                x-content-type: text/plain
+        '500':
+          description: Internal Error
+          content:
+            application/json:
+              schema:
+                $ref: models/ErrorCode.yaml
+  /signatures/{referenceID}/verify/{creator}/{signer}:
+    get:
+      description: Fetch all signatures for a given reference id, creator and signer from the ledger and verify the content against the on chain referencepayload link
+      tags:
+        - contract
+      parameters:
+        - in: path
+          name: referenceID
+          required: true
+          schema:
+            type: string
+          description: The referenceID
+        - in: path
+          name: creator
+          required: true
+          schema:
+            type: string
+          description: The initial creator of the contract that was signed. This also verifies the origin on chain.
+        - in: path
+          name: signer
+          required: true
+          schema:
+            type: string
+          description: The signer 
+      operationId: verifySignatures
+      responses:
+        '200':
+          description: Successful operation, returns json of verified signatures
           content:
             text/plain:
               schema:
@@ -354,6 +393,38 @@ paths:
               schema:
                 $ref: models/OffchainDBConfig.yaml
           description: The current configuration for the offchain-db
+        '500':
+          description: Internal Error
+          content:
+            application/json:
+              schema:
+                $ref: models/ErrorCode.yaml
+  /config/certificates/root:
+    put:
+      description: Upload a root certificate
+      tags:
+        - config
+      operationId: setCertificateRoot
+      requestBody:
+        description: Set the signature root certificate.
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                type: string
+                description: BUGBUG openapi does not like string bodies?! Use json array for now
+                example: ["-----BEGIN CERTIFICATE-----..."]
+        
+        required: true
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            text/plain:
+              schema:
+                type: string
+                x-content-type: text/plain
         '500':
           description: Internal Error
           content:

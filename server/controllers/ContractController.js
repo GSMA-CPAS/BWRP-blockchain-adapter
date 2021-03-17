@@ -32,6 +32,10 @@ const uploadSignature = async (request, response) => {
   await Controller.handleRequest(request, response, service.uploadSignature);
 };
 
+const verifySignatures = async (request, response) => {
+  await Controller.handleRequest(request, response, service.verifySignatures);
+};
+
 
 module.exports = {
   deletePrivateDocument,
@@ -40,4 +44,5 @@ module.exports = {
   fetchSignatures,
   uploadPrivateDocument,
   uploadSignature,
+  verifySignatures,
 };

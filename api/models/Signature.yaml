@@ -1,0 +1,17 @@
+title: Signature
+type: object
+properties:
+  document:
+    type: string
+    description: A document
+  signature:
+    type: string
+    description: The signature of the document
+  certificateList:
+    type: string
+    description: A certificate list formatted as JSON array of PEMs
+    example: ["root_pem", "inter_pem", ..., "user_pem"] 
+required:
+  - document
+  - signature
+  - certificateList
