@@ -2,7 +2,7 @@ openapi: 3.0.3
 info:
   title: Blockchain-Adapter
   description: This is the REST api specification for the blockchain-adapter
-  version: 0.1.1
+  version: 0.1.2
   contact:
     name: Simon Schulz
     email: Simon.Schulz01@telekom.de
@@ -342,6 +342,39 @@ paths:
       responses:
         '200':
           description: Successful operation, returns json of verified signatures
+          content:
+            text/plain:
+              schema:
+                type: string
+                x-content-type: text/plain
+        '500':
+          description: Internal Error
+          content:
+            application/json:
+              schema:
+                $ref: models/ErrorCode.yaml
+  /payloadlink/{referenceID}/{creatorMSPID}:
+    get:
+      description: Fetch the stored referencepayloadlink for a given reference id and creator
+      tags:
+        - contract
+      parameters:
+        - in: path
+          name: referenceID
+          required: true
+          schema:
+            type: string
+          description: The referenceID
+        - in: path
+          name: creatorMSPID
+          required: true
+          schema:
+            type: string
+          description: The initial creator MSPID of the contract.
+      operationId: getReferencePayloadLink
+      responses:
+        '200':
+          description: Successful operation, returns the referencepayloadlink
           content:
             text/plain:
               schema:

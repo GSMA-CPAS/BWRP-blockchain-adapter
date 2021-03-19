@@ -8,6 +8,7 @@ Method | HTTP request | Description
 [**fetchPrivateDocument**](ContractApi.md#fetchPrivateDocument) | **GET** /private-documents/{referenceID} | 
 [**fetchPrivateDocumentReferenceIDs**](ContractApi.md#fetchPrivateDocumentReferenceIDs) | **GET** /private-documents | 
 [**fetchSignatures**](ContractApi.md#fetchSignatures) | **GET** /signatures/{referenceID}/{signerMSP} | 
+[**getReferencePayloadLink**](ContractApi.md#getReferencePayloadLink) | **GET** /payloadlink/{referenceID}/{creatorMSPID} | 
 [**uploadPrivateDocument**](ContractApi.md#uploadPrivateDocument) | **POST** /private-documents | 
 [**uploadSignature**](ContractApi.md#uploadSignature) | **PUT** /signatures/{referenceID} | 
 [**verifySignatures**](ContractApi.md#verifySignatures) | **GET** /signatures/{referenceID}/verify/{creator}/{signer} | 
@@ -105,6 +106,34 @@ Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
  **referenceID** | **String**| The referenceID of the document | [default to null]
  **signerMSP** | **String**| The signers MSP name | [default to null]
+
+### Return type
+
+[**String**](../Models/string.md)
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+- **Content-Type**: Not defined
+- **Accept**: text/plain, application/json
+
+<a name="getReferencePayloadLink"></a>
+# **getReferencePayloadLink**
+> String getReferencePayloadLink(referenceID, creatorMSPID)
+
+
+
+    Fetch the stored referencepayloadlink for a given reference id and creator
+
+### Parameters
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **referenceID** | **String**| The referenceID | [default to null]
+ **creatorMSPID** | **String**| The initial creator MSPID of the contract. | [default to null]
 
 ### Return type
 
