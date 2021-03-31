@@ -36,6 +36,28 @@ const getApiStatus = () => new Promise(
 );
 
 
+/**
+* Show status information of an MSP
+*
+* mspid String Name of a MSP
+* returns Object
+* */
+const getStatusMSP = ({ mspid }) => new Promise(
+  async (resolve, reject) => {
+    try {
+      resolve(Service.successResponse({
+        mspid,
+      }));
+    } catch (e) {
+      reject(Service.rejectResponse(
+        e.message || 'Invalid input',
+        e.status || 405,
+      ));
+    }
+  },
+);
+
 module.exports = {
   getApiStatus,
+  getStatusMSP
 };
