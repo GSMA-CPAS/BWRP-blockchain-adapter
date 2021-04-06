@@ -44,16 +44,12 @@ const getApiStatus = () => new Promise(
 * */
 const getStatusMSP = ({ mspid }) => new Promise(
   async (resolve, reject) => {
-    try {
-      resolve(Service.successResponse({
-        mspid,
-      }));
-    } catch (e) {
-      reject(Service.rejectResponse(
-        e.message || 'Invalid input',
-        e.status || 405,
-      ));
-    }
+    const blockchainConnection = new BlockchainService(process.env.BSA_CCP);
+    return blockchainConnection.getOffchainStatus(mspid).then((offchainStatus) => {
+      resolve(Service.successResponse(offchainStatus));
+    }).catch( (error) => {
+      reject(Service.rejectResponse({'code': error.code, 'message': error.message}, 500));
+    });
   },
 );
 
