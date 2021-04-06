@@ -103,10 +103,10 @@ createRoot TMUS
 createUserCert TMUS
 
 echo "###################################################"
-echo "> getting status information of DTAG"
-RES=$(request "GET" '' http://$BSA_DTAG/status/offchain/DTAG)
+echo "> getting status information of TMUS"
+RES=$(request "GET" '' http://$BSA_DTAG/status/offchain/TMUS)
 STATUS=$(echo $RES | jq -r .status)
-echo "DTAG Status: $STATUS"
+echo "TMUS Status: $STATUS"
 if [ $STATUS != "OK" ]; then
     exit 1
 fi
