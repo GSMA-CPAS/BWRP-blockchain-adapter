@@ -103,6 +103,15 @@ createRoot TMUS
 createUserCert TMUS
 
 echo "###################################################"
+echo "> getting status information of DTAG"
+RES=$(request "GET" '' http://$BSA_DTAG/status/offchain/DTAG)
+STATUS=$(echo $RES | jq -r .status)
+echo "DTAG Status: $STATUS"
+if [ $STATUS != "OK" ]; then
+    exit 1
+fi
+
+echo "###################################################"
 echo "> storing root cert on DTAG"
 request PUT "[\"$(cat $DIR/root.DTAG.pem | awk 1 ORS='\\n' )\"]" http://$BSA_DTAG/config/certificates/root
 echo "> storing root cert on TMUS"
