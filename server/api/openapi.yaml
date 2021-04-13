@@ -424,6 +424,45 @@ paths:
       tags:
       - contract
       x-eov-operation-handler: controllers/ContractController
+  /payloadlink/{referenceID}/{creatorMSPID}:
+    get:
+      description: Fetch the stored referencepayloadlink for a given reference id
+        and creator
+      operationId: getReferencePayloadLink
+      parameters:
+      - description: The referenceID
+        explode: false
+        in: path
+        name: referenceID
+        required: true
+        schema:
+          type: string
+        style: simple
+      - description: The initial creator MSPID of the contract.
+        explode: false
+        in: path
+        name: creatorMSPID
+        required: true
+        schema:
+          type: string
+        style: simple
+      responses:
+        "200":
+          content:
+            text/plain:
+              schema:
+                type: string
+                x-content-type: text/plain
+          description: Successful operation, returns the referencepayloadlink
+        "500":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorCode'
+          description: Internal Error
+      tags:
+      - contract
+      x-eov-operation-handler: controllers/ContractController
   /config/offchain-db:
     get:
       description: Read back the configuration of the offchain-db

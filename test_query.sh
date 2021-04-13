@@ -150,7 +150,16 @@ RES=$(request "PUT" '{"algorithm": "secp384r1", "certificate" : "'"${CERT}"'", "
 TXID_TMUS=$(echo $RES | jq -r .txID)
 echo "> stored signature with txid $TXID_TMUS"
 
-
+echo "###################################################"
+echo "> verifying reference payload link for creator "
+RES=$(request "GET" '' http://$BSA_DTAG/payloadlink/$REFERENCE_ID/DTAG)
+if [ $RES == "$PAYLOADLINK" ]; then
+    echo "> ok. payloadlink on ledger matches local one!"
+else
+    echo "FAILED, expected: $PAYLOADLINK"
+    echo "received        : $RES"
+    exit 1
+fi
 
 echo "###################################################"
 echo "> test get all signatures call on dtag: signed by TMUS "

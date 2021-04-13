@@ -151,6 +151,26 @@ const verifySignatures = ({referenceID, creator, signer}) => new Promise(
     },
 );
 
+/** Fetch the stored referencepayloadlink for a given reference id and creator
+ * @param {string} referenceID - the referenceID
+ * @param {string} creatorMSPID - the initial creator of the contract.
+ * @return {string}
+*/
+const getReferencePayloadLink = ({referenceID, creatorMSPID}) => new Promise(
+    async (resolve, reject) => {
+      const blockchainConnection = new BlockchainService(process.env.BSA_CCP);
+
+      blockchainConnection.getReferencePayloadLink(referenceID, creatorMSPID)
+          .then( (response) => {
+            resolve(Service.successResponse(response, 200));
+          }).catch((error) => {
+            reject(Service.rejectResponse({'code': error.code, 'message': error.message}, 500));
+          }).finally( () => {
+            blockchainConnection.disconnect();
+          });
+    },
+);
+
 module.exports = {
   fetchPrivateDocument,
   deletePrivateDocument,
@@ -159,4 +179,5 @@ module.exports = {
   uploadPrivateDocument,
   uploadSignature,
   verifySignatures,
+  getReferencePayloadLink,
 };

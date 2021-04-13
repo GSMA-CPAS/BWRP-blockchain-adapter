@@ -699,6 +699,38 @@ class BlockchainService {
       return Promise.reject(new ErrorCode('ERROR_INTERNAL', 'getBlockchainStatus() failed'));
     });
   }
+
+
+  /** get a reference payloadlink from the ledger
+   * @param {referenceId} referenceId - a reference Id
+   * @param {creatorMSPID} creatorMSPID - the initial creator
+   * @return {Promise} referencepayload link
+  */
+  getReferencePayloadLink(referenceId, creatorMSPID) {
+    const self = this;
+
+    return this.network.then( (network) => {
+    // fetch contract
+      const contract = network.getContract(self.connectionProfile.config.contractID);
+
+      console.log('> fetching referencepayloadlink for referenceId ' + referenceId);
+
+      // enable filter to execute query on our MSP
+      const onMSP = this.connectionProfile.organizations[this.connectionProfile.client.organization].mspid;
+      network.queryHandler.setFilter(onMSP);
+
+      return contract.evaluateTransaction('GetReferencePayloadLink', ...[creatorMSPID, referenceId]).then( (payloadlink) => {
+        // reset filter
+        network.queryHandler.setFilter('');
+
+        console.log('> got payloadlink: ' + payloadlink.toString());
+
+        return payloadlink.toString();
+      }).catch( (error) => {
+        return Promise.reject(ErrorCode.fromError(error, 'GetReferencePayloadLink() failed'));
+      });
+    });
+  }
 }
 
 module.exports = {BlockchainService};
