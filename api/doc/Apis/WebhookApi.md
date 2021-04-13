@@ -11,7 +11,7 @@ Method | HTTP request | Description
 
 <a name="webhooksGet"></a>
 # **webhooksGet**
-> Object webhooksGet()
+> String webhooksGet()
 
 
 
@@ -22,7 +22,7 @@ This endpoint does not need any parameter.
 
 ### Return type
 
-[**Object**](../Models/object.md)
+[**String**](../Models/string.md)
 
 ### Authorization
 

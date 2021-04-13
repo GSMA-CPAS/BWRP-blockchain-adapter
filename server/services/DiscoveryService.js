@@ -13,7 +13,7 @@ const getDiscoveryMSP = ({mspid}) => new Promise(
 
       blockchainConnection.getDiscoveryMSP(mspid)
           .then( (results) => {
-            resolve(Service.successResponse(results, 200));
+            resolve(Service.successResponse(JSON.stringify(results), 200));
           }).catch((error) => {
             reject(Service.rejectResponse({'code': error.code, 'message': error.message}, 500));
           }).finally( () => {
@@ -31,7 +31,7 @@ const getDiscoveryMSPs = () => new Promise(
 
       blockchainConnection.getDiscoveryMSPs()
           .then( (results) => {
-            resolve(Service.successResponse(results, 200));
+            resolve(Service.successResponse(JSON.stringify(results), 200));
           }).catch((error) => {
             reject(Service.rejectResponse({'code': error.code, 'message': error.message}, 500));
           }).finally( () => {

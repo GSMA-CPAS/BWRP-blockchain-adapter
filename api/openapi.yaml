@@ -2,7 +2,7 @@ openapi: 3.0.3
 info:
   title: Blockchain-Adapter
   description: This is the REST api specification for the blockchain-adapter
-  version: 0.1.2
+  version: 0.1.1
   contact:
     name: Simon Schulz
     email: Simon.Schulz01@telekom.de
@@ -30,7 +30,8 @@ paths:
           content:
             application/json:
               schema:
-                type: object
+                type: string
+                x-content-type: application/json
         '500':
           description: Internal Error
           content: {}
@@ -53,7 +54,8 @@ paths:
           content:
             application/json:
               schema:
-                type: object
+                type: string
+                x-content-type: application/json
         '500':
           description: Internal Error
           content: {}
@@ -69,7 +71,8 @@ paths:
           content:
             application/json:
               schema:
-                type: object
+                type: string
+                x-content-type: application/json
         '500':
           description: Internal Error
           content: {}
@@ -239,7 +242,8 @@ paths:
           content: 
             application/json:
               schema:
-                type: object
+                type: string
+                x-content-type: application/json
         '500':
           description: Internal Server Error
           content: {}
@@ -303,6 +307,7 @@ paths:
             text/plain:
               schema:
                 type: string
+                x-content-type: text/plain
         '500':
           description: Internal Error
           content:
@@ -340,7 +345,8 @@ paths:
           content:
             text/plain:
               schema:
-                type: object
+                type: string
+                x-content-type: text/plain
         '500':
           description: Internal Error
           content:
@@ -400,6 +406,7 @@ paths:
             text/plain:
               schema:
                 type: string
+                x-content-type: text/plain
         '500':
           description: Internal Error
           content:
@@ -450,6 +457,7 @@ paths:
             text/plain:
               schema:
                 type: string
+                x-content-type: text/plain
         '500':
           description: Internal Error
           content:

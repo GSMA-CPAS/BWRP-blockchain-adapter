@@ -28,7 +28,7 @@ const getApiStatus = () => new Promise(
 
       return blockchainConnection.getBlockchainStatus().then((blockchainStatus) => {
         statusInfo.hyperledger = blockchainStatus;
-        resolve(Service.successResponse(statusInfo));
+        resolve(Service.successResponse(JSON.stringify(statusInfo)));
       }).catch( (error) => {
         reject(Service.rejectResponse({'code': error.code, 'message': error.message}, 500));
       });
