@@ -14,6 +14,7 @@ Class | Method | HTTP request | Description
 *ContractApi* | [**fetchPrivateDocument**](Apis/ContractApi.md#fetchprivatedocument) | **GET** /private-documents/{referenceID} | Fetch a private document from the database, identified by its referenceID
 *ContractApi* | [**fetchPrivateDocumentReferenceIDs**](Apis/ContractApi.md#fetchprivatedocumentreferenceids) | **GET** /private-documents | show all private documents that are in the transient storage
 *ContractApi* | [**fetchSignatures**](Apis/ContractApi.md#fetchsignatures) | **GET** /signatures/{referenceID}/{signerMSP} | Fetch all signatures for a given referenceID and a signerMSP from the ledger
+*ContractApi* | [**getReferencePayloadLink**](Apis/ContractApi.md#getreferencepayloadlink) | **GET** /payloadlink/{referenceID}/{creatorMSPID} | Fetch the stored referencepayloadlink for a given reference id and creator
 *ContractApi* | [**uploadPrivateDocument**](Apis/ContractApi.md#uploadprivatedocument) | **POST** /private-documents | Upload a private document, shared between our own organization and a partner MSP
 *ContractApi* | [**uploadSignature**](Apis/ContractApi.md#uploadsignature) | **PUT** /signatures/{referenceID} | store a signature for the document identified by its referenceID on the ledger
 *ContractApi* | [**verifySignatures**](Apis/ContractApi.md#verifysignatures) | **GET** /signatures/{referenceID}/verify/{creator}/{signer} | Fetch all signatures for a given reference id, creator and signer from the ledger and verify the content against the on chain referencepayload link

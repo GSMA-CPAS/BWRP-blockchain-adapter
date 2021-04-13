@@ -24,6 +24,10 @@ const fetchSignatures = async (request, response) => {
   await Controller.handleRequest(request, response, service.fetchSignatures);
 };
 
+const getReferencePayloadLink = async (request, response) => {
+  await Controller.handleRequest(request, response, service.getReferencePayloadLink);
+};
+
 const uploadPrivateDocument = async (request, response) => {
   await Controller.handleRequest(request, response, service.uploadPrivateDocument);
 };
@@ -42,6 +46,7 @@ module.exports = {
   fetchPrivateDocument,
   fetchPrivateDocumentReferenceIDs,
   fetchSignatures,
+  getReferencePayloadLink,
   uploadPrivateDocument,
   uploadSignature,
   verifySignatures,
