@@ -176,7 +176,7 @@ No authorization required
 
 <a name="verifySignatures"></a>
 # **verifySignatures**
-> String verifySignatures(referenceID, creator, signer)
+> Object verifySignatures(referenceID, creator, signer)
 
 
 
@@ -192,7 +192,7 @@ Name | Type | Description  | Notes
 
 ### Return type
 
-[**String**](../Models/string.md)
+[**Object**](../Models/object.md)
 
 ### Authorization
 

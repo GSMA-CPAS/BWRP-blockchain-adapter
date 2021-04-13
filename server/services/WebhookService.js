@@ -97,7 +97,7 @@ const webhooksGET = () => new Promise(
     async (resolve, reject) => {
       try {
         const subscriptions = webhookService.getSubscriptions();
-        resolve(Service.successResponse(JSON.stringify(subscriptions), 200));
+        resolve(Service.successResponse(subscriptions, 200));
       } catch (error) {
         reject(Service.rejectResponse({'message': error.toString()}, 500));
       }

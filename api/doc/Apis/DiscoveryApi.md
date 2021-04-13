@@ -10,7 +10,7 @@ Method | HTTP request | Description
 
 <a name="getDiscoveryMSP"></a>
 # **getDiscoveryMSP**
-> String getDiscoveryMSP(mspid)
+> Object getDiscoveryMSP(mspid)
 
 
 
@@ -24,7 +24,7 @@ Name | Type | Description  | Notes
 
 ### Return type
 
-[**String**](../Models/string.md)
+[**Object**](../Models/object.md)
 
 ### Authorization
 
@@ -37,7 +37,7 @@ No authorization required
 
 <a name="getDiscoveryMSPs"></a>
 # **getDiscoveryMSPs**
-> String getDiscoveryMSPs()
+> Object getDiscoveryMSPs()
 
 
 
@@ -48,7 +48,7 @@ This endpoint does not need any parameter.
 
 ### Return type
 
-[**String**](../Models/string.md)
+[**Object**](../Models/object.md)
 
 ### Authorization
 
