@@ -5,6 +5,7 @@ All URIs are relative to *http://localhost*
 Method | HTTP request | Description
 ------------- | ------------- | -------------
 [**getApiStatus**](StatusApi.md#getApiStatus) | **GET** /status | 
+[**getStatusMSP**](StatusApi.md#getStatusMSP) | **GET** /status/offchain/{mspid} | 
 
 
 <a name="getApiStatus"></a>
@@ -17,6 +18,33 @@ Method | HTTP request | Description
 
 ### Parameters
 This endpoint does not need any parameter.
+
+### Return type
+
+[**Object**](../Models/object.md)
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+- **Content-Type**: Not defined
+- **Accept**: application/json
+
+<a name="getStatusMSP"></a>
+# **getStatusMSP**
+> Object getStatusMSP(mspid)
+
+
+
+    Show status information of an MSP
+
+### Parameters
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **mspid** | **String**| Name of a MSP | [default to null]
 
 ### Return type
 

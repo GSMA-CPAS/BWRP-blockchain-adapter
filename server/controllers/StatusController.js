@@ -12,7 +12,12 @@ const getApiStatus = async (request, response) => {
   await Controller.handleRequest(request, response, service.getApiStatus);
 };
 
+const getStatusMSP = async (request, response) => {
+  await Controller.handleRequest(request, response, service.getStatusMSP);
+};
+
 
 module.exports = {
   getApiStatus,
+  getStatusMSP,
 };

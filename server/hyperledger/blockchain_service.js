@@ -651,6 +651,36 @@ class BlockchainService {
     });
   };
 
+  /** get offchain status of msp
+   * @return {Promise} struct with status
+  */
+  getOffchainStatus(mspID) {
+    const self = this;
+    return this.network.then( (_) => {
+      const self = this;
+
+      return this.network.then( (network) => {
+        // fetch contract
+        const contract = network.getContract(self.connectionProfile.config.contractID);
+
+        // enable filter
+        network.queryHandler.setFilter(mspID);
+
+        return contract.evaluateTransaction('CheckOffchainDBConfig', ...[]).then( (_) => {
+          // reset filter
+          network.queryHandler.setFilter('');
+
+          // done
+          console.log('> ' + mspID + ' CheckOffchainDBConfig success');
+
+          return {status: 'OK'};
+        });
+      });
+    }).catch( (error) => {
+      console.log(error);
+      return Promise.reject(new ErrorCode('ERROR_INTERNAL', 'getOffchainStatus() failed'));
+    });
+  }
 
   /** get some hyperledger status
    * @return {Promise} struct with hyperledger status data (channel, contract, and localMSP)
