@@ -1,7 +1,13 @@
+# SPDX-FileCopyrightText: 2021 the BWRP-blockchain-adapter contributors.
+#
+# SPDX-License-Identifier: Apache-2.0
+#
 # codegen
 api/bin
 api/.bin
 api/codegen_server
+
+server/webhook_subscriptions.json
 
 #server
 server/.git_info

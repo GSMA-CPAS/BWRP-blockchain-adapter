@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2021 the BWRP-blockchain-adapter contributors.
+//
+// SPDX-License-Identifier: Apache-2.0
+//
 const path = require('path');
 
 const config = {

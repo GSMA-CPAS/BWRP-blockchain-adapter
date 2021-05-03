@@ -1,3 +1,8 @@
+<!--
+ SPDX-FileCopyrightText: 2021 the BWRP-blockchain-adapter contributors.
+
+ SPDX-License-Identifier: Apache-2.0
+-->
 # About
 
 This is a POC for the blockchain-adapter and a proposal for its REST Api..

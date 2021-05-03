@@ -1,4 +1,8 @@
 #!/bin/sh
+# SPDX-FileCopyrightText: 2021 the BWRP-blockchain-adapter contributors.
+#
+# SPDX-License-Identifier: Apache-2.0
+#
 if [ $# -eq 1 ]; then
     COMMIT_HASH=$1
 elif [ -e "../.git" ]; then

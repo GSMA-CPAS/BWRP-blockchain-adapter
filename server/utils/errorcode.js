@@ -1,4 +1,7 @@
-
+// SPDX-FileCopyrightText: 2021 the BWRP-blockchain-adapter contributors.
+//
+// SPDX-License-Identifier: Apache-2.0
+//
 /** ErrorCode implements a custom error class */
 class ErrorCode extends Error {
   /** process a chaincode error, parse the response and return a proper error
