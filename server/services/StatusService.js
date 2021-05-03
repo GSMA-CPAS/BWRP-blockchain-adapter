@@ -41,23 +41,29 @@ const getApiStatus = () => new Promise(
 
 
 /**
-* Show status information of an MSP
+*
 *
 * mspid String Name of a MSP
 * returns Object
 * */
-const getStatusMSP = ({ mspid }) => new Promise(
-  async (resolve, reject) => {
-    const blockchainConnection = new BlockchainService(process.env.BSA_CCP);
-    return blockchainConnection.getOffchainStatus(mspid).then((offchainStatus) => {
-      resolve(Service.successResponse(offchainStatus));
-    }).catch( (error) => {
-      reject(Service.rejectResponse({'code': error.code, 'message': error.message}, 500));
-    });
-  },
+/**
+* Show status information of an MSP
+*
+* @param {string} mspid - The mspid
+* @return {string} - no response value expected for this operation
+* */
+const getStatusMSP = ({mspid}) => new Promise(
+    async (resolve, reject) => {
+      const blockchainConnection = new BlockchainService(process.env.BSA_CCP);
+      return blockchainConnection.getOffchainStatus(mspid).then((offchainStatus) => {
+        resolve(Service.successResponse(offchainStatus));
+      }).catch( (error) => {
+        reject(Service.rejectResponse({'code': error.code, 'message': error.message}, 500));
+      });
+    },
 );
 
 module.exports = {
   getApiStatus,
-  getStatusMSP
+  getStatusMSP,
 };
