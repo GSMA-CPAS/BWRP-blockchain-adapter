@@ -1,5 +1,5 @@
 #!/bin/bash
-# SPDX-FileCopyrightText: 2021 the BWRP-blockchain-adapter contributors.
+# SPDX-FileCopyrightText: 2021 GSMA and all contributors.
 #
 # SPDX-License-Identifier: Apache-2.0
 set -e
@@ -31,7 +31,7 @@ java -jar .bin/${OPENAPI_JAR} generate  -i openapi.yaml  -g markdown -o doc | te
 FILES=$(cat $log |grep writing | cut -d " " -f8)
 
 # define license. NOTE: keep the "" after the SPDX tag in order not to break the reuse parser (bug)
-LICENSE="# SPDX-FileCopyrightText: 2021 the BWRP-blockchain-adapter contributors.\n#\n# SPDX-""License-Identifier: Apache-2.0\n"
+LICENSE="# SPDX-FileCopyrightText: 2021 GSMA and all contributors.\n#\n# SPDX-""License-Identifier: Apache-2.0\n"
 
 while IFS= read -r line; do
    echo "adding license to "$line".license"

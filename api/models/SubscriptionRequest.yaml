@@ -1,4 +1,4 @@
-# SPDX-FileCopyrightText: 2021 the BWRP-blockchain-adapter contributors.
+# SPDX-FileCopyrightText: 2021 GSMA and all contributors.
 #
 # SPDX-License-Identifier: Apache-2.0
 #
