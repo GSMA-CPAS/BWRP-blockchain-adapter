@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2021 GSMA and all contributors.
+//
+// SPDX-License-Identifier: Apache-2.0
+//
 const http = require('http');
 const textBody = require('body');
 const {promisify} = require('util');

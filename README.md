@@ -1,3 +1,8 @@
+<!--
+ SPDX-FileCopyrightText: 2021 GSMA and all contributors.
+
+ SPDX-License-Identifier: Apache-2.0
+-->
 # About
 
 This is a POC for the blockchain-adapter and a proposal for its REST Api..

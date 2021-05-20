@@ -1,9 +1,7 @@
-/**
- * Copyright 2018, 2019 IBM All Rights Reserved.
- *
- * SPDX-License-Identifier: Apache-2.0
- */
-
+// SPDX-FileCopyrightText: 2021 GSMA and all contributors.
+//
+// SPDX-License-Identifier: Apache-2.0
+//
 // based on https://raw.githubusercontent.com/hyperledger/fabric-sdk-node/master/test/ts-scenario/config/handlers/sample-query-handler.ts
 const {ErrorCode} = require('../utils/errorcode');
 

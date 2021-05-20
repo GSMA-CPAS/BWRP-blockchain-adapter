@@ -1,5 +1,8 @@
 #!/bin/sh
-
+# SPDX-FileCopyrightText: 2021 GSMA and all contributors.
+#
+# SPDX-License-Identifier: Apache-2.0
+#
 echo "#####################################################################"
 echo "# WARNING: setting TLS to insecure!"
 echo "#          THIS IS UNSAFE! DO NOT DO THIS IN PRODUCTION SYSTEMS"

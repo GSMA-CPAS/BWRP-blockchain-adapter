@@ -1,4 +1,8 @@
 #!/bin/bash
+# SPDX-FileCopyrightText: 2021 GSMA and all contributors.
+#
+# SPDX-License-Identifier: Apache-2.0
+#
 if [ $# -ne 1 ]; then
   echo "> usage: $0 <HOSTNAME>"
   exit 1

@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2021 GSMA and all contributors.
+//
+// SPDX-License-Identifier: Apache-2.0
+//
 const {v4: uuidv4} = require('uuid');
 const debug = require('debug')('bsa:webhook');
 const got = require('got');

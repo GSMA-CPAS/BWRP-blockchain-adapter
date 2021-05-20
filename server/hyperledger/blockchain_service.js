@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2021 GSMA and all contributors.
+//
+// SPDX-License-Identifier: Apache-2.0
+//
 const fs = require('fs');
 const path = require('path');
 const crypto = require('crypto');
@@ -652,13 +656,12 @@ class BlockchainService {
   };
 
   /** get offchain status of msp
+   * @param {string} mspID - the MSP to get the status from
    * @return {Promise} struct with status
   */
   getOffchainStatus(mspID) {
     const self = this;
     return this.network.then( (_) => {
-      const self = this;
-
       return this.network.then( (network) => {
         // fetch contract
         const contract = network.getContract(self.connectionProfile.config.contractID);

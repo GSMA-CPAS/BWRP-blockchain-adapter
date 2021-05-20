@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2021 GSMA and all contributors.
+//
+// SPDX-License-Identifier: Apache-2.0
+//
 const Service = require('./Service');
 const Webhook = require('../webhook/service');
 const {BlockchainService} = require('../hyperledger/blockchain_service');

@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2021 GSMA and all contributors.
+#
+# SPDX-License-Identifier: Apache-2.0
+#
 title: SubscriptionPayload
 type: object
 properties:
