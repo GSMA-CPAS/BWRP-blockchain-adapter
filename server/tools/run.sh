@@ -27,11 +27,6 @@ if [ ! -z "$BSA_DEBUG" ] && [ "$BSA_DEBUG" -eq "1" ]; then
     #export GRPC_TRACE="all"
 fi
 
-unset http_proxy
-unset https_proxy
-
-
-
 #BASE="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 #$BASE/make_tags.sh || echo "skipped make tag"
 
