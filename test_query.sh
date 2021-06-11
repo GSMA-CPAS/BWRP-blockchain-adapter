@@ -111,9 +111,9 @@ echo "###################################################"
 echo "> creating root and user certs"
 echo "###################################################"
 createRoot DTAG
-createUserCert DTAG '{"attrs":{"CanSignDocument":"yes"}}'
+createUserCert DTAG
 createRoot TMUS
-createUserCert TMUS '{"attrs":{"CanSignDocument":"yes"}}'
+createUserCert TMUS
 
 
 echo "###################################################"
