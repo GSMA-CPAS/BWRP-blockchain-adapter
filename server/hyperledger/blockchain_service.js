@@ -306,6 +306,42 @@ class BlockchainService {
     });
   }
 
+  /** isValidSignature checks an unsubmitted signature for validity
+   * @param {Network} network - a fabric network object
+   * @param {Contract} contract - a fabric contract object
+   * @param {string} creatorMSPID - the msp id of the contract creator
+   * @param {string} referenceID - a referenceID of a document
+   * @param {string} signatureJSON - the signature object json as string
+   * @return {Promise}
+  */
+  isValidSignature(network, contract, creatorMSPID, referenceID, signatureJSON) {
+    // fetch our MSP name
+    const localMSP = this.connectionProfile.organizations[this.connectionProfile.client.organization].mspid;
+
+    // enable filter
+    network.queryHandler.setFilter(localMSP);
+
+    // fetch referencePayloadLink
+    return contract.evaluateTransaction('GetReferencePayloadLink', ...[creatorMSPID, referenceID]).then( (referencePayloadLink) => {
+      // calculate signature payload
+      const signaturePayload = crypto.createHash('sha256').update(localMSP + ':' + referenceID + ':' + referencePayloadLink).digest('hex');
+
+      // check signature
+      console.log('> creatorMSPID      : ' + creatorMSPID);
+      console.log('> signaturePayload  : ' + signaturePayload);
+      console.log('> signature         : ' + signatureJSON);
+
+      const signatureObject = JSON.parse(signatureJSON);
+
+      return contract.evaluateTransaction('IsValidSignature', ...[creatorMSPID, signaturePayload, signatureObject.signature, signatureObject.algorithm, signatureObject.certificate]).then( () => {
+        // reset filter
+        network.queryHandler.setFilter('');
+
+        return;
+      });
+    });
+  };
+
   /** create a unique referenceID
    * @param {Network} network - a fabric network object
    * @param {Contract} contract - a fabric contract object
@@ -380,11 +416,12 @@ class BlockchainService {
   }
 
   /** sign a document
+   * @param {string} creatorMSPID - the msp id of the creator
    * @param {string} referenceID - a document referenceID
    * @param {string} signatureJSON - a signature object
    * @return {Promise}
   */
-  signDocument(referenceID, signatureJSON) {
+  signDocument(creatorMSPID, referenceID, signatureJSON) {
     const self = this;
     console.log('> signDocument(' + referenceID + ', ...)');
 
@@ -397,10 +434,48 @@ class BlockchainService {
 
       // calculate storage key
       return self.createStorageKey(network, contract, localMSP, referenceID).then( (storageKey) => {
-        return self.storeSignature(contract, storageKey, signatureJSON);
+        return self.isValidSignature(network, contract, creatorMSPID, referenceID, signatureJSON).then( () => {
+          return self.storeSignature(contract, storageKey, signatureJSON);
+        });
       });
+    }).catch( (error) => {
+      return Promise.reject(ErrorCode.fromError(error, 'signDocument(' + referenceID + ', ...) failed'));
     });
   }
+
+
+  
+/*
+  return this.network.then( (network) => {
+    // fetch contract
+    const contract = network.getContract(self.connectionProfile.config.contractID);
+
+    // enable filter to execute query on our MSP
+    const onMSP = this.connectionProfile.organizations[this.connectionProfile.client.organization].mspid;
+    network.queryHandler.setFilter(onMSP);
+
+    const creatorMSPID = ?
+    const referencePayloadLink = this.getReferencePayloadLink(referenceId, creatorMSPID)
+    const signaturePayload = util.CalculateHash(util.HashConcat(localMSP, referenceID, referencePayloadLink))
+
+    const signature = signatureJSON.signature
+    const signatureAlgorithm = signatureJSON.algorithm
+    const certChainPEM = signatureJSON.certificate
+    
+    signaturePayload, signature, signatureAlgorithm, certChainPEM
+
+  return contract.evaluateTransaction('IsValidSignature', ...[creatorMSPID, signaturePayload, signature, signatureAlgorithm, certChainPEM]).then( () => {
+    // reset filter
+    network.queryHandler.setFilter('');
+
+    console.log('> reply: IsValidSignature(...)');
+
+    return;
+  }).catch( (error) => {
+    return Promise.reject(ErrorCode.fromError(error, 'IsValidSignature(...) failed'));
+  });
+ */
+
 
   /** get signatures for a given storage key
    * @param {Network} network - a fabric network object
