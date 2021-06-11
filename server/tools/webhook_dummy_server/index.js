@@ -9,8 +9,8 @@ const sleep = promisify(setTimeout);
 
 // config
 const port = 8086;
-var blockchainadapterHost = 'localhost';
-var blockchainadapterPort = 8085;
+let blockchainadapterHost = 'localhost';
+let blockchainadapterPort = 8085;
 
 if (process.env.WEBHOOK_DUMMY_PORT != undefined) {
   port = process.env.WEBHOOK_DUMMY_PORT;
@@ -114,8 +114,6 @@ function subscribe() {
         reject(res.statusCode);
       }
     });
-
-    
 
     req.on('error', (e) => {
       reject(e);

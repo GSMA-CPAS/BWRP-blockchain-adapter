@@ -16,7 +16,11 @@ properties:
   signature:
     type: string
     description: The digital signature over the document
+  contractCreator:
+    type: string
+    description: The initial creator of the contract that is being signed
 required:
   - algorithm
   - certificate
-  - signature  
+  - signature
+  - contractCreator

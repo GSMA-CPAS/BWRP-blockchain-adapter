@@ -93,7 +93,8 @@ const uploadPrivateDocument = ({body}) => new Promise(
 
       blockchainConnection.addDocument(body['toMSP'], body['payload'])
           .then( (responseJSON) => {
-            console.log('> both parties stored data with referenceID ' + responseJSON.referenceID);
+            const responseObject = JSON.parse(responseJSON)
+            console.log('> both parties stored data with referenceID ' + responseObject.referenceID);
             resolve(Service.successResponse(responseJSON, 200));
           }).catch((error) => {
             reject(Service.rejectResponse({'code': error.code, 'message': error.message}, 500));
@@ -117,6 +118,7 @@ const uploadSignature = ({referenceID, body}) => new Promise(
         'algorithm': body['algorithm'],
         'certificate': body['certificate'],
         'signature': body['signature'],
+        'contractCreator': body['contractCreator']
       };
       const signatureJSON = JSON.stringify(signature);
 

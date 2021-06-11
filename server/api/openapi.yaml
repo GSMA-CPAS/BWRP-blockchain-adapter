@@ -670,6 +670,7 @@ components:
         certificate: |-
           -----BEGIN CERTIFICATE-----
           MIICYjCCAemgAwIBA...
+        contractCreator: contractCreator
         algorithm: secp384r1
       properties:
         algorithm:
@@ -685,9 +686,13 @@ components:
         signature:
           description: The digital signature over the document
           type: string
+        contractCreator:
+          description: The initial creator of the contract that is being signed
+          type: string
       required:
       - algorithm
       - certificate
+      - contractCreator
       - signature
       title: DocumentSignature
       type: object

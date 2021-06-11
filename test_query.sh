@@ -72,6 +72,11 @@ function request {
     echo $RET | grep -i "err" > /dev/null && echo $RET > /dev/stderr && exit 1 || : 
 }
 
+function request_noexit {    
+    RET=$(curl -s -S -X $1 -H "Content-Type: application/json" -d "$2" "$3")
+    echo $RET
+}
+
 function createRoot {
     ORG=$1
     echo -ne "[ default ]\nbasicConstraints = critical,CA:true\nkeyUsage = critical,keyCertSign\n" > $DIR/ca.$ORG.ext
@@ -136,7 +141,7 @@ SIGNATUREPAYLOAD=$(payload "DTAG" "$REFERENCE_ID" "$PAYLOADLINK")
 echo -e "payload to sign <$SIGNATUREPAYLOAD>"
 SIGNATURE_DTAG=$(echo -ne $SIGNATUREPAYLOAD | openssl dgst -sha256 -sign $DIR/user.DTAG.key | openssl base64 | tr -d '\n')
 # call blockchain adapter
-RES=$(request "PUT" '{"algorithm": "ecdsaWithSha256", "certificate" : "'"${CERT}"'", "signature" : "'$SIGNATURE_DTAG'" }'  http://$BSA_DTAG/signatures/$REFERENCE_ID)
+RES=$(request "PUT" '{"contractCreator": "DTAG", "algorithm": "ecdsaWithSha256", "certificate" : "'"${CERT}"'", "signature" : "'$SIGNATURE_DTAG'" }'  http://$BSA_DTAG/signatures/$REFERENCE_ID)
 TXID_DTAG=$(echo $RES | jq -r .txID)
 echo "> stored signature with txid $TXID_DTAG"
 
@@ -150,7 +155,7 @@ echo -e "payload to sign <$SIGNATUREPAYLOAD>"
 SIGNATURE_TMUS=$(echo -ne $SIGNATUREPAYLOAD | openssl dgst -sha256 -sign $DIR/user.TMUS.key | openssl base64 | tr -d '\n')
 
 # call blockchain adapter
-RES=$(request "PUT" '{"algorithm": "ecdsaWithSha256", "certificate" : "'"${CERT}"'", "signature" : "'$SIGNATURE_TMUS'" }'  http://$BSA_TMUS/signatures/$REFERENCE_ID)
+RES=$(request "PUT" '{"contractCreator": "DTAG", "algorithm": "ecdsaWithSha256", "certificate" : "'"${CERT}"'", "signature" : "'$SIGNATURE_TMUS'" }'  http://$BSA_TMUS/signatures/$REFERENCE_ID)
 TXID_TMUS=$(echo $RES | jq -r .txID)
 echo "> stored signature with txid $TXID_TMUS"
 
@@ -217,6 +222,29 @@ else
     echo "FAILED"
     exit 1
 fi
+
+
+echo "###################################################"
+echo "> dtag signs contract with a bad signature (e.g. use a foreign one, here tmus)"
+# do the signing
+CERT=$(cat $DIR/user.DTAG.crt_newline)
+SIGNATUREPAYLOAD=$(payload "DTAG" "$REFERENCE_ID" "$PAYLOADLINK")
+echo -e "payload to sign <$SIGNATUREPAYLOAD>"
+SIGNATURE_DTAG=$(echo -ne $SIGNATUREPAYLOAD | openssl dgst -sha256 -sign $DIR/user.DTAG.key | openssl base64 | tr -d '\n')
+# call blockchain adapter
+RES=$(request_noexit "PUT" '{"contractCreator": "DTAG", "algorithm": "ecdsaWithSha256", "certificate" : "'"${CERT}"'", "signature" : "'$SIGNATURE_TMUS'" }'  http://$BSA_DTAG/signatures/$REFERENCE_ID)
+#echo $RES
+ERROR_CODE=$(echo $RES | jq -r .code)
+ERROR_MESSAGE=$(echo $RES | jq -r .message)
+if [ "$ERROR_CODE" != "ERROR_SIGNATURE_INVALID" ]; then
+    echo "> ERROR: wrong error code, got '$ERROR_CODE'"
+    exit 1
+fi;
+if [[ "$ERROR_MESSAGE" != signDocument* ]]; then
+    echo "> ERROR: wrong error response, got '$ERROR_MESSAGE'"
+    exit 1
+fi;
+echo "> looking good, bad signature was sucessfully detected!"
 
 exit 0
 
