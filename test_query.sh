@@ -66,18 +66,21 @@ DOC=$DIR/DOC
 # make sure to remove temp files on exit
 trap "{ rm -fr $DIR; }" EXIT
 
-function request {
+function request {    
     RET=$(curl -s -S -X $1 -H "Content-Type: application/json" -d "$2" "$3")
     echo $RET
     echo $RET | grep -i "err" > /dev/null && echo $RET > /dev/stderr && exit 1 || : 
 }
 
+function request_noexit {    
+    RET=$(curl -s -S -X $1 -H "Content-Type: application/json" -d "$2" "$3")
+    echo $RET
+}
+
 function createRoot {
     ORG=$1
     echo -ne "[ default ]\nbasicConstraints = critical,CA:true\nkeyUsage = critical,keyCertSign\n" > $DIR/ca.$ORG.ext
-    attr_hex=$(echo -n '{"attrs":{"CanSignDocument":"yes"}}' | xxd -ps -c 200 | tr -d '\n')
-    echo -ne "[default]\n1.2.3.4.5.6.7.8.1=DER:$attr_hex\n" > $DIR/user.$ORG.ext
-
+    
     # create ca 
     openssl req -new -newkey ec -pkeyopt ec_paramgen_curve:secp384r1 -nodes -out $DIR/root.$ORG.csr -keyout $DIR/root.$ORG.key  -subj "/CN=ROOT@$ORG/C=DE/ST=NRW/L=Bielefeld/O=$ORG/OU=${ORG}OU" 
     openssl x509 -signkey $DIR/root.$ORG.key -days 365 -req -in $DIR/root.$ORG.csr -out $DIR/root.$ORG.pem  --extfile $DIR/ca.$ORG.ext
@@ -86,16 +89,22 @@ function createRoot {
 
 function createUserCert {
     ORG=$1
-    
+
+    # user attributes
+    attr_hex=$(echo -n '{"attrs":{"CanSignDocument":"yes"}}' | xxd -ps -c 200 | tr -d '\n')
+    echo -ne "[default]\n1.2.3.4.5.6.7.8.1=DER:$attr_hex\n" > $DIR/user.$ORG.ext
+
     # create signing request
     openssl req -newkey ec -pkeyopt ec_paramgen_curve:secp384r1 -nodes -keyout $DIR/user.$ORG.key -out $DIR/user.$ORG.csr  -subj "/CN=user@$ORG/C=DE/ST=NRW/L=Bielefeld/O=$ORG/OU=${ORG}OU"
 
     # use ca to sign it
     openssl x509 -CA $DIR/root.$ORG.crt -CAkey $DIR/root.$ORG.key -CAcreateserial -req -in  $DIR/user.$ORG.csr -out $DIR/user.$ORG.pem -extfile $DIR/user.$ORG.ext -days 365
-    openssl x509 -in $DIR/user.$ORG.pem > $DIR/user.$ORG.crt
+    openssl x509 -in $DIR/user.$ORG.pem | awk 1 ORS='\\n' > $DIR/user.$ORG.crt
+    
 
-    # replace newlines
-    cat $DIR/user.$ORG.crt | awk 1 ORS='\\n' > $DIR/user.$ORG.crt_newline
+    # create an additional "broken" cert that misses the extension flag CanSignDocument
+    openssl x509 -CA $DIR/root.$ORG.crt -CAkey $DIR/root.$ORG.key -CAcreateserial -req -in  $DIR/user.$ORG.csr -out $DIR/user.$ORG.bad.pem -days 365
+    openssl x509 -in $DIR/user.$ORG.bad.pem | awk 1 ORS='\\n' > $DIR/user.$ORG.bad.crt
 }
 
 echo "###################################################"
@@ -105,6 +114,7 @@ createRoot DTAG
 createUserCert DTAG
 createRoot TMUS
 createUserCert TMUS
+
 
 echo "###################################################"
 echo "> getting status information of TMUS"
@@ -131,9 +141,9 @@ PAYLOADLINK=$(payloadlink $REFERENCE_ID $DOCUMENTSHA256)
 echo "###################################################"
 echo "> dtag signs contract"
 # do the signing
-CERT=$(cat $DIR/user.DTAG.crt_newline)
+CERT=$(cat $DIR/user.DTAG.crt)
 SIGNATUREPAYLOAD=$(payload "DTAG" "$REFERENCE_ID" "$PAYLOADLINK")
-echo -e "payload to sign <$SIGNATUREPAYLOAD>"
+echo -e "> payload to sign <$SIGNATUREPAYLOAD>"
 SIGNATURE_DTAG=$(echo -ne $SIGNATUREPAYLOAD | openssl dgst -sha256 -sign $DIR/user.DTAG.key | openssl base64 | tr -d '\n')
 # call blockchain adapter
 RES=$(request "PUT" '{"algorithm": "ecdsaWithSha256", "certificate" : "'"${CERT}"'", "signature" : "'$SIGNATURE_DTAG'" }'  http://$BSA_DTAG/signatures/$REFERENCE_ID)
@@ -143,10 +153,10 @@ echo "> stored signature with txid $TXID_DTAG"
 echo "###################################################"
 echo "> tmus signs contract"
 # do the signing
-CERT=$(cat $DIR/user.TMUS.crt_newline)
+CERT=$(cat $DIR/user.TMUS.crt)
 
 SIGNATUREPAYLOAD=$(payload "TMUS" "$REFERENCE_ID" "$PAYLOADLINK")
-echo -e "payload to sign <$SIGNATUREPAYLOAD>"
+echo -e "> payload to sign <$SIGNATUREPAYLOAD>"
 SIGNATURE_TMUS=$(echo -ne $SIGNATUREPAYLOAD | openssl dgst -sha256 -sign $DIR/user.TMUS.key | openssl base64 | tr -d '\n')
 
 # call blockchain adapter
@@ -217,6 +227,29 @@ else
     echo "FAILED"
     exit 1
 fi
+
+
+echo "###################################################"
+echo "> dtag signs contract with a BAD cert (missing ext)"
+# do the signing
+CERT=$(cat $DIR/user.DTAG.bad.crt)
+SIGNATUREPAYLOAD=$(payload "DTAG" "$REFERENCE_ID" "$PAYLOADLINK")
+echo -e "> payload to sign <$SIGNATUREPAYLOAD>"
+SIGNATURE_DTAG=$(echo -ne $SIGNATUREPAYLOAD | openssl dgst -sha256 -sign $DIR/user.DTAG.key | openssl base64 | tr -d '\n')
+# call blockchain adapter
+RES=$(request_noexit "PUT" '{"algorithm": "ecdsaWithSha256", "certificate" : "'"${CERT}"'", "signature" : "'$SIGNATURE_DTAG'" }'  http://$BSA_DTAG/signatures/$REFERENCE_ID)
+#echo $RES
+ERROR_CODE=$(echo $RES | jq -r .code)
+ERROR_MESSAGE=$(echo $RES | jq -r .message)
+if [ "$ERROR_CODE" != "ERROR_INTERNAL" ]; then
+    echo "> ERROR: wrong error code, got '$ERROR_CODE'"
+    exit 1
+fi;
+if [[ "$ERROR_MESSAGE" != StoreSignature* ]]; then
+    echo "> ERROR: wrong error response, got '$ERROR_MESSAGE'"
+    exit 1
+fi;
+echo "> looking good, bad signature was sucessfully detected!"
 
 exit 0
 
