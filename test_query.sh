@@ -230,11 +230,11 @@ fi
 
 
 echo "###################################################"
-echo "> dtag signs contract with a bad signature (e.g. use a foreign one, here tmus)"
+echo "> dtag signs contract with a bad signature (here: bad payload data)"
 # do the signing
-CERT=$(cat $DIR/user.DTAG.crt_newline)
-SIGNATUREPAYLOAD=$(payload "DTAG" "$REFERENCE_ID" "$PAYLOADLINK")
-echo -e "payload to sign <$SIGNATUREPAYLOAD>"
+CERT=$(cat $DIR/user.DTAG.crt)
+SIGNATUREPAYLOAD="this_is_an_invalid_payload"
+echo -e "> payload to sign <$SIGNATUREPAYLOAD>"
 SIGNATURE_DTAG=$(echo -ne $SIGNATUREPAYLOAD | openssl dgst -sha256 -sign $DIR/user.DTAG.key | openssl base64 | tr -d '\n')
 # call blockchain adapter
 RES=$(request_noexit "PUT" '{"algorithm": "ecdsaWithSha256", "certificate" : "'"${CERT}"'", "signature" : "'$SIGNATURE_TMUS'" }'  http://$BSA_DTAG/signatures/$REFERENCE_ID)
@@ -249,7 +249,7 @@ if [[ "$ERROR_MESSAGE" != signDocument* ]]; then
     echo "> ERROR: wrong error response, got '$ERROR_MESSAGE'"
     exit 1
 fi;
-echo "> looking good, bad signature was sucessfully detected!"
+echo "> looking good, bad signature (wrong cert) was sucessfully detected!"
 
 echo "###################################################"
 echo "> dtag signs contract with a BAD cert (missing ext)"
@@ -263,11 +263,11 @@ RES=$(request_noexit "PUT" '{"algorithm": "ecdsaWithSha256", "certificate" : "'"
 #echo $RES
 ERROR_CODE=$(echo $RES | jq -r .code)
 ERROR_MESSAGE=$(echo $RES | jq -r .message)
-if [ "$ERROR_CODE" != "ERROR_INTERNAL" ]; then
+if [ "$ERROR_CODE" != "ERROR_CERT_INVALID" ]; then
     echo "> ERROR: wrong error code, got '$ERROR_CODE'"
     exit 1
 fi;
-if [[ "$ERROR_MESSAGE" != StoreSignature* ]]; then
+if [[ "$ERROR_MESSAGE" != signDocument* ]]; then
     echo "> ERROR: wrong error response, got '$ERROR_MESSAGE'"
     exit 1
 fi;
