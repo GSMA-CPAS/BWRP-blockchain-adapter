@@ -161,7 +161,7 @@ echo "> stored signature with txid $TXID_TMUS"
 
 echo "###################################################"
 echo "> verifying reference payload link for creator "
-RES=$(request "GET" '' http://$BSA_DTAG/payloadlink/$REFERENCE_ID/DTAG)
+RES=$(request "GET" '' http://$BSA_DTAG/payloadlink/$REFERENCE_ID)
 if [ $RES == "$PAYLOADLINK" ]; then
     echo "> ok. payloadlink on ledger matches local one!"
 else

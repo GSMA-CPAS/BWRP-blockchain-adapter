@@ -320,7 +320,7 @@ class BlockchainService {
     // enable filter
     network.queryHandler.setFilter(localMSP);
 
-    // debug 
+    // debug
     console.log('> signature         : ' + signatureJSON);
 
     // extract object
@@ -490,11 +490,10 @@ class BlockchainService {
 
   /** verify all signatures for given msp, referenceID, and payloadHash
    * @param {string} referenceID - a referenceID
-   * @param {string} creatorMSP - the MSP that initially created the document
    * @param {string} signerMSP - the MSP that signed
    * @return {Promise}
   */
-  verifySignatures(referenceID, creatorMSP, signerMSP) {
+  verifySignatures(referenceID, signerMSP) {
     const self = this;
 
     return this.network.then( (network) => {
@@ -505,16 +504,16 @@ class BlockchainService {
       const onMSP = this.connectionProfile.organizations[this.connectionProfile.client.organization].mspid;
       network.queryHandler.setFilter(onMSP);
 
-      // creatorMSPID, targetMSPID, referenceID
-      return contract.evaluateTransaction('VerifySignatures', ...[referenceID, creatorMSP, signerMSP]).then( (results) => {
+      // query the contract
+      return contract.evaluateTransaction('VerifySignatures', ...[referenceID, signerMSP]).then( (results) => {
         // reset filter
         network.queryHandler.setFilter('');
 
-        console.log('> reply: VerifySignatures(' +referenceID+', '+ creatorMSP +', '+ signerMSP +') = \n' + JSON.stringify(JSON.parse(results.toString()), null, 4));
+        console.log('> reply: VerifySignatures(' +referenceID+', '+ signerMSP +') = \n' + JSON.stringify(JSON.parse(results.toString()), null, 4));
 
         return results.toString();
       }).catch( (error) => {
-        return Promise.reject(ErrorCode.fromError(error, 'VerifySignatures(' +referenceID+', '+ creatorMSP +', '+ signerMSP +') failed'));
+        return Promise.reject(ErrorCode.fromError(error, 'VerifySignatures(' +referenceID+', '+ signerMSP +') failed'));
       });
     });
   }
@@ -749,10 +748,9 @@ class BlockchainService {
 
   /** get a reference payloadlink from the ledger
    * @param {referenceId} referenceId - a reference Id
-   * @param {creatorMSPID} creatorMSPID - the initial creator
    * @return {Promise} referencepayload link
   */
-  getReferencePayloadLink(referenceId, creatorMSPID) {
+  getReferencePayloadLink(referenceId) {
     const self = this;
 
     return this.network.then( (network) => {
@@ -765,7 +763,7 @@ class BlockchainService {
       const onMSP = this.connectionProfile.organizations[this.connectionProfile.client.organization].mspid;
       network.queryHandler.setFilter(onMSP);
 
-      return contract.evaluateTransaction('GetReferencePayloadLink', ...[creatorMSPID, referenceId]).then( (payloadlink) => {
+      return contract.evaluateTransaction('GetReferencePayloadLink', ...[referenceId]).then( (payloadlink) => {
         // reset filter
         network.queryHandler.setFilter('');
 

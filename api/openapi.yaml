@@ -338,7 +338,7 @@ paths:
             application/json:
               schema:
                 $ref: models/ErrorCode.yaml
-  /signatures/{referenceID}/verify/{creator}/{signer}:
+  /signatures/{referenceID}/{signerMSP}/verify:
     get:
       description: Fetch all signatures for a given reference id, creator and signer from the ledger and verify the content against the on chain referencepayload link
       tags:
@@ -351,17 +351,11 @@ paths:
             type: string
           description: The referenceID
         - in: path
-          name: creator
+          name: signerMSP
           required: true
           schema:
             type: string
-          description: The initial creator of the contract that was signed. This also verifies the origin on chain.
-        - in: path
-          name: signer
-          required: true
-          schema:
-            type: string
-          description: The signer 
+          description: The signers MSP name 
       operationId: verifySignatures
       responses:
         '200':

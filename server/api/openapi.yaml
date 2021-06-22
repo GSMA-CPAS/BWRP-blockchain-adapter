@@ -424,7 +424,7 @@ paths:
       tags:
       - contract
       x-eov-operation-handler: controllers/ContractController
-  /payloadlink/{referenceID}/{creatorMSPID}:
+  /payloadlink/{referenceID}:
     get:
       description: Fetch the stored referencepayloadlink for a given reference id
         and creator
@@ -434,14 +434,6 @@ paths:
         explode: false
         in: path
         name: referenceID
-        required: true
-        schema:
-          type: string
-        style: simple
-      - description: The initial creator MSPID of the contract.
-        explode: false
-        in: path
-        name: creatorMSPID
         required: true
         schema:
           type: string

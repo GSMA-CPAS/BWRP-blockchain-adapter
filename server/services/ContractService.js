@@ -93,7 +93,7 @@ const uploadPrivateDocument = ({body}) => new Promise(
 
       blockchainConnection.addDocument(body['toMSP'], body['payload'])
           .then( (responseJSON) => {
-            const responseObject = JSON.parse(responseJSON)
+            const responseObject = JSON.parse(responseJSON);
             console.log('> both parties stored data with referenceID ' + responseObject.referenceID);
             resolve(Service.successResponse(responseJSON, 200));
           }).catch((error) => {
@@ -118,7 +118,6 @@ const uploadSignature = ({referenceID, body}) => new Promise(
         'algorithm': body['algorithm'],
         'certificate': body['certificate'],
         'signature': body['signature'],
-        'contractCreator': body['contractCreator']
       };
       const signatureJSON = JSON.stringify(signature);
 
@@ -138,15 +137,14 @@ const uploadSignature = ({referenceID, body}) => new Promise(
 
 /** verify the on chain signatures for a given document identified by its referenceID
    * @param {string} referenceID - The referenceID
-   * @param {string} creator - The msp that initially created the document
-   * @param {string} signer - The msp that signed
+   * @param {string} signerMSP - The msp that signed
    * @return {string}
   */
-const verifySignatures = ({referenceID, creator, signer}) => new Promise(
+const verifySignatures = ({referenceID, signerMSP}) => new Promise(
     async (resolve, reject) => {
       const blockchainConnection = new BlockchainService(process.env.BSA_CCP);
 
-      blockchainConnection.verifySignatures(referenceID, creator, signer)
+      blockchainConnection.verifySignatures(referenceID, signerMSP)
           .then( (response) => {
             resolve(Service.successResponse(response, 200));
           }).catch((error) => {
@@ -159,14 +157,13 @@ const verifySignatures = ({referenceID, creator, signer}) => new Promise(
 
 /** Fetch the stored referencepayloadlink for a given reference id and creator
  * @param {string} referenceID - the referenceID
- * @param {string} creatorMSPID - the initial creator of the contract.
  * @return {string}
 */
-const getReferencePayloadLink = ({referenceID, creatorMSPID}) => new Promise(
+const getReferencePayloadLink = ({referenceID}) => new Promise(
     async (resolve, reject) => {
       const blockchainConnection = new BlockchainService(process.env.BSA_CCP);
 
-      blockchainConnection.getReferencePayloadLink(referenceID, creatorMSPID)
+      blockchainConnection.getReferencePayloadLink(referenceID)
           .then( (response) => {
             resolve(Service.successResponse(response, 200));
           }).catch((error) => {
