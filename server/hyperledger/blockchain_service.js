@@ -327,10 +327,9 @@ class BlockchainService {
     const signatureObject = JSON.parse(signatureJSON);
 
     const creatorMSPID = signatureObject.contractCreator;
-    console.log('> creator: ' + creatorMSPID);
 
     // fetch referencePayloadLink
-    return contract.evaluateTransaction('GetReferencePayloadLink', ...[creatorMSPID, referenceID]).then( (referencePayloadLink) => {
+    return contract.evaluateTransaction('GetReferencePayloadLink', ...[referenceID]).then( (referencePayloadLink) => {
       // calculate signature payload
       const signaturePayload = crypto.createHash('sha256').update(localMSP + ':' + referenceID + ':' + referencePayloadLink).digest('hex');
       console.log('> signaturePayload  : ' + signaturePayload);
