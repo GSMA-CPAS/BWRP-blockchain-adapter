@@ -201,7 +201,7 @@ fi
 
 echo "###################################################"
 echo "> verify dtag signature on-chain"
-RES=$(request "GET" '' http://$BSA_DTAG/signatures/$REFERENCE_ID/verify/DTAG/DTAG)
+RES=$(request "GET" '' http://$BSA_DTAG/signatures/$REFERENCE_ID/DTAG/verify)
 echo $RES | jq 
 VALID=$(echo $RES | jq -r .\"$TXID_DTAG\".valid)
 if [ $VALID == "true" ]; then
@@ -213,7 +213,7 @@ fi
 
 echo "###################################################"
 echo "> verify tmus signature on-chain"
-RES=$(request "GET" '' http://$BSA_DTAG/signatures/$REFERENCE_ID/verify/DTAG/TMUS)
+RES=$(request "GET" '' http://$BSA_DTAG/signatures/$REFERENCE_ID/TMUS/verify)
 echo $RES | jq 
 VALID=$(echo $RES | jq -r .\"$TXID_TMUS\".valid)
 if [ $VALID == "true" ]; then

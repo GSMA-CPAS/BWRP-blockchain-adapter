@@ -8,7 +8,7 @@ Method | HTTP request | Description
 [**fetchPrivateDocument**](ContractApi.md#fetchPrivateDocument) | **GET** /private-documents/{referenceID} | 
 [**fetchPrivateDocumentReferenceIDs**](ContractApi.md#fetchPrivateDocumentReferenceIDs) | **GET** /private-documents | 
 [**fetchSignatures**](ContractApi.md#fetchSignatures) | **GET** /signatures/{referenceID}/{signerMSP} | 
-[**getReferencePayloadLink**](ContractApi.md#getReferencePayloadLink) | **GET** /payloadlink/{referenceID}/{creatorMSPID} | 
+[**getReferencePayloadLink**](ContractApi.md#getReferencePayloadLink) | **GET** /payloadlink/{referenceID} | 
 [**uploadPrivateDocument**](ContractApi.md#uploadPrivateDocument) | **POST** /private-documents | 
 [**uploadSignature**](ContractApi.md#uploadSignature) | **PUT** /signatures/{referenceID} | 
 [**verifySignatures**](ContractApi.md#verifySignatures) | **GET** /signatures/{referenceID}/{signerMSP}/verify | 
@@ -122,7 +122,7 @@ No authorization required
 
 <a name="getReferencePayloadLink"></a>
 # **getReferencePayloadLink**
-> String getReferencePayloadLink(referenceID, creatorMSPID)
+> String getReferencePayloadLink(referenceID)
 
 
 
@@ -133,7 +133,6 @@ No authorization required
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
  **referenceID** | **String**| The referenceID | [default to null]
- **creatorMSPID** | **String**| The initial creator MSPID of the contract. | [default to null]
 
 ### Return type
 

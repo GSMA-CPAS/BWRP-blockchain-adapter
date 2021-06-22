@@ -370,7 +370,7 @@ paths:
             application/json:
               schema:
                 $ref: models/ErrorCode.yaml
-  /payloadlink/{referenceID}/{creatorMSPID}:
+  /payloadlink/{referenceID}:
     get:
       description: Fetch the stored referencepayloadlink for a given reference id and creator
       tags:
@@ -382,12 +382,6 @@ paths:
           schema:
             type: string
           description: The referenceID
-        - in: path
-          name: creatorMSPID
-          required: true
-          schema:
-            type: string
-          description: The initial creator MSPID of the contract.
       operationId: getReferencePayloadLink
       responses:
         '200':
