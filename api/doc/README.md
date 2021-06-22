@@ -17,7 +17,7 @@ Class | Method | HTTP request | Description
 *ContractApi* | [**getReferencePayloadLink**](Apis/ContractApi.md#getreferencepayloadlink) | **GET** /payloadlink/{referenceID}/{creatorMSPID} | Fetch the stored referencepayloadlink for a given reference id and creator
 *ContractApi* | [**uploadPrivateDocument**](Apis/ContractApi.md#uploadprivatedocument) | **POST** /private-documents | Upload a private document, shared between our own organization and a partner MSP
 *ContractApi* | [**uploadSignature**](Apis/ContractApi.md#uploadsignature) | **PUT** /signatures/{referenceID} | store a signature for the document identified by its referenceID on the ledger
-*ContractApi* | [**verifySignatures**](Apis/ContractApi.md#verifysignatures) | **GET** /signatures/{referenceID}/verify/{creator}/{signer} | Fetch all signatures for a given reference id, creator and signer from the ledger and verify the content against the on chain referencepayload link
+*ContractApi* | [**verifySignatures**](Apis/ContractApi.md#verifysignatures) | **GET** /signatures/{referenceID}/{signerMSP}/verify | Fetch all signatures for a given reference id, creator and signer from the ledger and verify the content against the on chain referencepayload link
 *DiscoveryApi* | [**getDiscoveryMSP**](Apis/DiscoveryApi.md#getdiscoverymsp) | **GET** /discovery/msps/{mspid} | Show details for a specific MSP
 *DiscoveryApi* | [**getDiscoveryMSPs**](Apis/DiscoveryApi.md#getdiscoverymsps) | **GET** /discovery/msps | Show a list of all MSPs
 *StatusApi* | [**getApiStatus**](Apis/StatusApi.md#getapistatus) | **GET** /status | Show version information of the API

@@ -309,11 +309,12 @@ class BlockchainService {
   /** isValidSignature checks an unsubmitted signature for validity
    * @param {Network} network - a fabric network object
    * @param {Contract} contract - a fabric contract object
+   * @param {string} signerMSPID - the mspid of the signer
    * @param {string} referenceID - a referenceID of a document
    * @param {string} signatureJSON - the signature object json as string
    * @return {Promise}
   */
-  isValidSignature(network, contract, referenceID, signatureJSON) {
+  isValidSignature(network, contract, signerMSPID, referenceID, signatureJSON) {
     // fetch our MSP name
     const localMSP = this.connectionProfile.organizations[this.connectionProfile.client.organization].mspid;
 
@@ -326,8 +327,6 @@ class BlockchainService {
     // extract object
     const signatureObject = JSON.parse(signatureJSON);
 
-    const creatorMSPID = signatureObject.contractCreator;
-
     // fetch referencePayloadLink
     return contract.evaluateTransaction('GetReferencePayloadLink', ...[referenceID]).then( (referencePayloadLink) => {
       // calculate signature payload
@@ -335,7 +334,7 @@ class BlockchainService {
       console.log('> signaturePayload  : ' + signaturePayload);
 
       // check signature
-      return contract.evaluateTransaction('IsValidSignature', ...[creatorMSPID, signaturePayload, signatureObject.signature, signatureObject.algorithm, signatureObject.certificate]).then( () => {
+      return contract.evaluateTransaction('IsValidSignature', ...[signerMSPID, signaturePayload, signatureObject.signature, signatureObject.algorithm, signatureObject.certificate]).then( () => {
         // reset filter
         network.queryHandler.setFilter('');
 
@@ -435,7 +434,7 @@ class BlockchainService {
 
       // calculate storage key
       return self.createStorageKey(network, contract, localMSP, referenceID).then( (storageKey) => {
-        return self.isValidSignature(network, contract, referenceID, signatureJSON).then( () => {
+        return self.isValidSignature(network, contract, localMSP, referenceID, signatureJSON).then( () => {
           return self.storeSignature(contract, storageKey, signatureJSON);
         });
       });
