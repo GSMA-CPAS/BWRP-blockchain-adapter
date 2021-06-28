@@ -166,7 +166,7 @@ echo "> stored signature with txid $TXID_TMUS"
 
 echo "###################################################"
 echo "> verifying reference payload link for creator "
-RES=$(request "GET" '' http://$BSA_DTAG/payloadlink/$REFERENCE_ID/DTAG)
+RES=$(request "GET" '' http://$BSA_DTAG/payloadlink/$REFERENCE_ID)
 if [ $RES == "$PAYLOADLINK" ]; then
     echo "> ok. payloadlink on ledger matches local one!"
 else
@@ -206,7 +206,7 @@ fi
 
 echo "###################################################"
 echo "> verify dtag signature on-chain"
-RES=$(request "GET" '' http://$BSA_DTAG/signatures/$REFERENCE_ID/verify/DTAG/DTAG)
+RES=$(request "GET" '' http://$BSA_DTAG/signatures/$REFERENCE_ID/DTAG/verify)
 echo $RES | jq 
 VALID=$(echo $RES | jq -r .\"$TXID_DTAG\".valid)
 if [ $VALID == "true" ]; then
@@ -218,7 +218,7 @@ fi
 
 echo "###################################################"
 echo "> verify tmus signature on-chain"
-RES=$(request "GET" '' http://$BSA_DTAG/signatures/$REFERENCE_ID/verify/DTAG/TMUS)
+RES=$(request "GET" '' http://$BSA_DTAG/signatures/$REFERENCE_ID/TMUS/verify)
 echo $RES | jq 
 VALID=$(echo $RES | jq -r .\"$TXID_TMUS\".valid)
 if [ $VALID == "true" ]; then
@@ -228,6 +228,28 @@ else
     exit 1
 fi
 
+
+echo "###################################################"
+echo "> dtag signs contract with a bad signature (here: bad payload data)"
+# do the signing
+CERT=$(cat $DIR/user.DTAG.crt)
+SIGNATUREPAYLOAD="this_is_an_invalid_payload"
+echo -e "> payload to sign <$SIGNATUREPAYLOAD>"
+SIGNATURE_DTAG=$(echo -ne $SIGNATUREPAYLOAD | openssl dgst -sha256 -sign $DIR/user.DTAG.key | openssl base64 | tr -d '\n')
+# call blockchain adapter
+RES=$(request_noexit "PUT" '{"algorithm": "ecdsaWithSha256", "certificate" : "'"${CERT}"'", "signature" : "'$SIGNATURE_TMUS'" }'  http://$BSA_DTAG/signatures/$REFERENCE_ID)
+#echo $RES
+ERROR_CODE=$(echo $RES | jq -r .code)
+ERROR_MESSAGE=$(echo $RES | jq -r .message)
+if [ "$ERROR_CODE" != "ERROR_SIGNATURE_INVALID" ]; then
+    echo "> ERROR: wrong error code, got '$ERROR_CODE'"
+    exit 1
+fi;
+if [[ "$ERROR_MESSAGE" != signDocument* ]]; then
+    echo "> ERROR: wrong error response, got '$ERROR_MESSAGE'"
+    exit 1
+fi;
+echo "> looking good, bad signature (wrong cert) was sucessfully detected!"
 
 echo "###################################################"
 echo "> dtag signs contract with a BAD cert (missing ext)"
@@ -241,28 +263,12 @@ RES=$(request_noexit "PUT" '{"algorithm": "ecdsaWithSha256", "certificate" : "'"
 #echo $RES
 ERROR_CODE=$(echo $RES | jq -r .code)
 ERROR_MESSAGE=$(echo $RES | jq -r .message)
-if [ "$ERROR_CODE" != "ERROR_INTERNAL" ]; then
+if [ "$ERROR_CODE" != "ERROR_CERT_INVALID" ]; then
     echo "> ERROR: wrong error code, got '$ERROR_CODE'"
     exit 1
 fi;
-if [[ "$ERROR_MESSAGE" != StoreSignature* ]]; then
+if [[ "$ERROR_MESSAGE" != signDocument* ]]; then
     echo "> ERROR: wrong error response, got '$ERROR_MESSAGE'"
     exit 1
 fi;
-echo "> looking good, bad signature was sucessfully detected!"
-
-exit 0
-
-
-
-
-echo "###################################################"
-echo "> removing document from transient db on DTAG"
-RES=$(request "DELETE" ''  http://$BSA_DTAG/private-documents/$REFERENCE_ID)
-echo $RES
-
-
-echo "###################################################"
-echo "> fetching list pf referenceIDs from DTAG"
-RES=$(request "GET" ''  http://$BSA_DTAG/private-documents/)
-echo $RES
+echo "> looking good, bad signature (because of bad certificate) was sucessfully detected!"

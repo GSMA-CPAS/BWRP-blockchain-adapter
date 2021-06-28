@@ -376,7 +376,7 @@ paths:
       tags:
       - contract
       x-eov-operation-handler: controllers/ContractController
-  /signatures/{referenceID}/verify/{creator}/{signer}:
+  /signatures/{referenceID}/{signerMSP}/verify:
     get:
       description: Fetch all signatures for a given reference id, creator and signer
         from the ledger and verify the content against the on chain referencepayload
@@ -391,19 +391,10 @@ paths:
         schema:
           type: string
         style: simple
-      - description: The initial creator of the contract that was signed. This also
-          verifies the origin on chain.
+      - description: The signers MSP name
         explode: false
         in: path
-        name: creator
-        required: true
-        schema:
-          type: string
-        style: simple
-      - description: The signer
-        explode: false
-        in: path
-        name: signer
+        name: signerMSP
         required: true
         schema:
           type: string
@@ -424,7 +415,7 @@ paths:
       tags:
       - contract
       x-eov-operation-handler: controllers/ContractController
-  /payloadlink/{referenceID}/{creatorMSPID}:
+  /payloadlink/{referenceID}:
     get:
       description: Fetch the stored referencepayloadlink for a given reference id
         and creator
@@ -434,14 +425,6 @@ paths:
         explode: false
         in: path
         name: referenceID
-        required: true
-        schema:
-          type: string
-        style: simple
-      - description: The initial creator MSPID of the contract.
-        explode: false
-        in: path
-        name: creatorMSPID
         required: true
         schema:
           type: string

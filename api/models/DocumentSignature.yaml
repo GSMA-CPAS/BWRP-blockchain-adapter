@@ -19,4 +19,4 @@ properties:
 required:
   - algorithm
   - certificate
-  - signature  
+  - signature
