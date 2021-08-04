@@ -7,6 +7,8 @@ const path = require('path');
 const crypto = require('crypto');
 
 const {Gateway, Wallets} = require('fabric-network');
+const  {Client, Discoverer, DiscoveryService } = require('fabric-common');
+
 const SingleMSPQueryHandler = require('./query_handler');
 const {ErrorCode} = require('../utils/errorcode');
 
@@ -646,6 +648,103 @@ class BlockchainService {
   */
   getDiscoveryMSPs() {
     return this.network.then( (network) => {
+     
+
+      const client = new Client('discovery client');
+      client.setTlsClientCertAndKey(
+        "-----BEGIN CERTIFICATE-----\nMIICjDCCAjKgAwIBAgIRAMyJehkJYHLG5mlG+WVOEd0wCgYIKoZIzj0EAwIwgZwx\nEDAOBgNVBAYTB0dlcm1hbnkxDTALBgNVBAgTBEJvbm4xDTALBgNVBAcTBEJvbm4x\nIjAgBgNVBAkTGUZyaWVkcmljaC1FYmVydC1BbGxlZSAxNDAxDjAMBgNVBBETBTUz\nMTEzMRcwFQYDVQQKEw5kdGFnLm5vbWFkLmNvbTEdMBsGA1UEAxMUdGxzY2EuZHRh\nZy5ub21hZC5jb20wHhcNMTgxMTI4MTE1MTAwWhcNMjgxMTI1MTE1MTAwWjCBgzEQ\nMA4GA1UEBhMHR2VybWFueTENMAsGA1UECBMEQm9ubjENMAsGA1UEBxMEQm9ubjEi\nMCAGA1UECRMZRnJpZWRyaWNoLUViZXJ0LUFsbGVlIDE0MDEOMAwGA1UEERMFNTMx\nMTMxHTAbBgNVBAMMFEFkbWluQGR0YWcubm9tYWQuY29tMFkwEwYHKoZIzj0CAQYI\nKoZIzj0DAQcDQgAETQOv2bprE49+ruzh6R7ZNfPB3d860KqP8bjM++OAKqmVkCdR\nfn+B4SIBUWu/wB8iBkgt2yfaV14pmp3a1k46NKNsMGowDgYDVR0PAQH/BAQDAgWg\nMB0GA1UdJQQWMBQGCCsGAQUFBwMBBggrBgEFBQcDAjAMBgNVHRMBAf8EAjAAMCsG\nA1UdIwQkMCKAIJM7nh37s4FxEX41BFW3QFc5Hb31uTy8icKqf4IFB4unMAoGCCqG\nSM49BAMCA0gAMEUCIQDNYylQsU2UsWLELZdw16bjuRYm6sofxMNs36e12BlUagIg\nOAEq63Y4IqryKn541UL4Tu7Fbc2xcWxzyBkg73u1dpc=\n-----END CERTIFICATE-----",
+        "-----BEGIN PRIVATE KEY-----\nMIGHAgEAMBMGByqGSM49AgEGCCqGSM49AwEHBG0wawIBAQQg0vcFuKMbgaRgVbur\n0W1ZnzNLlyEXCxA0WL4E7RfNkIKhRANCAARNA6/ZumsTj36u7OHpHtk188Hd3zrQ\nqo/xuMz744AqqZWQJ1F+f4HhIgFRa7/AHyIGSC3bJ9pXXimandrWTjo0\n-----END PRIVATE KEY-----"
+      );
+
+      // see https://github.com/hyperledger/blockchain-explorer/blob/ba59056fdeafaeb2ef65899c65222e4fe0c65c60/app/platform/fabric/gateway/FabricGateway.ts#L395
+
+        // _------> network.getChannel(); CHANNEL HAS A LOT OF INFO!!! 
+
+      const mspID = "DTAG";
+      const peer = "TMUS";
+      const discoverer = new Discoverer(`be discoverer ${peer}`, client, mspID);
+      const url = "grpcs://peer0.dtag.nomad.com:7051";
+      const pem = "-----BEGIN CERTIFICATE-----\nMIIClzCCAj2gAwIBAgIQHjNxIosFAs846sUPicHhxzAKBggqhkjOPQQDAjCBnDEQ\nMA4GA1UEBhMHR2VybWFueTENMAsGA1UECBMEQm9ubjENMAsGA1UEBxMEQm9ubjEi\nMCAGA1UECRMZRnJpZWRyaWNoLUViZXJ0LUFsbGVlIDE0MDEOMAwGA1UEERMFNTMx\nMTMxFzAVBgNVBAoTDmR0YWcubm9tYWQuY29tMR0wGwYDVQQDExR0bHNjYS5kdGFn\nLm5vbWFkLmNvbTAeFw0xODExMjgxMTUxMDBaFw0yODExMjUxMTUxMDBaMIGcMRAw\nDgYDVQQGEwdHZXJtYW55MQ0wCwYDVQQIEwRCb25uMQ0wCwYDVQQHEwRCb25uMSIw\nIAYDVQQJExlGcmllZHJpY2gtRWJlcnQtQWxsZWUgMTQwMQ4wDAYDVQQREwU1MzEx\nMzEXMBUGA1UEChMOZHRhZy5ub21hZC5jb20xHTAbBgNVBAMTFHRsc2NhLmR0YWcu\nbm9tYWQuY29tMFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEUGUCEzemSi3GH4/k\nH5lCR00mHfdG6bguIe3fmchyVnabWEKaIpp2yBVjEUFft2ay2TI0RelOu1TpW1kQ\n89P0SKNfMF0wDgYDVR0PAQH/BAQDAgGmMA8GA1UdJQQIMAYGBFUdJQAwDwYDVR0T\nAQH/BAUwAwEB/zApBgNVHQ4EIgQgkzueHfuzgXERfjUEVbdAVzkdvfW5PLyJwqp/\nggUHi6cwCgYIKoZIzj0EAwIDSAAwRQIhAO+HFg28t7ZvmxDG00XGY28AdjMvFYC/\nLP4YK2LurjwpAiA1bpW2wZSavtKgVOpG5EVw4bYEnnlROO2CoNPdiPNqLA==\n-----END CERTIFICATE-----";
+      let grpcOpt = {
+        "ssl-target-name-override": "peer0.dtag.nomad.com",
+        "hostnameOverride": "peer0.dtag.nomad.com"
+      }
+
+
+      const peer_endpoint = client.newEndpoint(
+          Object.assign(grpcOpt, {
+            url: url,
+            pem: pem
+          })
+      );
+      
+      discoverer.connect(peer_endpoint).then( (res) => {
+        console.log("GOT CONN");
+
+        
+        const channel = network.getChannel();
+        //console.log("CHANNEL");
+        //console.log(channel);
+
+			  var ds = new DiscoveryService('be discovery service', channel);
+
+        const idx = this.gateway.identityContext;
+        // do the three steps
+        ds.build(idx);
+        ds.sign(idx);
+
+
+        var dsTargets = [discoverer];
+        //console.log(dsTargets);
+
+        ds.send({
+          asLocalhost: false, //see ccp
+          requestTimeout: 5000,
+          refreshAge: 15000,
+          targets: dsTargets,
+        }).then(() => {
+          console.log('Succeeded to send discovery request');
+          ds.getDiscoveryResults().then( (res) => {
+            //console.log(res);
+            console.log(res.peers_by_org["DTAG"].peers[0].ledgerHeight.toString());
+            console.log(res.peers_by_org["DTAG"].peers[0].chaincodes);
+          });
+        })
+        .catch(error => {
+          if (error) {
+            console.log(
+              'Failed to send discovery request for channel',
+              error,
+            );
+            ds.close();
+          }
+        });
+      })
+      
+      
+      /*
+      const mTlsIdLabel = this.fabricConfig.getClientTlsIdentity();
+			if (mTlsIdLabel) {
+				logger.info('client TLS enabled');
+				this.clientTlsIdentity = await this.wallet.get(mTlsIdLabel);
+				if (this.clientTlsIdentity !== undefined) {
+					connectionOptions.clientTlsIdentity = mTlsIdLabel;
+				} else {
+					throw new ExplorerError(
+						`Not found Identity ${mTlsIdLabel} in your wallet`
+					);
+				}
+			}
+*/
+      
+/*
+      network.getChannel().newDiscoveryService("aaa").getDiscoveryResults().then( (res) => {
+        console.log(res);
+      });
+
+      network.getChannel().newDiscoveryService("test").getDiscoveryResults(true).then( (res) => {
+        console.log(res);
+      });*/
       return (network.getChannel().getMspids());
     });
   }
