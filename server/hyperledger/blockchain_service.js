@@ -766,13 +766,14 @@ class BlockchainService {
     // get the MSP
     var msp = channel.getMsp(selfID);
 
+    // build endpoint config based on grpcoptions
+    const endpointConfig = selfPeerNetworkConfig.grpcOptions;
+    // add url and pem
+    endpointConfig.url = selfPeerNetworkConfig.url;
+    endpointConfig.pem = selfPeerNetworkConfig.tlsCACerts.pem;
+  
     // create the endpoint
-    const peer_endpoint = channel.client.newEndpoint(
-      Object.assign(selfPeerNetworkConfig.grpcOptions, {
-        url: selfPeerNetworkConfig.url,
-        pem: selfPeerNetworkConfig.tlsCACerts.pem
-      })
-    );
+    const peer_endpoint = channel.client.newEndpoint(endpointConfig);
   
     // start discoverer using the client
     const discoverer = new Discoverer("my_discovery", client, selfID);
