@@ -11,6 +11,7 @@ const  {Client, Discoverer, DiscoveryService } = require('fabric-common');
 
 const SingleMSPQueryHandler = require('./query_handler');
 const {ErrorCode} = require('../utils/errorcode');
+const { exit } = require('process');
 
 const sleep = require('util').promisify(setTimeout);
 
@@ -647,104 +648,8 @@ class BlockchainService {
    * @return {Promise}
   */
   getDiscoveryMSPs() {
+    var self = this;
     return this.network.then( (network) => {
-     
-
-      const client = new Client('discovery client');
-      client.setTlsClientCertAndKey(
-        "-----BEGIN CERTIFICATE-----\nMIICjDCCAjKgAwIBAgIRAMyJehkJYHLG5mlG+WVOEd0wCgYIKoZIzj0EAwIwgZwx\nEDAOBgNVBAYTB0dlcm1hbnkxDTALBgNVBAgTBEJvbm4xDTALBgNVBAcTBEJvbm4x\nIjAgBgNVBAkTGUZyaWVkcmljaC1FYmVydC1BbGxlZSAxNDAxDjAMBgNVBBETBTUz\nMTEzMRcwFQYDVQQKEw5kdGFnLm5vbWFkLmNvbTEdMBsGA1UEAxMUdGxzY2EuZHRh\nZy5ub21hZC5jb20wHhcNMTgxMTI4MTE1MTAwWhcNMjgxMTI1MTE1MTAwWjCBgzEQ\nMA4GA1UEBhMHR2VybWFueTENMAsGA1UECBMEQm9ubjENMAsGA1UEBxMEQm9ubjEi\nMCAGA1UECRMZRnJpZWRyaWNoLUViZXJ0LUFsbGVlIDE0MDEOMAwGA1UEERMFNTMx\nMTMxHTAbBgNVBAMMFEFkbWluQGR0YWcubm9tYWQuY29tMFkwEwYHKoZIzj0CAQYI\nKoZIzj0DAQcDQgAETQOv2bprE49+ruzh6R7ZNfPB3d860KqP8bjM++OAKqmVkCdR\nfn+B4SIBUWu/wB8iBkgt2yfaV14pmp3a1k46NKNsMGowDgYDVR0PAQH/BAQDAgWg\nMB0GA1UdJQQWMBQGCCsGAQUFBwMBBggrBgEFBQcDAjAMBgNVHRMBAf8EAjAAMCsG\nA1UdIwQkMCKAIJM7nh37s4FxEX41BFW3QFc5Hb31uTy8icKqf4IFB4unMAoGCCqG\nSM49BAMCA0gAMEUCIQDNYylQsU2UsWLELZdw16bjuRYm6sofxMNs36e12BlUagIg\nOAEq63Y4IqryKn541UL4Tu7Fbc2xcWxzyBkg73u1dpc=\n-----END CERTIFICATE-----",
-        "-----BEGIN PRIVATE KEY-----\nMIGHAgEAMBMGByqGSM49AgEGCCqGSM49AwEHBG0wawIBAQQg0vcFuKMbgaRgVbur\n0W1ZnzNLlyEXCxA0WL4E7RfNkIKhRANCAARNA6/ZumsTj36u7OHpHtk188Hd3zrQ\nqo/xuMz744AqqZWQJ1F+f4HhIgFRa7/AHyIGSC3bJ9pXXimandrWTjo0\n-----END PRIVATE KEY-----"
-      );
-
-      // see https://github.com/hyperledger/blockchain-explorer/blob/ba59056fdeafaeb2ef65899c65222e4fe0c65c60/app/platform/fabric/gateway/FabricGateway.ts#L395
-
-        // _------> network.getChannel(); CHANNEL HAS A LOT OF INFO!!! 
-
-      const mspID = "DTAG";
-      const peer = "TMUS";
-      const discoverer = new Discoverer(`be discoverer ${peer}`, client, mspID);
-      const url = "grpcs://peer0.dtag.nomad.com:7051";
-      const pem = "-----BEGIN CERTIFICATE-----\nMIIClzCCAj2gAwIBAgIQHjNxIosFAs846sUPicHhxzAKBggqhkjOPQQDAjCBnDEQ\nMA4GA1UEBhMHR2VybWFueTENMAsGA1UECBMEQm9ubjENMAsGA1UEBxMEQm9ubjEi\nMCAGA1UECRMZRnJpZWRyaWNoLUViZXJ0LUFsbGVlIDE0MDEOMAwGA1UEERMFNTMx\nMTMxFzAVBgNVBAoTDmR0YWcubm9tYWQuY29tMR0wGwYDVQQDExR0bHNjYS5kdGFn\nLm5vbWFkLmNvbTAeFw0xODExMjgxMTUxMDBaFw0yODExMjUxMTUxMDBaMIGcMRAw\nDgYDVQQGEwdHZXJtYW55MQ0wCwYDVQQIEwRCb25uMQ0wCwYDVQQHEwRCb25uMSIw\nIAYDVQQJExlGcmllZHJpY2gtRWJlcnQtQWxsZWUgMTQwMQ4wDAYDVQQREwU1MzEx\nMzEXMBUGA1UEChMOZHRhZy5ub21hZC5jb20xHTAbBgNVBAMTFHRsc2NhLmR0YWcu\nbm9tYWQuY29tMFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEUGUCEzemSi3GH4/k\nH5lCR00mHfdG6bguIe3fmchyVnabWEKaIpp2yBVjEUFft2ay2TI0RelOu1TpW1kQ\n89P0SKNfMF0wDgYDVR0PAQH/BAQDAgGmMA8GA1UdJQQIMAYGBFUdJQAwDwYDVR0T\nAQH/BAUwAwEB/zApBgNVHQ4EIgQgkzueHfuzgXERfjUEVbdAVzkdvfW5PLyJwqp/\nggUHi6cwCgYIKoZIzj0EAwIDSAAwRQIhAO+HFg28t7ZvmxDG00XGY28AdjMvFYC/\nLP4YK2LurjwpAiA1bpW2wZSavtKgVOpG5EVw4bYEnnlROO2CoNPdiPNqLA==\n-----END CERTIFICATE-----";
-      let grpcOpt = {
-        "ssl-target-name-override": "peer0.dtag.nomad.com",
-        "hostnameOverride": "peer0.dtag.nomad.com"
-      }
-
-
-      const peer_endpoint = client.newEndpoint(
-          Object.assign(grpcOpt, {
-            url: url,
-            pem: pem
-          })
-      );
-      
-      discoverer.connect(peer_endpoint).then( (res) => {
-        console.log("GOT CONN");
-
-        
-        const channel = network.getChannel();
-        //console.log("CHANNEL");
-        //console.log(channel);
-
-			  var ds = new DiscoveryService('be discovery service', channel);
-
-        const idx = this.gateway.identityContext;
-        // do the three steps
-        ds.build(idx);
-        ds.sign(idx);
-
-
-        var dsTargets = [discoverer];
-        //console.log(dsTargets);
-
-        ds.send({
-          asLocalhost: false, //see ccp
-          requestTimeout: 5000,
-          refreshAge: 15000,
-          targets: dsTargets,
-        }).then(() => {
-          console.log('Succeeded to send discovery request');
-          ds.getDiscoveryResults().then( (res) => {
-            //console.log(res);
-            console.log(res.peers_by_org["DTAG"].peers[0].ledgerHeight.toString());
-            console.log(res.peers_by_org["DTAG"].peers[0].chaincodes);
-          });
-        })
-        .catch(error => {
-          if (error) {
-            console.log(
-              'Failed to send discovery request for channel',
-              error,
-            );
-            ds.close();
-          }
-        });
-      })
-      
-      
-      /*
-      const mTlsIdLabel = this.fabricConfig.getClientTlsIdentity();
-			if (mTlsIdLabel) {
-				logger.info('client TLS enabled');
-				this.clientTlsIdentity = await this.wallet.get(mTlsIdLabel);
-				if (this.clientTlsIdentity !== undefined) {
-					connectionOptions.clientTlsIdentity = mTlsIdLabel;
-				} else {
-					throw new ExplorerError(
-						`Not found Identity ${mTlsIdLabel} in your wallet`
-					);
-				}
-			}
-*/
-      
-/*
-      network.getChannel().newDiscoveryService("aaa").getDiscoveryResults().then( (res) => {
-        console.log(res);
-      });
-
-      network.getChannel().newDiscoveryService("test").getDiscoveryResults(true).then( (res) => {
-        console.log(res);
-      });*/
       return (network.getChannel().getMspids());
     });
   }
@@ -842,6 +747,93 @@ class BlockchainService {
     });
   }
 
+/** get peer status via discovery
+ * @return {Promise} struct with peer status
+ */
+ getBlockchainPeerStatus() {
+  const self = this;
+  return this.network.then( (network) => {
+    const channel = network.getChannel();
+    // this is a bit hacky... direct member access is not a good idea in general
+    // todo: is there an official way to get this client instance?!
+    const client  = channel.client;
+ 
+    // fetch various config bits from the ccp
+    const selfID = self.connectionProfile.organizations[self.connectionProfile.client.organization].mspid;
+    const selfPeerName = self.connectionProfile.organizations[self.connectionProfile.client.organization].peers[0];
+    const selfPeerNetworkConfig = self.connectionProfile.peers[selfPeerName];
+
+    // get the MSP
+    var msp = channel.getMsp(selfID);
+
+    // create the endpoint
+    const peer_endpoint = channel.client.newEndpoint(
+      Object.assign(selfPeerNetworkConfig.grpcOptions, {
+        url: selfPeerNetworkConfig.url,
+        pem: selfPeerNetworkConfig.tlsCACerts.pem
+      })
+    );
+  
+    // start discoverer using the client
+    const discoverer = new Discoverer("my_discovery", client, selfID);
+
+    // connect to the given peer endpoint
+    return discoverer.connect(peer_endpoint).then( (_) => {
+      console.log("> got discoverer connection...");
+      var discoveryService = new DiscoveryService('be discovery service', channel);
+
+      // build an identity context 
+      const identityContext = this.gateway.identityContext;
+      discoveryService.build(identityContext);
+      discoveryService.sign(identityContext);
+
+      // for now only one discoverer
+      var discoveryServiceTargets = [discoverer];
+      
+      // fetch setting from ccp
+      var discoveryAsLocalhost = false;
+      if (self.connectionProfile.config.discoveryOptions.asLocalhost != undefined){
+        discoveryAsLocalhost = self.connectionProfile.config.discoveryOptions.asLocalhost
+      }
+
+      const discoveryOptions = {
+        asLocalhost: discoveryAsLocalhost, 
+        requestTimeout: 5000,
+        refreshAge: 15000,
+        targets: discoveryServiceTargets,
+      };
+
+      // execute the discovery request
+      return discoveryService.send(discoveryOptions).then(() => {
+        console.log('> succeeded to send discovery request');
+        return discoveryService.getDiscoveryResults().then( (result) => {
+          var response = {};
+          for (const peerID in result.peers_by_org) {
+            response[peerID] = {};
+            for (const peerStatus of result.peers_by_org[peerID].peers) {
+              response[peerID][peerStatus.name] = {};
+              response[peerID][peerStatus.name].ledgerHeight = peerStatus.ledgerHeight.toString();
+              response[peerID][peerStatus.name].chaincodes = {};
+              for (const chaincode of peerStatus.chaincodes){
+                response[peerID][peerStatus.name].chaincodes[chaincode.name] = chaincode.version;
+              }
+            }
+          }
+          return response;
+        });
+      }).catch(error => {
+        if (error) {
+          console.log('Failed to send discovery request for channel', error, );
+          discoveryService.close();
+        }
+      });
+    });
+  }).catch( (error) => {
+    console.log(error);
+    return Promise.reject(new ErrorCode('ERROR_INTERNAL', 'getBlockchainPeerStatus() failed'));
+  });
+}
+            
 
   /** get a reference payloadlink from the ledger
    * @param {referenceId} referenceId - a reference Id

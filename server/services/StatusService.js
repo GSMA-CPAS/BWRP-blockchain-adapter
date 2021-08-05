@@ -32,7 +32,11 @@ const getApiStatus = () => new Promise(
 
       return blockchainConnection.getBlockchainStatus().then((blockchainStatus) => {
         statusInfo.hyperledger = blockchainStatus;
-        resolve(Service.successResponse(statusInfo));
+
+        return blockchainConnection.getBlockchainPeerStatus().then((peerStatus) => {
+          statusInfo.hyperledger.peers = peerStatus;
+          resolve(Service.successResponse(statusInfo));
+        });
       }).catch( (error) => {
         reject(Service.rejectResponse({'code': error.code, 'message': error.message}, 500));
       });
