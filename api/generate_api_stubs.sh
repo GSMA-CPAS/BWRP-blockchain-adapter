@@ -24,7 +24,8 @@ echo "> generating server api stubs"
 java -jar .bin/${OPENAPI_JAR} generate  -i openapi.yaml  -g nodejs-express-server -o ../server | tee $log
 
 echo "> generating markdown"
-rm -r doc
+if [ -e doc ]; then rm -r doc; fi
+
 java -jar .bin/${OPENAPI_JAR} generate  -i openapi.yaml  -g markdown -o doc | tee -a $log
 
 # add license info to generated files:

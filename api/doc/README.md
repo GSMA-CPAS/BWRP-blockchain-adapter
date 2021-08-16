@@ -21,6 +21,7 @@ Class | Method | HTTP request | Description
 *DiscoveryApi* | [**getDiscoveryMSP**](Apis/DiscoveryApi.md#getdiscoverymsp) | **GET** /discovery/msps/{mspid} | Show details for a specific MSP
 *DiscoveryApi* | [**getDiscoveryMSPs**](Apis/DiscoveryApi.md#getdiscoverymsps) | **GET** /discovery/msps | Show a list of all MSPs
 *StatusApi* | [**getApiStatus**](Apis/StatusApi.md#getapistatus) | **GET** /status | Show version information of the API
+*StatusApi* | [**getApiStatusHyperledgerMSP**](Apis/StatusApi.md#getapistatushyperledgermsp) | **GET** /status/hyperledger/{mspid} | Show hyperledger status information of an MSP
 *StatusApi* | [**getStatusMSP**](Apis/StatusApi.md#getstatusmsp) | **GET** /status/offchain/{mspid} | Show status information of an MSP
 *WebhookApi* | [**webhooksGet**](Apis/WebhookApi.md#webhooksget) | **GET** /webhooks | show all subscriptions
 *WebhookApi* | [**webhooksSubscribePost**](Apis/WebhookApi.md#webhookssubscribepost) | **POST** /webhooks/subscribe | subscribes a client to receive the specified event

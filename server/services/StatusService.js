@@ -43,6 +43,25 @@ const getApiStatus = () => new Promise(
     },
 );
 
+/** Show hyperledger information of the API
+   * @return {string}
+  */
+const getApiStatusHyperledgerMSP = ({mspid}) => new Promise(
+    async (resolve, reject) => {
+      const blockchainConnection = new BlockchainService(process.env.BSA_CCP);
+
+      return blockchainConnection.getBlockchainPeerStatus().then((peerStatus) => {
+        response = {};
+        if (peerStatus.hasOwnProperty(mspid)) {
+          response = peerStatus[mspid];
+        }
+        resolve(Service.successResponse(response));
+      }).catch( (error) => {
+        reject(Service.rejectResponse({'code': error.code, 'message': error.message}, 500));
+      });
+    },
+);
+
 
 /**
 *
@@ -70,4 +89,5 @@ const getStatusMSP = ({mspid}) => new Promise(
 module.exports = {
   getApiStatus,
   getStatusMSP,
+  getApiStatusHyperledgerMSP,
 };
