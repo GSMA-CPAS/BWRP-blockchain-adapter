@@ -127,9 +127,9 @@ fi
 
 echo "###################################################"
 echo "> storing root cert on DTAG"
-request PUT "[\"$(cat $DIR/root.DTAG.pem | awk 1 ORS='\\n' )\"]" http://$BSA_DTAG/config/certificates/root
+request PUT "[\"$(cat $DIR/root.DTAG.pem | awk 1 ORS='\\n' )\"]" http://$BSA_DTAG/certificates/root
 echo "> storing root cert on TMUS"
-request PUT "[\"$(cat $DIR/root.TMUS.pem | awk 1 ORS='\\n' )\"]" http://$BSA_TMUS/config/certificates/root
+request PUT "[\"$(cat $DIR/root.TMUS.pem | awk 1 ORS='\\n' )\"]" http://$BSA_TMUS/certificates/root
 
 echo "###################################################"
 echo "> storing document on both parties by calling the function on DTAG with the partner id TMUS"
@@ -272,3 +272,41 @@ if [[ "$ERROR_MESSAGE" != signDocument* ]]; then
     exit 1
 fi;
 echo "> looking good, bad signature (because of bad certificate) was sucessfully detected!"
+
+echo "###################################################"
+echo "> revoke certificate for DTAG user"
+CERT=$DIR/user.DTAG.pem
+# config for openssl
+CONFIG=$DIR/ca.conf
+SCRIPT_DIR="$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
+sed "s|REPLACE_DIR|${DIR}|" $SCRIPT_DIR/testing/config/ca.conf > $CONFIG
+echo 01 > $DIR/serial.txt
+echo 01 > $DIR/crlnumber
+# add certificate to database
+touch $DIR/index.txt
+openssl ca -config $CONFIG -valid $CERT
+# revoke in database
+openssl ca -config $CONFIG -revoke $CERT -crl_compromise 20200101120000Z
+# cat $DIR/index.txt
+# create CRL
+openssl ca -config $CONFIG -gencrl -out $DIR/user.DTAG.crl.pem
+# openssl crl -in $DIR/user.DTAG.crl.pem -noout -text 
+
+# post crl to chaincode
+RES=$(request POST '{"crl": "'"$(cat $DIR/user.DTAG.crl.pem | awk 1 ORS='\\n' )"'", "certificateList": ""}' http://$BSA_DTAG/certificates/revoke)
+if [ $RES != "OK" ]; then
+    ERROR_CODE=$(echo $RES | jq -r .code)
+    echo "> ERROR: could not upload CRL: '$ERROR_CODE'"
+    exit 1
+fi
+
+# check if signature is deemed valid after revocation of certificate
+RES=$(request_noexit "GET" '' http://$BSA_DTAG/signatures/$REFERENCE_ID/DTAG/verify)
+echo $RES | jq 
+VALID=$(echo $RES | jq -r .\"$TXID_DTAG\".valid)
+if [ $VALID == "false" ]; then
+    echo "SIGNATURE INVALID DUE TO REVOKED CERTIFICATE, SUCCESS!"
+else
+    echo "SIGNATURE DEEMED VALID! FAILED!"
+    exit 1
+fi;

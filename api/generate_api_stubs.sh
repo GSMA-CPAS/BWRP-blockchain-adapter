@@ -18,7 +18,7 @@ if [ ! -f .bin/${OPENAPI_JAR} ]; then
 	cd ..
 fi
 
-log=$(tempfile)
+log=$(mktemp)
 
 echo "> generating server api stubs"
 java -jar .bin/${OPENAPI_JAR} generate  -i openapi.yaml  -g nodejs-express-server -o ../server | tee $log

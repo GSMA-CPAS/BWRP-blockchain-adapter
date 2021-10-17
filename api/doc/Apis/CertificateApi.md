@@ -1,0 +1,64 @@
+# CertificateApi
+
+All URIs are relative to *http://localhost*
+
+Method | HTTP request | Description
+------------- | ------------- | -------------
+[**setCertificateRoot**](CertificateApi.md#setCertificateRoot) | **PUT** /certificates/root | 
+[**submitCertificateRevocationList**](CertificateApi.md#submitCertificateRevocationList) | **POST** /certificates/revoke | 
+
+
+<a name="setCertificateRoot"></a>
+# **setCertificateRoot**
+> String setCertificateRoot(string)
+
+
+
+    Upload a root certificate
+
+### Parameters
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **string** | [**List**](../Models/string.md)| Set the signature root certificate. |
+
+### Return type
+
+[**String**](../Models/string.md)
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+- **Content-Type**: application/json
+- **Accept**: text/plain, application/json
+
+<a name="submitCertificateRevocationList"></a>
+# **submitCertificateRevocationList**
+> String submitCertificateRevocationList(body)
+
+
+
+    Upload a certificate revokation list (CRL)
+
+### Parameters
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **body** | [**CertificateRevocationList**](../Models/CertificateRevocationList.md)| Submit a certificate revocation list signed by a CA. |
+
+### Return type
+
+[**String**](../Models/string.md)
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+- **Content-Type**: application/json
+- **Accept**: text/plain, application/json
+

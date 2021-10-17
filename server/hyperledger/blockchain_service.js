@@ -177,6 +177,32 @@ class BlockchainService {
     });
   }
 
+  /** set a cert of the type <type>
+  * @param {string} crl - the pem encoded crl
+  * @param {string} certChain - the pem endcoded certificate chain signing the crl
+  * @return {Promise}
+  */
+  submitCRL(crl, certChain) {
+    const self = this;
+
+    return this.network.then( (network) => {
+    // fetch contract
+      const contract = network.getContract(self.connectionProfile.config.contractID);
+
+      // configure certificate
+      console.log('> will submit new crl');
+
+      // send transaction
+      const tx = contract.createTransaction('SubmitCRL');
+
+      return tx.submit(...[crl, certChain]).then( (_) => {
+        return '';
+      }).catch( (error) => {
+        return Promise.reject(ErrorCode.fromError(error, 'SetCertificate('+type+',' +cert+') failed'));
+      });
+    });
+  }
+
   /** store a document
    * @param {Network} network - a fabric network object
    * @param {Contract} contract - a fabric contract object
