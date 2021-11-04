@@ -17,7 +17,7 @@ See api/generate.sh for details.
 # API Documentation
 
 see the auto-generated [API Documentation](./api/doc/README.md)
-alternative: the full online api specification can be accessed via http://localhost:$BSA_PORT/docs once the server is running.
+alternative: the full online api specification can be accessed via http://localhost:$BSA_PORT/api-docs once the server is running.
 
 # NOTES
 
