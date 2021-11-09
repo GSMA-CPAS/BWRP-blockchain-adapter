@@ -477,7 +477,7 @@ paths:
                 $ref: models/ErrorCode.yaml
   /certificates/revoke:
     post:
-      description: Upload a certificate revokation list (CRL)
+      description: Upload a certificate revocation list (CRL)
       tags:
         - certificate
       operationId: submitCertificateRevocationList
