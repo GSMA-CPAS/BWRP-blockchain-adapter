@@ -10,8 +10,7 @@ properties:
     description: A x509 certificate revocation list in PEM format
   certificateList:
     type: string
-    description: A certificate list formatted as JSON array of PEMs, the last certificate signs the crl
+    description: If the CRL is submitted by an intermediate CA, the certificate list must be submitted and formatted as JSON array of PEMs, the last certificate signs the crl
     example: ["root_pem", "inter_pem", ..., "signing_pem"] 
 required:
   - crl
-  - signature

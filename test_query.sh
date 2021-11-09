@@ -127,9 +127,9 @@ fi
 
 echo "###################################################"
 echo "> storing root cert on DTAG"
-request PUT "[\"$(cat $DIR/root.DTAG.pem | awk 1 ORS='\\n' )\"]" http://$BSA_DTAG/certificates/root
+request PUT "[\"$(cat $DIR/root.DTAG.pem | awk 1 ORS='\\n' )\"]" http://$BSA_DTAG/certificate/root
 echo "> storing root cert on TMUS"
-request PUT "[\"$(cat $DIR/root.TMUS.pem | awk 1 ORS='\\n' )\"]" http://$BSA_TMUS/certificates/root
+request PUT "[\"$(cat $DIR/root.TMUS.pem | awk 1 ORS='\\n' )\"]" http://$BSA_TMUS/certificate/root
 
 echo "###################################################"
 echo "> storing document on both parties by calling the function on DTAG with the partner id TMUS"
@@ -293,7 +293,7 @@ openssl ca -config $CONFIG -gencrl -out $DIR/user.DTAG.crl.pem
 # openssl crl -in $DIR/user.DTAG.crl.pem -noout -text 
 
 # post crl to chaincode
-RES=$(request POST '{"crl": "'"$(cat $DIR/user.DTAG.crl.pem | awk 1 ORS='\\n' )"'", "certificateList": ""}' http://$BSA_DTAG/certificates/revoke)
+RES=$(request POST '{"crl": "'"$(cat $DIR/user.DTAG.crl.pem | awk 1 ORS='\\n' )"'", "certificateList": ""}' http://$BSA_DTAG/certificate/revoke)
 if [ $RES != "OK" ]; then
     ERROR_CODE=$(echo $RES | jq -r .code)
     echo "> ERROR: could not upload CRL: '$ERROR_CODE'"

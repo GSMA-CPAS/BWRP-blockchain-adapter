@@ -495,7 +495,7 @@ paths:
       - config
       x-codegen-request-body-name: body
       x-eov-operation-handler: controllers/ConfigController
-  /certificates/root:
+  /certificate/root:
     put:
       description: Upload a root certificate
       operationId: setCertificateRoot
@@ -527,9 +527,10 @@ paths:
       tags:
       - certificate
       x-eov-operation-handler: controllers/CertificateController
-  /certificates/revoke:
+  /certificate/revoke:
     post:
-      description: Upload a certificate revokation list (CRL)
+      description: Upload a certificate revocation list (CRL), revoked certificates
+        are stored on the ledger and cannot be used for signing thereafter
       operationId: submitCertificateRevocationList
       requestBody:
         content:
@@ -726,8 +727,9 @@ components:
           description: A x509 certificate revocation list in PEM format
           type: string
         certificateList:
-          description: A certificate list formatted as JSON array of PEMs, the last
-            certificate signs the crl
+          description: If the CRL is submitted by an intermediate CA, the certificate
+            list must be submitted and formatted as JSON array of PEMs, the last certificate
+            signs the crl
           example: '[root_pem, inter_pem, ..., signing_pem]'
           type: string
       required:

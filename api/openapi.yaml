@@ -444,7 +444,7 @@ paths:
             application/json:
               schema:
                 $ref: models/ErrorCode.yaml
-  /certificates/root:
+  /certificate/root:
     put:
       description: Upload a root certificate
       tags:
@@ -475,9 +475,9 @@ paths:
             application/json:
               schema:
                 $ref: models/ErrorCode.yaml
-  /certificates/revoke:
+  /certificate/revoke:
     post:
-      description: Upload a certificate revocation list (CRL)
+      description: Upload a certificate revocation list (CRL), revoked certificates are stored on the ledger and cannot be used for signing thereafter
       tags:
         - certificate
       operationId: submitCertificateRevocationList

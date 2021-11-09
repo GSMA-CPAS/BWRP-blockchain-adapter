@@ -4,8 +4,8 @@ All URIs are relative to *http://localhost*
 
 Method | HTTP request | Description
 ------------- | ------------- | -------------
-[**setCertificateRoot**](CertificateApi.md#setCertificateRoot) | **PUT** /certificates/root | 
-[**submitCertificateRevocationList**](CertificateApi.md#submitCertificateRevocationList) | **POST** /certificates/revoke | 
+[**setCertificateRoot**](CertificateApi.md#setCertificateRoot) | **PUT** /certificate/root | 
+[**submitCertificateRevocationList**](CertificateApi.md#submitCertificateRevocationList) | **POST** /certificate/revoke | 
 
 
 <a name="setCertificateRoot"></a>
@@ -41,7 +41,7 @@ No authorization required
 
 
 
-    Upload a certificate revokation list (CRL)
+    Upload a certificate revocation list (CRL), revoked certificates are stored on the ledger and cannot be used for signing thereafter
 
 ### Parameters
 

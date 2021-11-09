@@ -7,8 +7,8 @@ All URIs are relative to *http://localhost*
 
 Class | Method | HTTP request | Description
 ------------ | ------------- | ------------- | -------------
-*CertificateApi* | [**setCertificateRoot**](Apis/CertificateApi.md#setcertificateroot) | **PUT** /certificates/root | Upload a root certificate
-*CertificateApi* | [**submitCertificateRevocationList**](Apis/CertificateApi.md#submitcertificaterevocationlist) | **POST** /certificates/revoke | Upload a certificate revokation list (CRL)
+*CertificateApi* | [**setCertificateRoot**](Apis/CertificateApi.md#setcertificateroot) | **PUT** /certificate/root | Upload a root certificate
+*CertificateApi* | [**submitCertificateRevocationList**](Apis/CertificateApi.md#submitcertificaterevocationlist) | **POST** /certificate/revoke | Upload a certificate revocation list (CRL), revoked certificates are stored on the ledger and cannot be used for signing thereafter
 *ConfigApi* | [**getOffchainDBConfig**](Apis/ConfigApi.md#getoffchaindbconfig) | **GET** /config/offchain-db | Read back the configuration of the offchain-db
 *ConfigApi* | [**setOffchainDBConfig**](Apis/ConfigApi.md#setoffchaindbconfig) | **PUT** /config/offchain-db | Update the configuration of the offchain-db
 *ContractApi* | [**deletePrivateDocument**](Apis/ContractApi.md#deleteprivatedocument) | **DELETE** /private-documents/{referenceID} | Delete a private document from the database, identified by its referenceID

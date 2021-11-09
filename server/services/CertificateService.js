@@ -22,13 +22,10 @@ const {BlockchainService} = require('../hyperledger/blockchain_service');
     });
   },
 );
-
-/**
-* Upload a certificate revokation list (CRL)
-*
-* certificateRevocationList CertificateRevocationList Submit a certificate revocation list signed by a CA.
-* returns String
-* */
+/** Upload a certificate revocation list (CRL), revoked certificates are stored on the ledger and cannot be used for signing thereafter
+   * @param {CertificateRevocationList} body - Submit a certificate revocation list signed by a CA.
+   * @return {string}
+  */
 const submitCertificateRevocationList = ({ body }) => new Promise(
   async (resolve, reject) => {
     const blockchainConnection = new BlockchainService(process.env.BSA_CCP);
