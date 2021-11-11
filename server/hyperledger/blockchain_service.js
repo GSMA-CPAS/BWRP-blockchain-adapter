@@ -189,7 +189,6 @@ class BlockchainService {
     // fetch contract
       const contract = network.getContract(self.connectionProfile.config.contractID);
 
-      // configure certificate
       console.log('> will submit new crl');
 
       // send transaction
