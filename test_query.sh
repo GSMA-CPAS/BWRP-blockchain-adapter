@@ -320,8 +320,8 @@ revokeUserCertificate() {
 
     # post crl to chaincode
     RES=$(request POST '{"crl": "'"$(cat $DIR/user.$ORG.crl.pem | awk 1 ORS='\\n' )"'", "certificateList": "'"$INTERMEDIATE"'"}' http://$BSA/certificate/revoke)
-    echo $RES
-    if [ $RES != "OK" ]; then
+    SUCCESS=$(echo $RES | jq -r .success)
+    if [ $SUCCESS != "true" ]; then
         ERROR_CODE=$(echo $RES | jq -r .code)
         echo "> ERROR: could not upload CRL: '$ERROR_CODE'"
         exit 1

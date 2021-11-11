@@ -31,7 +31,7 @@ const submitCertificateRevocationList = ({ body }) => new Promise(
     const blockchainConnection = new BlockchainService(process.env.BSA_CCP);
     console.dir(body);
     blockchainConnection.submitCRL(body['crl'], body['certificateList']).then( () => {
-      resolve(Service.successResponse('OK', 200));
+      resolve(Service.successResponse({'success': true}, 200));
     }).catch((error) => {
       reject(Service.rejectResponse({'code': error.code, 'message': error.message}, 500));
     }).finally( () => {

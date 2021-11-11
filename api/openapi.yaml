@@ -495,7 +495,7 @@ paths:
           content:
             text/plain:
               schema:
-                type: string
+                type: object
         '500':
           description: Internal Error
           content:

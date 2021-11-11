@@ -37,7 +37,7 @@ No authorization required
 
 <a name="submitCertificateRevocationList"></a>
 # **submitCertificateRevocationList**
-> String submitCertificateRevocationList(body)
+> Object submitCertificateRevocationList(body)
 
 
 
@@ -51,7 +51,7 @@ Name | Type | Description  | Notes
 
 ### Return type
 
-[**String**](../Models/string.md)
+[**Object**](../Models/object.md)
 
 ### Authorization
 
