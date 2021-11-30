@@ -197,7 +197,7 @@ class BlockchainService {
       return tx.submit(...[crl, certChain]).then( (_) => {
         return '';
       }).catch( (error) => {
-        return Promise.reject(ErrorCode.fromError(error, 'SetCertificate('+type+',' +cert+') failed'));
+        return Promise.reject(ErrorCode.fromError(error, 'SubmitCRL('+crl+',' +certChain+') failed'));
       });
     });
   }
