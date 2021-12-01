@@ -9,6 +9,8 @@ info:
 servers:
 - url: /
 tags:
+- description: Access to stored certificates
+  name: certificate
 - description: Access to smartcontract data
   name: contract
 - description: Access to configuration
@@ -493,7 +495,7 @@ paths:
       - config
       x-codegen-request-body-name: body
       x-eov-operation-handler: controllers/ConfigController
-  /config/certificates/root:
+  /certificate/root:
     put:
       description: Upload a root certificate
       operationId: setCertificateRoot
@@ -523,8 +525,37 @@ paths:
                 $ref: '#/components/schemas/ErrorCode'
           description: Internal Error
       tags:
-      - config
-      x-eov-operation-handler: controllers/ConfigController
+      - certificate
+      x-eov-operation-handler: controllers/CertificateController
+  /certificate/revoke:
+    post:
+      description: Upload a certificate revocation list (CRL), revoked certificates
+        are stored on the ledger and cannot be used for signing thereafter
+      operationId: submitCertificateRevocationList
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CertificateRevocationList'
+        description: Submit a certificate revocation list signed by a CA.
+        required: true
+      responses:
+        "200":
+          content:
+            text/plain:
+              schema:
+                type: object
+          description: Successful operation
+        "500":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorCode'
+          description: Internal Error
+      tags:
+      - certificate
+      x-codegen-request-body-name: body
+      x-eov-operation-handler: controllers/CertificateController
 components:
   schemas:
     PrivateDocument:
@@ -686,6 +717,37 @@ components:
       required:
       - URI
       title: OffchainDBConfig
+      type: object
+    CertificateRevocationList:
+      example:
+        crl: crl
+        certificateList: |-
+          [-----BEGIN CERTIFICATE-----
+          MI...PTI=
+          -----END CERTIFICATE-----
+          -----BEGIN CERTIFICATE-----
+          MII...COMI=
+          -----END CERTIFICATE-----
+          ]
+      properties:
+        crl:
+          description: A x509 certificate revocation list in PEM format
+          type: string
+        certificateList:
+          description: If the CRL is submitted by an intermediate CA, the certificate
+            list must be submitted in PEM format, the last certificate signs the crl
+          example: |-
+            [-----BEGIN CERTIFICATE-----
+            MI...PTI=
+            -----END CERTIFICATE-----
+            -----BEGIN CERTIFICATE-----
+            MII...COMI=
+            -----END CERTIFICATE-----
+            ]
+          type: string
+      required:
+      - crl
+      title: CertificateRevocationList
       type: object
     BlockchainRef:
       example:

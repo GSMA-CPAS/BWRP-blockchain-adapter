@@ -87,8 +87,21 @@ function createRoot {
     openssl x509 -in $DIR/root.$ORG.pem > $DIR/root.$ORG.crt
 }
 
+function createIntermediateCert {
+    ORG=$1
+    echo -ne "[ default ]\nbasicConstraints = critical,CA:true\nkeyUsage = critical,keyCertSign\n" > $DIR/intermediate.$ORG.ext
+
+    # use root ca to sign it
+    openssl req -new -newkey ec -pkeyopt ec_paramgen_curve:secp384r1 -nodes -out $DIR/intermediate.$ORG.csr -keyout $DIR/intermediate.$ORG.key  -subj "/CN=INTERMEDIATE@$ORG/C=DE/ST=BE/L=Berlin/O=$ORG/OU=${ORG}OU" 
+    openssl x509 -CA $DIR/root.$ORG.crt -CAkey $DIR/root.$ORG.key -CAcreateserial -req -in $DIR/intermediate.$ORG.csr -out $DIR/intermediate.$ORG.pem -extfile $DIR/intermediate.$ORG.ext -days 365
+    openssl x509 -in $DIR/intermediate.$ORG.pem > $DIR/intermediate.$ORG.crt
+    # openssl requires crt w/o \n, the API requests to
+    cat $DIR/intermediate.$ORG.crt | awk 1 ORS='\\n' > $DIR/intermediate_api.$ORG.crt
+}
+
 function createUserCert {
     ORG=$1
+    SIGNER=$2
 
     # user attributes
     attr_hex=$(echo -n '{"attrs":{"CanSignDocument":"yes"}}' | xxd -ps -c 200 | tr -d '\n')
@@ -98,22 +111,23 @@ function createUserCert {
     openssl req -newkey ec -pkeyopt ec_paramgen_curve:secp384r1 -nodes -keyout $DIR/user.$ORG.key -out $DIR/user.$ORG.csr  -subj "/CN=user@$ORG/C=DE/ST=NRW/L=Bielefeld/O=$ORG/OU=${ORG}OU"
 
     # use ca to sign it
-    openssl x509 -CA $DIR/root.$ORG.crt -CAkey $DIR/root.$ORG.key -CAcreateserial -req -in  $DIR/user.$ORG.csr -out $DIR/user.$ORG.pem -extfile $DIR/user.$ORG.ext -days 365
+    openssl x509 -CA $DIR/$SIGNER.$ORG.crt -CAkey $DIR/$SIGNER.$ORG.key -CAcreateserial -req -in $DIR/user.$ORG.csr -out $DIR/user.$ORG.pem -extfile $DIR/user.$ORG.ext -days 365
     openssl x509 -in $DIR/user.$ORG.pem | awk 1 ORS='\\n' > $DIR/user.$ORG.crt
     
 
     # create an additional "broken" cert that misses the extension flag CanSignDocument
-    openssl x509 -CA $DIR/root.$ORG.crt -CAkey $DIR/root.$ORG.key -CAcreateserial -req -in  $DIR/user.$ORG.csr -out $DIR/user.$ORG.bad.pem -days 365
+    openssl x509 -CA $DIR/$SIGNER.$ORG.crt -CAkey $DIR/$SIGNER.$ORG.key -CAcreateserial -req -in  $DIR/user.$ORG.csr -out $DIR/user.$ORG.bad.pem -days 365
     openssl x509 -in $DIR/user.$ORG.bad.pem | awk 1 ORS='\\n' > $DIR/user.$ORG.bad.crt
 }
 
 echo "###################################################"
-echo "> creating root and user certs"
+echo "> creating root, intermediate and user certs"
 echo "###################################################"
-createRoot DTAG
-createUserCert DTAG
+createRoot DTAG 
+createIntermediateCert DTAG 
+createUserCert DTAG intermediate
 createRoot TMUS
-createUserCert TMUS
+createUserCert TMUS root
 
 
 echo "###################################################"
@@ -127,9 +141,9 @@ fi
 
 echo "###################################################"
 echo "> storing root cert on DTAG"
-request PUT "[\"$(cat $DIR/root.DTAG.pem | awk 1 ORS='\\n' )\"]" http://$BSA_DTAG/config/certificates/root
+request PUT "[\"$(cat $DIR/root.DTAG.pem | awk 1 ORS='\\n' )\"]" http://$BSA_DTAG/certificate/root
 echo "> storing root cert on TMUS"
-request PUT "[\"$(cat $DIR/root.TMUS.pem | awk 1 ORS='\\n' )\"]" http://$BSA_TMUS/config/certificates/root
+request PUT "[\"$(cat $DIR/root.TMUS.pem | awk 1 ORS='\\n' )\"]" http://$BSA_TMUS/certificate/root
 
 echo "###################################################"
 echo "> storing document on both parties by calling the function on DTAG with the partner id TMUS"
@@ -141,7 +155,7 @@ PAYLOADLINK=$(payloadlink $REFERENCE_ID $DOCUMENTSHA256)
 echo "###################################################"
 echo "> dtag signs contract"
 # do the signing
-CERT=$(cat $DIR/user.DTAG.crt)
+CERT=$(cat $DIR/intermediate_api.DTAG.crt $DIR/user.DTAG.crt)
 SIGNATUREPAYLOAD=$(payload "DTAG" "$REFERENCE_ID" "$PAYLOADLINK")
 echo -e "> payload to sign <$SIGNATUREPAYLOAD>"
 SIGNATURE_DTAG=$(echo -ne $SIGNATUREPAYLOAD | openssl dgst -sha256 -sign $DIR/user.DTAG.key | openssl base64 | tr -d '\n')
@@ -232,7 +246,7 @@ fi
 echo "###################################################"
 echo "> dtag signs contract with a bad signature (here: bad payload data)"
 # do the signing
-CERT=$(cat $DIR/user.DTAG.crt)
+CERT=$(cat $DIR/intermediate_api.DTAG.crt $DIR/user.DTAG.crt)
 SIGNATUREPAYLOAD="this_is_an_invalid_payload"
 echo -e "> payload to sign <$SIGNATUREPAYLOAD>"
 SIGNATURE_DTAG=$(echo -ne $SIGNATUREPAYLOAD | openssl dgst -sha256 -sign $DIR/user.DTAG.key | openssl base64 | tr -d '\n')
@@ -254,7 +268,7 @@ echo "> looking good, bad signature (wrong cert) was sucessfully detected!"
 echo "###################################################"
 echo "> dtag signs contract with a BAD cert (missing ext)"
 # do the signing
-CERT=$(cat $DIR/user.DTAG.bad.crt)
+CERT=$(cat $DIR/intermediate_api.DTAG.crt $DIR/user.DTAG.bad.crt)
 SIGNATUREPAYLOAD=$(payload "DTAG" "$REFERENCE_ID" "$PAYLOADLINK")
 echo -e "> payload to sign <$SIGNATUREPAYLOAD>"
 SIGNATURE_DTAG=$(echo -ne $SIGNATUREPAYLOAD | openssl dgst -sha256 -sign $DIR/user.DTAG.key | openssl base64 | tr -d '\n')
@@ -272,3 +286,67 @@ if [[ "$ERROR_MESSAGE" != signDocument* ]]; then
     exit 1
 fi;
 echo "> looking good, bad signature (because of bad certificate) was sucessfully detected!"
+
+revokeUserCertificate() {
+    ORG=$1
+    INTERMEDIATE=$2
+
+    CERT=$DIR/user.$ORG.pem
+    if [ "$INTERMEDIATE" -eq "1" ]; then
+        INTERMEDIATE=$(cat $DIR/intermediate_api.$ORG.crt)
+        ROLE=intermediate
+    else
+        INTERMEDIATE=""
+        ROLE=root
+    fi;
+
+    # config for openssl
+    mkdir $DIR/$ORG
+    CONFIG=$DIR/$ORG/ca.conf
+    SCRIPT_DIR="$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
+    sed "s|REPLACE_DIR|${DIR}\/${ORG}|; s|ROLE|${ROLE}|; s|ORG|${ORG}|" $SCRIPT_DIR/testing/config/ca.conf > $CONFIG
+    echo 01 > $DIR/$ORG/serial.txt
+    echo 01 > $DIR/$ORG/crlnumber
+    # add certificate to database
+    touch $DIR/$ORG/index.txt
+    openssl ca -config $CONFIG -valid $CERT
+    # revoke in database
+    openssl ca -config $CONFIG -revoke $CERT -crl_compromise 20200101120000Z
+    # create CRL
+    openssl ca -config $CONFIG -gencrl -out $DIR/user.$ORG.crl.pem
+
+    BSA_NAME=BSA_$ORG
+    BSA=${!BSA_NAME}
+
+    # post crl to chaincode
+    RES=$(request POST '{"crl": "'"$(cat $DIR/user.$ORG.crl.pem | awk 1 ORS='\\n' )"'", "certificateList": "'"$INTERMEDIATE"'"}' http://$BSA/certificate/revoke)
+    SUCCESS=$(echo $RES | jq -r .success)
+    if [ $SUCCESS != "true" ]; then
+        ERROR_CODE=$(echo $RES | jq -r .code)
+        echo "> ERROR: could not upload CRL: '$ERROR_CODE'"
+        exit 1
+    fi
+
+    TXID_NAME=TXID_$ORG
+    TXID=${!TXID_NAME}
+
+    # check if signature is deemed valid after revocation of certificate
+    RES=$(request_noexit "GET" '' http://$BSA/signatures/$REFERENCE_ID/$ORG/verify)
+    echo $RES | jq 
+    VALID=$(echo $RES | jq -r .\"$TXID\".valid)
+    if [ $VALID == "false" ]; then
+        echo "SIGNATURE INVALID DUE TO REVOKED CERTIFICATE, SUCCESS!"
+    else
+        echo "SIGNATURE DEEMED VALID, FAILED!"
+        exit 1
+    fi;
+}
+
+echo "###################################################"
+echo "> revoke certificate for DTAG user (revocation by intermediate)"
+revokeUserCertificate DTAG 1
+
+
+echo "###################################################"
+echo "> revoke certificate for TMUS user (no intermediate certificate)"
+revokeUserCertificate TMUS 0

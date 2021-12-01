@@ -1,0 +1,16 @@
+# SPDX-FileCopyrightText: 2021 GSMA and all contributors.
+#
+# SPDX-License-Identifier: Apache-2.0
+#
+title: CertificateRevocationList
+type: object
+properties:
+  crl:
+    type: string
+    description: A x509 certificate revocation list in PEM format
+  certificateList:
+    type: string
+    description: If the CRL is submitted by an intermediate CA, the certificate list must be submitted in PEM format, the last certificate signs the crl
+    example: ["-----BEGIN CERTIFICATE-----\nMI...PTI=\n-----END CERTIFICATE-----\n-----BEGIN CERTIFICATE-----\nMII...COMI=\n-----END CERTIFICATE-----\n"] 
+required:
+  - crl

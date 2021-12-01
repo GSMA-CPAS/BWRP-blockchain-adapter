@@ -11,6 +11,8 @@ info:
     name: Simon Schulz
     email: Simon.Schulz01@telekom.de
 tags:
+  - name: certificate
+    description: Access to stored certificates
   - name: contract
     description: Access to smartcontract data
   - name: config
@@ -442,11 +444,11 @@ paths:
             application/json:
               schema:
                 $ref: models/ErrorCode.yaml
-  /config/certificates/root:
+  /certificate/root:
     put:
       description: Upload a root certificate
       tags:
-        - config
+        - certificate
       operationId: setCertificateRoot
       requestBody:
         description: Set the signature root certificate.
@@ -467,6 +469,33 @@ paths:
             text/plain:
               schema:
                 type: string
+        '500':
+          description: Internal Error
+          content:
+            application/json:
+              schema:
+                $ref: models/ErrorCode.yaml
+  /certificate/revoke:
+    post:
+      description: Upload a certificate revocation list (CRL), revoked certificates are stored on the ledger and cannot be used for signing thereafter
+      tags:
+        - certificate
+      operationId: submitCertificateRevocationList
+      requestBody:
+        description: Submit a certificate revocation list signed by a CA.
+        content:
+          application/json:
+            schema:
+              $ref: models/CertificateRevocationList.yaml
+        required: true
+      x-codegen-request-body-name: body
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            text/plain:
+              schema:
+                type: object
         '500':
           description: Internal Error
           content:

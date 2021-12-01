@@ -46,26 +46,7 @@ const getOffchainDBConfig = () => new Promise(
     },
 );
 
-/** Update the signature root certificate for this organization
-   * @param {Certificate} body - A PEM encoded root certificate
-   * @return {string}
-  */
-const setCertificateRoot = ({body}) => new Promise(
-    async (resolve, reject) => {
-      const blockchainConnection = new BlockchainService(process.env.BSA_CCP);
-      console.dir(body);
-      blockchainConnection.setCertificate('root', body).then( () => {
-        resolve(Service.successResponse('OK', 200));
-      }).catch((error) => {
-        reject(Service.rejectResponse({'code': error.code, 'message': error.message}, 500));
-      }).finally( () => {
-        blockchainConnection.disconnect();
-      });
-    },
-);
-
 module.exports = {
   setOffchainDBConfig,
   getOffchainDBConfig,
-  setCertificateRoot,
 };

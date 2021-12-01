@@ -7,8 +7,9 @@ All URIs are relative to *http://localhost*
 
 Class | Method | HTTP request | Description
 ------------ | ------------- | ------------- | -------------
+*CertificateApi* | [**setCertificateRoot**](Apis/CertificateApi.md#setcertificateroot) | **PUT** /certificate/root | Upload a root certificate
+*CertificateApi* | [**submitCertificateRevocationList**](Apis/CertificateApi.md#submitcertificaterevocationlist) | **POST** /certificate/revoke | Upload a certificate revocation list (CRL), revoked certificates are stored on the ledger and cannot be used for signing thereafter
 *ConfigApi* | [**getOffchainDBConfig**](Apis/ConfigApi.md#getoffchaindbconfig) | **GET** /config/offchain-db | Read back the configuration of the offchain-db
-*ConfigApi* | [**setCertificateRoot**](Apis/ConfigApi.md#setcertificateroot) | **PUT** /config/certificates/root | Upload a root certificate
 *ConfigApi* | [**setOffchainDBConfig**](Apis/ConfigApi.md#setoffchaindbconfig) | **PUT** /config/offchain-db | Update the configuration of the offchain-db
 *ContractApi* | [**deletePrivateDocument**](Apis/ContractApi.md#deleteprivatedocument) | **DELETE** /private-documents/{referenceID} | Delete a private document from the database, identified by its referenceID
 *ContractApi* | [**fetchPrivateDocument**](Apis/ContractApi.md#fetchprivatedocument) | **GET** /private-documents/{referenceID} | Fetch a private document from the database, identified by its referenceID
@@ -31,6 +32,7 @@ Class | Method | HTTP request | Description
 ## Documentation for Models
 
  - [BlockchainRef](./Models/BlockchainRef.md)
+ - [CertificateRevocationList](./Models/CertificateRevocationList.md)
  - [DocumentSignature](./Models/DocumentSignature.md)
  - [ErrorCode](./Models/ErrorCode.md)
  - [OffchainDBConfig](./Models/OffchainDBConfig.md)
