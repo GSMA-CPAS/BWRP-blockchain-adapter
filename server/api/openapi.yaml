@@ -82,6 +82,32 @@ paths:
       tags:
       - status
       x-eov-operation-handler: controllers/StatusController
+  /status/hyperledger/{mspid}:
+    get:
+      description: Show hyperledger status information of an MSP
+      operationId: getApiStatusHyperledgerMSP
+      parameters:
+      - description: Name of a MSP
+        explode: false
+        in: path
+        name: mspid
+        required: true
+        schema:
+          type: string
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: object
+          description: The status of the service
+        "500":
+          content: {}
+          description: Internal Error
+      tags:
+      - status
+      x-eov-operation-handler: controllers/StatusController
   /status/offchain/{mspid}:
     get:
       description: Show status information of an MSP

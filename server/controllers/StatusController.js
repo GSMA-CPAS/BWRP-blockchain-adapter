@@ -12,6 +12,10 @@ const getApiStatus = async (request, response) => {
   await Controller.handleRequest(request, response, service.getApiStatus);
 };
 
+const getApiStatusHyperledgerMSP = async (request, response) => {
+  await Controller.handleRequest(request, response, service.getApiStatusHyperledgerMSP);
+};
+
 const getStatusMSP = async (request, response) => {
   await Controller.handleRequest(request, response, service.getStatusMSP);
 };
@@ -19,5 +23,6 @@ const getStatusMSP = async (request, response) => {
 
 module.exports = {
   getApiStatus,
+  getApiStatusHyperledgerMSP,
   getStatusMSP,
 };

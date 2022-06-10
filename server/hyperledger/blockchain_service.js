@@ -7,6 +7,8 @@ const path = require('path');
 const crypto = require('crypto');
 
 const {Gateway, Wallets} = require('fabric-network');
+const {Discoverer, DiscoveryService} = require('fabric-common');
+
 const SingleMSPQueryHandler = require('./query_handler');
 const {ErrorCode} = require('../utils/errorcode');
 
@@ -31,7 +33,6 @@ class BlockchainService {
     // read ccp profile
     const connectionProfileBinary = await fs.promises.readFile(ccpFilename);
     this.connectionProfile = JSON.parse(connectionProfileBinary.toString());
-
 
     // read wallet
     const walletPath = path.dirname(ccpFilename) + '/' + this.connectionProfile.config.walletPath;
@@ -768,6 +769,90 @@ class BlockchainService {
     });
   }
 
+  /** get peer status via discovery
+   * @return {Promise} struct with peer status
+  */
+  getBlockchainPeerStatus() {
+    const self = this;
+    return this.network.then( (network) => {
+      const channel = network.getChannel();
+      // this is a bit hacky... direct member access is not a good idea in general
+      // todo: is there an official way to get this client instance?!
+      const client = channel.client;
+
+      // fetch various config bits from the ccp
+      const selfID = self.connectionProfile.organizations[self.connectionProfile.client.organization].mspid;
+      const selfPeerName = self.connectionProfile.organizations[self.connectionProfile.client.organization].peers[0];
+      const selfPeerNetworkConfig = self.connectionProfile.peers[selfPeerName];
+
+      // build endpoint config based on grpcoptions
+      const endpointConfig = selfPeerNetworkConfig.grpcOptions;
+      // add url and pem
+      endpointConfig.url = selfPeerNetworkConfig.url;
+      endpointConfig.pem = selfPeerNetworkConfig.tlsCACerts.pem;
+
+      // create the endpoint
+      const peerEndpoint = channel.client.newEndpoint(endpointConfig);
+
+      // start discoverer using the client
+      const discoverer = new Discoverer('my_discovery', client, selfID);
+
+      // connect to the given peer endpoint
+      return discoverer.connect(peerEndpoint).then( (_) => {
+        console.log('> got discoverer connection...');
+        const discoveryService = new DiscoveryService('be discovery service', channel);
+
+        // build an identity context
+        const identityContext = this.gateway.identityContext;
+        discoveryService.build(identityContext);
+        discoveryService.sign(identityContext);
+
+        // for now only one discoverer
+        const discoveryServiceTargets = [discoverer];
+
+        // fetch setting from ccp
+        let discoveryAsLocalhost = false;
+        if (self.connectionProfile.config.discoveryOptions.asLocalhost != undefined) {
+          discoveryAsLocalhost = self.connectionProfile.config.discoveryOptions.asLocalhost;
+        }
+
+        const discoveryOptions = {
+          asLocalhost: discoveryAsLocalhost,
+          requestTimeout: 5000,
+          refreshAge: 15000,
+          targets: discoveryServiceTargets,
+        };
+
+        // execute the discovery request
+        return discoveryService.send(discoveryOptions).then(() => {
+          console.log('> succeeded to send discovery request');
+          return discoveryService.getDiscoveryResults().then( (result) => {
+            const response = {};
+            for (const [peerID, peerData] of Object.entries(result.peers_by_org)) {
+              response[peerID] = {};
+              for (const peerStatus of peerData.peers) {
+                response[peerID][peerStatus.name] = {};
+                response[peerID][peerStatus.name].ledgerHeight = peerStatus.ledgerHeight.toString();
+                response[peerID][peerStatus.name].chaincodes = {};
+                for (const chaincode of peerStatus.chaincodes) {
+                  response[peerID][peerStatus.name].chaincodes[chaincode.name] = chaincode.version;
+                }
+              }
+            }
+            return response;
+          });
+        }).catch( (error) => {
+          if (error) {
+            console.log('Failed to send discovery request for channel', error);
+            discoveryService.close();
+          }
+        });
+      });
+    }).catch( (error) => {
+      console.log(error);
+      return Promise.reject(new ErrorCode('ERROR_INTERNAL', 'getBlockchainPeerStatus() failed'));
+    });
+  }
 
   /** get a reference payloadlink from the ledger
    * @param {referenceId} referenceId - a reference Id
